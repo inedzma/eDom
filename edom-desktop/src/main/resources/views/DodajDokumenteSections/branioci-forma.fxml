@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.geometry.Insets?>
+
+<GridPane xmlns:fx="http://javafx.com/fxml"
+          fx:controller="controllers.DodajDokumenteControllers.BraniociDokumentiController"
+          hgap="18"
+          vgap="12"
+          styleClass="form-grid">
+
+    <padding>
+        <Insets top="6" right="0" bottom="6" left="0"/>
+    </padding>
+
+    <columnConstraints>
+        <ColumnConstraints percentWidth="70" hgrow="ALWAYS"/>
+        <ColumnConstraints percentWidth="30" hgrow="ALWAYS"/>
+    </columnConstraints>
+
+    <CheckBox text="Student RVI"
+              GridPane.rowIndex="0" GridPane.columnIndex="0"
+              fx:id="chkStudentRVI"
+              wrapText="true"
+              maxWidth="Infinity"
+              styleClass="checkbox"/>
+
+    <TextField promptText="Postotak invaliditeta"
+               GridPane.rowIndex="0" GridPane.columnIndex="1"
+               fx:id="txtPostotakInvaliditeta"
+               styleClass="field"
+               visible="false"
+               managed="false"
+               maxWidth="Infinity"/>
+
+    <CheckBox text="Invalidnost roditelja ili staratelja"
+              GridPane.rowIndex="1" GridPane.columnIndex="0"
+              fx:id="chkInvalidnostRoditelja"
+              wrapText="true"
+              maxWidth="Infinity"
+              styleClass="checkbox"/>
+
+    <TextField promptText="Postotak invalidnosti roditelja"
+               GridPane.rowIndex="1" GridPane.columnIndex="1"
+               fx:id="txtPostInvalidnostiRoditelja"
+               styleClass="field"
+               visible="false"
+               managed="false"
+               maxWidth="Infinity"/>
+
+    <CheckBox text="Dijete učesnika OSRBiH"
+              GridPane.rowIndex="2" GridPane.columnIndex="0"
+              fx:id="chkDjecaOSRBiH"
+              wrapText="true"
+              maxWidth="Infinity"
+              styleClass="checkbox"/>
+
+    <TextField promptText="Broj mjeseci"
+               GridPane.rowIndex="2" GridPane.columnIndex="1"
+               fx:id="txtBrojMjeseci"
+               styleClass="field"
+               visible="false"
+               managed="false"
+               maxWidth="Infinity"/>
+
+    <CheckBox text="Dijete šehida i poginuli boraca"
+              GridPane.rowIndex="3" GridPane.columnIndex="0"
+              fx:id="chkDjecaSehida"
+              wrapText="true"
+              maxWidth="Infinity"
+              styleClass="checkbox"/>
+
+    <CheckBox text="Član uže porodice šehida i poginulog borca (brat ili sestra)"
+              GridPane.rowIndex="4" GridPane.columnIndex="0"
+              fx:id="chkClanPorodiceSehida"
+              wrapText="true"
+              maxWidth="Infinity"
+              styleClass="checkbox"/>
+
+    <CheckBox text="Ostala invalidnost studenta"
+              GridPane.rowIndex="5" GridPane.columnIndex="0"
+              fx:id="chkInvaliditet"
+              wrapText="true"
+              maxWidth="Infinity"
+              styleClass="checkbox"/>
+
+    <CheckBox text="Dijete nosilaca ratnih priznanja"
+              GridPane.rowIndex="6" GridPane.columnIndex="0"
+              fx:id="chkDjecaNosilacaRPriznanja"
+              wrapText="true"
+              maxWidth="Infinity"
+              styleClass="checkbox"/>
+
+    <CheckBox text="Student logoraš"
+              GridPane.rowIndex="7" GridPane.columnIndex="0"
+              fx:id="chkStudentLogoras"
+              wrapText="true"
+              maxWidth="Infinity"
+              styleClass="checkbox"/>
+
+    <CheckBox text="Roditelj ili staratelj logoraš"
+              GridPane.rowIndex="8" GridPane.columnIndex="0"
+              fx:id="chkRoditeljLogoras"
+              wrapText="true"
+              maxWidth="Infinity"
+              styleClass="checkbox"/>
+
+    <CheckBox text="Student bez jednog roditelja"
+              GridPane.rowIndex="9" GridPane.columnIndex="0"
+              fx:id="chkDjecaBez1Roditelja"
+              wrapText="true"
+              maxWidth="Infinity"
+              styleClass="checkbox"/>
+
+    <CheckBox text="Student bez oba roditelja"
+              GridPane.rowIndex="10" GridPane.columnIndex="0"
+              fx:id="chkDjecaBezObaRoditelja"
+              wrapText="true"
+              maxWidth="Infinity"
+              styleClass="checkbox"/>
+
+    <CheckBox text="Student štićenik ustanove bez roditeljskog staranja"
+              GridPane.rowIndex="11" GridPane.columnIndex="0"
+              fx:id="chkBezRoditeljskogStaranja"
+              wrapText="true"
+              maxWidth="Infinity"
+              styleClass="checkbox"/>
+
+    <CheckBox text="Student čiji su roditelji/staratelji korisnici socijalne pomoći"
+              GridPane.rowIndex="12" GridPane.columnIndex="0"
+              fx:id="chkKorisniciSocijalnePomoci"
+              wrapText="true"
+              maxWidth="Infinity"
+              styleClass="checkbox"/>
+
+</GridPane>

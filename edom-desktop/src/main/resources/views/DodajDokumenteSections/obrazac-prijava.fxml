@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="12"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.DodajDokumenteControllers.ObrazacPrijaveController"
+      styleClass="doc-card">
+
+    <Label text="Prijava za prijem u studentski dom" styleClass="doc-title"/>
+
+    <CheckBox fx:id="chkDostavljen" text="Dokument dostavljen" styleClass="checkbox"/>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Button text="Dodaj dokument" onAction="#dodaj" styleClass="btn-primary"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button text="Dodaj PDF (opcionalno)" onAction="#onDodajPdf" styleClass="btn-secondary"/>
+        <Label fx:id="lblPdf" text="PDF nije dodan" styleClass="doc-status"/>
+    </HBox>
+
+</VBox>

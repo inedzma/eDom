@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="12"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controllers.DodajDokumenteControllers.GarancijaDokumentController"
+      styleClass="doc-card">
+
+    <Label text="Garancija o preuzimanju obaveza" styleClass="doc-title"/>
+
+    <TextField fx:id="txtImeGaranta" promptText="Ime i prezime garanta" styleClass="field"/>
+
+    <ComboBox fx:id="cmbTipGaranta" promptText="Tip garanta" styleClass="combo"/>
+
+    <CheckBox fx:id="chkGarancijaPotpisana"
+              text="Ovjerena garancija (općina ili notar)"
+              styleClass="checkbox"/>
+
+    <ComboBox fx:id="cmbDokumentGarancija" promptText="Izaberite dokument" styleClass="combo"/>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Button text="Dodaj dokument" onAction="#dodajDokumentGarancija" styleClass="btn-primary"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button text="Dodaj PDF (opcionalno)" onAction="#onDodajPdf" styleClass="btn-secondary"/>
+        <Label fx:id="lblPdf" text="PDF nije dodat" styleClass="doc-status"/>
+    </HBox>
+
+</VBox>

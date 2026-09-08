@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.AdminController"
+            stylesheets="@../styles/admin-main-style.css"
+            prefWidth="1100"
+            prefHeight="700"
+            maxWidth="Infinity"
+            maxHeight="Infinity">
+
+    <fx:define>
+        <ToggleGroup fx:id="navGroup"/>
+    </fx:define>
+
+    <left>
+        <VBox spacing="14"
+              prefWidth="230"
+              minWidth="230"
+              maxWidth="230"
+              styleClass="sidebar">
+
+            <VBox spacing="4" styleClass="sidebar-header">
+                <Label text="E-Dom" styleClass="sidebar-title"/>
+                <Label text="Admin panel" styleClass="sidebar-subtitle"/>
+            </VBox>
+
+            <Separator styleClass="sidebar-separator"/>
+
+            <ToggleButton text="Pregled sistema"
+                          toggleGroup="$navGroup"
+                          onAction="#showPregledSistema"
+                          maxWidth="Infinity"
+                          styleClass="nav-btn"
+                          selected="true"/>
+
+            <ToggleButton text="Prijave"
+                          toggleGroup="$navGroup"
+                          onAction="#showPrijave"
+                          maxWidth="Infinity"
+                          styleClass="nav-btn"/>
+
+            <ToggleButton text="Studenti"
+                          toggleGroup="$navGroup"
+                          onAction="#showStudenti"
+                          maxWidth="Infinity"
+                          styleClass="nav-btn"/>
+
+            <ToggleButton text="Rang lista"
+                          toggleGroup="$navGroup"
+                          onAction="#showRangLista"
+                          maxWidth="Infinity"
+                          styleClass="nav-btn"/>
+
+            <ToggleButton text="Moj profil"
+                          toggleGroup="$navGroup"
+                          onAction="#onMojProfil"
+                          maxWidth="Infinity"
+                          styleClass="nav-btn"/>
+
+            <Pane VBox.vgrow="ALWAYS"/>
+
+            <Button text="Odjavi se"
+                    onAction="#onLogout"
+                    maxWidth="Infinity"
+                    styleClass="logout-btn"/>
+
+            <Label text="© E-Dom" styleClass="sidebar-footer"/>
+
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane fx:id="contentArea"
+                   styleClass="content-area"
+                   minWidth="0"
+                   minHeight="0"
+                   maxWidth="Infinity"
+                   maxHeight="Infinity"/>
+    </center>
+
+</BorderPane>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="12"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.DodajDokumenteControllers.DodatniBodoviController"
+      styleClass="doc-card">
+
+    <Label fx:id="lblInfoDokument"
+           text="Dodajte dokument za dodatne bodove"
+           styleClass="doc-title"/>
+
+    <ComboBox fx:id="cmbDokument"
+              promptText="Izaberite dokument"
+              styleClass="combo"/>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Button text="Dodaj dokument"
+                onAction="#dodajDokument"
+                styleClass="btn-primary"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button text="Dodaj PDF (opcionalno)"
+                onAction="#onDodajPdf"
+                styleClass="btn-secondary"/>
+
+        <Label fx:id="lblPdf"
+               text="PDF nije dodan"
+               styleClass="doc-status"/>
+    </HBox>
+
+</VBox>

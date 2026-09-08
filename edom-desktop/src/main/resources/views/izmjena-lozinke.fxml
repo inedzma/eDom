@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.IzmjenaLozinkeController"
+            stylesheets="@../styles/izmjena-lozinke-style.css"
+            styleClass="root">
+
+    <left>
+        <VBox spacing="26"
+              alignment="TOP_LEFT"
+              styleClass="left-pane">
+
+            <HBox alignment="CENTER_LEFT">
+                <Pane HBox.hgrow="ALWAYS"/>
+
+                <ImageView fitWidth="190"
+                           preserveRatio="true"
+                           styleClass="left-logo">
+                    <image>
+                        <Image url="@../images/e-domLOGO.png"/>
+                    </image>
+                </ImageView>
+
+                <Pane HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <Label text="Sigurna izmjena lozinke"
+                   styleClass="app-title"/>
+
+            <Label text="Zaštita korisničkog naloga i siguran nastavak korištenja sistema."
+                   wrapText="true"
+                   styleClass="left-subtitle"/>
+
+            <VBox spacing="12" style="-fx-padding: 16 0 0 0;">
+                <Label text="✓ Kod se šalje na registrovani email" styleClass="left-text"/>
+                <Label text="✓ Lozinka se kriptuje u sistemu" styleClass="left-text"/>
+                <Label text="✓ Nema pristupa bez validnog koda" styleClass="left-text"/>
+            </VBox>
+
+            <Label text="Pouzdano. Sigurno. Profesionalno."
+                   styleClass="left-tagline"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane styleClass="right-pane">
+
+            <Pane styleClass="glow-mint"/>
+            <Pane styleClass="glow-yellow"/>
+
+            <StackPane styleClass="login-container">
+
+                <VBox spacing="26"
+                      alignment="CENTER"
+                      maxWidth="430"
+                      styleClass="login-card">
+
+                    <Label text="Reset lozinke"
+                           styleClass="login-title"/>
+
+                    <VBox spacing="18" maxWidth="360" alignment="CENTER">
+
+                        <VBox spacing="6">
+                            <Label text="Korisničko ime"
+                                   styleClass="field-label"/>
+                            <TextField fx:id="txtUsername"
+                                       promptText="Unesite korisničko ime"
+                                       styleClass="text-input"/>
+                        </VBox>
+
+                        <Button text="Pošalji kod"
+                                onAction="#onSendCodeClicked"
+                                styleClass="primary-btn"/>
+
+                        <Label fx:id="lblInfo"
+                               styleClass="error-label"/>
+
+                        <VBox spacing="6">
+                            <Label text="Verifikacioni kod"
+                                   styleClass="field-label"/>
+                            <TextField fx:id="txtCode"
+                                       promptText="Unesite kod"
+                                       disable="true"
+                                       styleClass="text-input"/>
+                        </VBox>
+
+                        <VBox spacing="6">
+                            <Label text="Nova lozinka"
+                                   styleClass="field-label"/>
+                            <PasswordField fx:id="txtNewPassword"
+                                           promptText="Nova lozinka"
+                                           disable="true"
+                                           styleClass="text-input"/>
+                        </VBox>
+
+                        <VBox spacing="6">
+                            <Label text="Potvrda lozinke"
+                                   styleClass="field-label"/>
+                            <PasswordField fx:id="txtConfirmPassword"
+                                           promptText="Potvrdite lozinku"
+                                           disable="true"
+                                           styleClass="text-input"/>
+                        </VBox>
+
+                        <Button fx:id="btnReset"
+                                text="Resetuj lozinku"
+                                onAction="#onResetClicked"
+                                disable="true"
+                                styleClass="primary-btn"/>
+
+                        <Button fx:id="btnNazad"
+                                text="Nazad na prijavu"
+                                onAction="#nazadNaPrijavu"
+                                styleClass="secondary-btn"/>
+                    </VBox>
+
+                </VBox>
+            </StackPane>
+        </StackPane>
+    </center>
+</BorderPane>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.DodajDokumenteControllers.ProsjekDokumentController"
+      spacing="12"
+      styleClass="doc-card">
+
+    <Label fx:id="lblOpis"
+           text="Opis dokumenta"
+           wrapText="true"
+           styleClass="doc-title"/>
+
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <RadioButton fx:id="rbUvjerenje"
+                     text="Uvjerenje sa fakulteta"
+                     styleClass="modern-radio"/>
+        <RadioButton fx:id="rbIndeks"
+                     text="Ovjerena kopija indeksa"
+                     styleClass="modern-radio"/>
+    </HBox>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label fx:id="lblIspiti"
+               text="Broj položenih ispita:"
+               wrapText="false"
+               minWidth="170"
+               styleClass="doc-subtitle"/>
+
+        <TextField fx:id="txtBrojPolozenih"
+                   promptText="0"
+                   styleClass="field field-small"
+                   />
+    </HBox>
+
+    <CheckBox fx:id="chkDostavljen"
+              text="Dokument dostavljen"
+              styleClass="checkbox"/>
+
+    <Button text="Dodaj dokument"
+            onAction="#dodaj"
+            styleClass="btn-primary"/>
+
+</VBox>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="12"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.DodajDokumenteControllers.UplatnicaDokumentConroller"
+      styleClass="doc-card">
+
+    <Label text="Opća uplatnica - troškovi obrade podataka (10,00 KM)" styleClass="doc-title"/>
+
+    <CheckBox fx:id="chkDostavljen" text="Dokument dostavljen" styleClass="checkbox"/>
+
+    <Button text="Dodaj dokument" onAction="#dodaj" styleClass="btn-primary"/>
+
+</VBox>

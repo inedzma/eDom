@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane styleClass="anchor-pane" stylesheets="@../styles/studenti-style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.studentiController">
+
+    <children>
+        <VBox spacing="18" styleClass="main-vbox" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20" VBox.vgrow="ALWAYS">
+
+            <BorderPane>
+
+                <left>
+                    <VBox spacing="10">
+                        <Label styleClass="header-title" text="Studenti" />
+                    </VBox>
+                </left>
+
+                <right>
+                    <HBox alignment="CENTER_RIGHT" spacing="14" />
+                </right>
+
+            </BorderPane>
+
+            <HBox alignment="CENTER_LEFT" spacing="14">
+
+                <TextField fx:id="txtSearch" prefWidth="420" promptText="Pretraga: ime, prezime, indeks, fakultet..." styleClass="search-input" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                  <Button onAction="#onRefresh" styleClass="icon-refresh-btn">
+
+                      <tooltip>
+                          <Tooltip text="Osvježi podatke" />
+                      </tooltip>
+
+                      <graphic>
+                          <Label styleClass="refresh-icon" text="⟳" />
+                      </graphic>
+                  </Button>
+
+
+            <HBox alignment="CENTER_RIGHT" spacing="14">
+
+                <MenuButton fx:id="btnSortiraj" styleClass="menu-btn" text="Sortiraj">
+                    <items>
+                        <MenuItem onAction="#sortImeAZ" text="Ime A–Z" />
+                        <MenuItem onAction="#sortImeZA" text="Ime Z–A" />
+                        <MenuItem onAction="#sortIdUzlazno" text="ID uzlazno" />
+                        <MenuItem onAction="#sortIdSilazno" text="ID silazno" />
+                        <MenuItem onAction="#sortProsjekAsc" text="Prosjek uzlazno" />
+                        <MenuItem onAction="#sortProsjekDesc" text="Prosjek silazno" />
+                    </items>
+                </MenuButton>
+
+                <MenuButton fx:id="btnFiltriraj" styleClass="menu-btn" text="Filtriraj">
+                    <items>
+                        <Menu fx:id="menuFakulteti" text="Fakulteti" />
+                        <Menu fx:id="menuStatus" text="Status prijave" />
+                        <Menu fx:id="menuGodina" text="Godina studija" />
+                    </items>
+                </MenuButton>
+
+            </HBox>
+            </HBox>
+
+            <TableView fx:id="tblStudenti" styleClass="table-view" VBox.vgrow="ALWAYS">
+
+                <columns>
+                    <TableColumn fx:id="colId" prefWidth="70" text="ID" styleClass="centered-cell"/>
+                    <TableColumn fx:id="colIme" prefWidth="140" text="Ime" />
+                    <TableColumn fx:id="colPrezime" prefWidth="160" text="Prezime" />
+                    <TableColumn fx:id="colIndeks" prefWidth="170" text="Broj indeksa" styleClass="centered-cell"/>
+                    <TableColumn fx:id="colFakultet" prefWidth="260" text="Fakultet" />
+                    <TableColumn fx:id="colGodina" prefWidth="110" text="Godina" styleClass="centered-cell"/>
+                    <TableColumn fx:id="colProsjek" prefWidth="120" text="Prosjek" styleClass="centered-cell"/>
+                    <TableColumn fx:id="colStatus" prefWidth="260" text="Soc. status" />
+                </columns>
+
+            </TableView>
+
+            <HBox alignment="CENTER_RIGHT">
+                <Button fx:id="btnExportHtmlPdf" onAction="#onExportHtmlPdf" text="Export PDF (HTML)" />
+            </HBox>
+
+        </VBox>
+    </children>
+</AnchorPane>

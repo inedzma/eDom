@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.LoginController"
+            stylesheets="@../styles/login-style.css"
+            styleClass="root">
+
+    <left>
+        <VBox spacing="26"
+              alignment="TOP_LEFT"
+              styleClass="left-pane">
+
+            <HBox alignment="CENTER_LEFT">
+                <children>
+
+                    <Pane HBox.hgrow="ALWAYS"/>
+
+                    <ImageView fitWidth="190"
+                               preserveRatio="true"
+                               styleClass="left-logo">
+                        <image>
+                            <Image url="@../images/e-domLOGO.png"/>
+                        </image>
+                    </ImageView>
+
+                    <Pane HBox.hgrow="ALWAYS"/>
+
+                </children>
+            </HBox>
+
+            <Label text="Digitalni sistem studentskog doma"
+                   wrapText="true"
+                   styleClass="app-title"/>
+
+            <Label text="Ubrzano upravljanje prijavama, bodovanjem i rangiranjem — uz potpunu evidenciju i kontrolu procesa."
+                   wrapText="true"
+                   styleClass="left-subtitle"/>
+
+            <VBox spacing="12" style="-fx-padding: 16 0 0 0;">
+                <Label text="✓ Evidencija prijava i smještaja u realnom vremenu" styleClass="left-text"/>
+                <Label text="✓ Automatsko bodovanje i provjera podataka" styleClass="left-text"/>
+                <Label text="✓ Rangiranje i izvoz izvještaja jednim klikom" styleClass="left-text"/>
+            </VBox>
+
+            <Label text="Pouzdano. Brzo. Precizno."
+                   style="-fx-padding: 18 0 0 0;"
+                   styleClass="left-tagline"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <HBox alignment="BOTTOM_LEFT" style="-fx-padding: 20 0 0 0;"/>
+
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane styleClass="right-pane">
+            <children>
+
+                <Pane styleClass="glow-mint"/>
+                <Pane styleClass="glow-yellow"/>
+
+                <!-- LOGIN SADRŽAJ -->
+                <StackPane alignment="CENTER" styleClass="login-container">
+
+                    <VBox spacing="26"
+                          alignment="TOP_LEFT"
+                          maxWidth="430"
+                          styleClass="login-card">
+
+                        <Label text="Prijava u E-Dom"
+                               styleClass="login-title"/>
+
+                        <VBox spacing="18" maxWidth="360">
+
+                            <VBox spacing="6">
+                                <Label text="Korisničko ime"
+                                       styleClass="field-label"/>
+                                <TextField fx:id="txtUsername"
+                                           promptText="Unesite korisničko ime"
+                                           styleClass="text-input"/>
+                            </VBox>
+
+                            <VBox spacing="6">
+                                <Label text="Lozinka"
+                                       styleClass="field-label"/>
+
+                                <StackPane styleClass="password-wrapper">
+
+                                    <PasswordField fx:id="txtPassword"
+                                                   promptText="Unesite lozinku"
+                                                   styleClass="text-input"/>
+
+                                    <TextField fx:id="txtPasswordVisible"
+                                               promptText="Unesite lozinku"
+                                               styleClass="text-input"
+                                               visible="false"
+                                               managed="false"/>
+
+                                    <Button fx:id="btnTogglePassword"
+                                            onAction="#onTogglePasswordVisibility"
+                                            styleClass="eye-btn"
+                                            StackPane.alignment="CENTER_RIGHT">
+
+                                        <graphic>
+                                            <ImageView fx:id="imgEye"
+                                                       fitWidth="38"
+                                                       fitHeight="38"
+                                                       preserveRatio="true"/>
+                                        </graphic>
+                                    </Button>
+
+                                </StackPane>
+                            </VBox>
+
+                            <HBox alignment="CENTER_LEFT" spacing="12">
+                                <CheckBox fx:id="chkRememberMe"
+                                          text="Zapamti me"
+                                          styleClass="check-box"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Hyperlink text="Zaboravili ste lozinku?"
+                                           onAction="#onForgotPasswordClicked"
+                                           styleClass="forgot-link"/>
+                            </HBox>
+
+                            <Button fx:id="btnLogin"
+                                    text="Prijava"
+                                    onAction="#onLoginClicked"
+                                    maxWidth="Infinity"
+                                    styleClass="primary-btn"/>
+
+                            <!-- ERROR -->
+                            <Label fx:id="lblError"
+                                   styleClass="error-label"/>
+
+                            <HBox alignment="CENTER" spacing="8" style="-fx-padding: 10 0 0 0;">
+                                <Label text="Nemate nalog?"/>
+                                <Hyperlink fx:id="linkRegister"
+                                           text="Registracija"
+                                           onAction="#onRegisterLinkClicked"
+                                           styleClass="register-link"/>
+                            </HBox>
+
+                        </VBox>
+
+                    </VBox>
+                </StackPane>
+
+                <StackPane fx:id="loadingOverlay"
+                           visible="false"
+                           styleClass="loading-overlay">
+
+                    <ProgressIndicator
+                            fx:id="loadingIndicator"
+                            prefWidth="90"
+                            prefHeight="90"
+                            styleClass="loading-green"/>
+
+                </StackPane>
+
+            </children>
+        </StackPane>
+    </center>
+
+</BorderPane>

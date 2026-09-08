@@ -1,0 +1,64 @@
+package controllers.DodajDokumenteControllers;
+
+import dao.DokumentDAO;
+import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import model.Dokument;
+import model.VrstaDokumenta;
+import service.PdfService;
+import service.PdfService;
+
+import java.time.LocalDate;
+
+public class CipsDokumentController {
+
+    @FXML
+    private CheckBox chkDostavljen;
+
+    @FXML
+    private Label lblPdf;
+
+    private int prijavaId;
+    private VrstaDokumenta vrsta;
+    private double bodoviUdaljenost;
+
+    private String pdfBase64; // ide u DokumentB64
+
+    public void init(int prijavaId, VrstaDokumenta vrsta, double bodoviUdaljenost) {
+        this.prijavaId = prijavaId;
+        this.vrsta = vrsta;
+        this.bodoviUdaljenost = bodoviUdaljenost;
+    }
+
+    @FXML
+    private void onDodajPdf() {
+        pdfBase64 = PdfService.uploadPdf(lblPdf.getScene().getWindow());
+
+        if (pdfBase64 != null) {
+            lblPdf.setText("PDF dodat");
+        } else {
+            lblPdf.setText("PDF nije dodat");
+        }
+    }
+    @FXML
+    private void dodaj() {
+
+        if (!chkDostavljen.isSelected()) {
+            return;
+        }
+
+        Dokument d = new Dokument();
+        d.setNaziv("CIPS");
+        d.setDatumUpload(LocalDate.now());
+        d.setDostavljen(true);
+        d.setBrojBodova(bodoviUdaljenost);
+        d.setVrstaDokumenta(vrsta);
+
+        if (pdfBase64 != null) {
+            d.setDokumentB64(pdfBase64);
+        }
+
+        new DokumentDAO().unesiDokument(d, prijavaId);
+    }
+}

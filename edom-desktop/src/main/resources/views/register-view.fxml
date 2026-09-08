@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.RegisterController"
+            stylesheets="@../styles/register-style.css"
+            styleClass="root">
+
+    <left>
+        <VBox spacing="26" alignment="TOP_LEFT" styleClass="left-pane">
+            <HBox>
+                <Pane HBox.hgrow="ALWAYS"/>
+                <ImageView fitWidth="190" preserveRatio="true">
+                    <image>
+                        <Image url="@../images/e-domLOGO.png"/>
+                    </image>
+                </ImageView>
+                <Pane HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <Label text="Digitalni sistem studentskog doma" styleClass="app-title"/>
+            <Label text="Ubrzano upravljanje prijavama i bodovanjem." styleClass="left-subtitle"/>
+
+            <VBox spacing="10">
+                <Label text="✓ Evidencija prijava" styleClass="left-text"/>
+                <Label text="✓ Automatsko bodovanje" styleClass="left-text"/>
+                <Label text="✓ Rang liste" styleClass="left-text"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane styleClass="right-pane">
+            <StackPane styleClass="register-container">
+
+                <VBox spacing="18" maxWidth="420" styleClass="register-card">
+
+                    <Label text="Registracija administratora" styleClass="register-title"/>
+
+                    <HBox spacing="12">
+                        <TextField fx:id="txtIme" promptText="Ime" styleClass="text-input"/>
+                        <TextField fx:id="txtPrezime" promptText="Prezime" styleClass="text-input"/>
+                    </HBox>
+
+                    <TextField fx:id="txtEmail" promptText="E-mail" styleClass="text-input"/>
+                    <TextField fx:id="txtUsername" promptText="Korisničko ime" styleClass="text-input"/>
+                    <PasswordField fx:id="txtPassword" promptText="Lozinka" styleClass="text-input"/>
+                    <PasswordField fx:id="txtPassword2" promptText="Ponovi lozinku" styleClass="text-input"/>
+
+                    <HBox spacing="14" alignment="CENTER">
+                        <Button text="Registruj" onAction="#onRegisterClicked"
+                                styleClass="primary-btn" prefWidth="180"/>
+                        <Button text="Nazad na prijavu" onAction="#onBackToLoginClicked"
+                                styleClass="secondary-btn" prefWidth="180"/>
+                    </HBox>
+
+                    <Label fx:id="lblError" styleClass="error-label"/>
+
+                </VBox>
+            </StackPane>
+        </StackPane>
+    </center>
+
+</BorderPane>

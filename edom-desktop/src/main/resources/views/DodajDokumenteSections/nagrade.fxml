@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="12"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.DodajDokumenteControllers.NagradeDokumentController"
+      styleClass="doc-card">
+
+    <Label text="Osvojene nagrade u toku školovanja (3 boda)" styleClass="doc-title"/>
+
+    <CheckBox fx:id="ckhImaNagrade" text="Student ima osvojene nagrade" styleClass="checkbox"/>
+    <CheckBox fx:id="chkDostavljen" text="Dokument dostavljen" styleClass="checkbox"/>
+
+    <Button text="Dodaj dokument" onAction="#dodaj" styleClass="btn-primary"/>
+
+</VBox>

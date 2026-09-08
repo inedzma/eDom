@@ -1,0 +1,100 @@
+
+.root {
+    -fx-font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+.sidebar {
+    -fx-background-color: #004E64;
+    -fx-padding: 24 0 20 0;
+}
+
+.sidebar-header {
+    -fx-padding: 0 20 20 20;
+}
+
+.sidebar-title {
+    -fx-text-fill: rgba(222,231,237);
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+}
+
+.sidebar-subtitle {
+    -fx-text-fill: rgba(255,255,255,0.75);
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+}
+
+
+.sidebar-separator .line {
+    -fx-background-color: rgba(255,255,255,0.15);
+    -fx-pref-height: 1;
+}
+
+
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255,255,255,0.85);
+    -fx-font-size: 15px;
+    -fx-font-weight: 600;
+
+    -fx-padding: 16 20;
+    -fx-alignment: CENTER_LEFT;
+    -fx-cursor: hand;
+
+    -fx-background-radius: 0;
+    -fx-border-width: 0 0 0 4;
+    -fx-border-color: transparent;
+}
+
+.nav-btn:hover {
+    -fx-background-color: rgba(0, 182, 150, 0.15);
+    -fx-text-fill: #ffffff;
+}
+
+.nav-btn:selected {
+    -fx-background-color: rgba(0, 182, 150, 0.25);
+    -fx-text-fill: rgba(222,231,237);
+    -fx-border-color: #00B696;
+}
+
+.nav-btn:selected:hover {
+    -fx-background-color: rgba(0, 182, 150, 0.35);
+}
+
+.content-area {
+    -fx-background-color: #f5f7fa;
+}
+
+.sidebar-footer {
+    -fx-text-fill: rgba(255,255,255,0.55);
+    -fx-font-size: 12px;
+    -fx-padding: 0 20;
+}
+
+/*dugme za odjavu*/
+.logout-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255, 180, 180, 0.9);
+    -fx-font-size: 15px;
+    -fx-font-weight: 600;
+    -fx-padding: 16 20;
+    -fx-alignment: CENTER_LEFT;
+    -fx-cursor: hand;
+    -fx-border-width: 0 0 0 4;
+    -fx-border-color: transparent;
+
+    -fx-background-radius: 0;
+}
+
+.logout-btn:hover {
+    -fx-background-color: rgba(231, 76, 60, 0.18);
+    -fx-text-fill: #ffffff;
+}
+
+.logout-btn:pressed {
+    -fx-background-color: rgba(231, 76, 60, 0.30);
+}
+
+.logout-btn:focused {
+    -fx-border-color: rgba(231, 76, 60, 0.85);
+}

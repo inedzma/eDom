@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controllers.MojProfilController"
+      spacing="16"
+      styleClass="profile-page"
+      stylesheets="@../styles/moj-profil-style.css">
+
+    <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-header">
+        <VBox spacing="2">
+            <Label text="Moj profil" styleClass="page-title"/>
+            <Label text="Upravljanje podacima i sigurnosnim postavkama" styleClass="page-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblBadgeUloga" text="ADMIN" styleClass="role-badge"/>
+    </HBox>
+
+    <VBox spacing="18" styleClass="profile-card">
+
+        <Label text="Podaci korisnika" styleClass="section-title"/>
+
+        <GridPane hgap="14" vgap="12" styleClass="form-grid">
+            <columnConstraints>
+                <ColumnConstraints minWidth="160" prefWidth="160"/>
+                <ColumnConstraints hgrow="ALWAYS"/>
+            </columnConstraints>
+
+            <Label text="Ime:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtIme" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+            <Label text="Prezime:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtPrezime" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+            <Label text="Korisničko ime:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtUsername" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+            <Label text="Uloga:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtUloga" disable="true" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            <Label text="Zadnja prijava:"
+                   GridPane.rowIndex="4"
+                   GridPane.columnIndex="0"/>
+
+            <Label fx:id="lblZadnjaPrijava"
+                   text="—"
+                   GridPane.rowIndex="4"
+                   GridPane.columnIndex="1"
+                   styleClass="readonly-info"/>
+        </GridPane>
+
+        <Separator styleClass="soft-separator"/>
+
+        <Label text="Sigurnost" styleClass="section-title"/>
+
+        <VBox spacing="14" styleClass="security-card">
+
+            <Label text="Promjena lozinke" styleClass="sub-title"/>
+
+            <GridPane hgap="14" vgap="12" styleClass="form-grid">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="160" prefWidth="160"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+
+                <Label text="Trenutna lozinka:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <PasswordField fx:id="txtStaraLozinka" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="Nova lozinka:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <PasswordField fx:id="txtNovaLozinka" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <Label text="Potvrda lozinke:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <PasswordField fx:id="txtPotvrdaLozinke" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            </GridPane>
+
+        </VBox>
+
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Button text="Sačuvaj promjene" onAction="#sacuvajPromjene" styleClass="btn-save"/>
+            <Region HBox.hgrow="ALWAYS"/>
+        </HBox>
+
+        <Label fx:id="lblPoruka"
+               visible="false"
+               managed="false"
+               styleClass="status-message"/>
+    </VBox>
+
+</VBox>

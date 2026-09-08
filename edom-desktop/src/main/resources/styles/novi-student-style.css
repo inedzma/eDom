@@ -1,0 +1,285 @@
+
+.root {
+    -fx-font-family: "Segoe UI", "Inter", system-ui;
+}
+
+/* BACKGROUND */
+.scroll-pane {
+    -fx-background-color: linear-gradient(to bottom right, #D9F0FF, #f7fbff);
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.page-wrapper {
+    -fx-alignment: center;
+}
+
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 28px;
+    -fx-border-radius: 28px;
+    -fx-border-color: rgba(0, 78, 100, 0.12);
+    -fx-border-width: 1.5px;
+
+    -fx-effect: dropshadow(gaussian, rgba(0, 78, 100, 0.14), 38, 0.26, 0, 12);
+
+    -fx-pref-width: 860px;
+    -fx-max-width: 860px;
+
+    -fx-padding: 26 34 26 34;
+}
+
+.page-title {
+    -fx-font-size: 34px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #004E64;
+}
+
+.page-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: rgba(0, 78, 100, 0.55);
+}
+
+.step-badge {
+    -fx-background-color: rgba(222,231,237);
+    -fx-text-fill: #004E64;
+    -fx-font-weight: 800;
+    -fx-padding: 10 16;
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-border-color: rgba(0, 78, 100, 0.18);
+    -fx-border-width: 1;
+}
+
+.progress-top {
+    -fx-accent: #00B696;
+    -fx-background-color: rgba(0, 78, 100, 0.12);
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-pref-height: 10px;
+    -fx-max-width: 420px;
+}
+
+.stepper {
+    -fx-padding: 0 0 2 0;
+}
+
+.step-dot {
+    -fx-min-width: 28px;
+    -fx-min-height: 28px;
+    -fx-alignment: center;
+    -fx-background-radius: 999px;
+    -fx-background-color: rgba(0, 78, 100, 0.10);
+    -fx-text-fill: #004E64;
+    -fx-font-weight: 800;
+}
+
+.step-dot-active {
+    -fx-background-color: #00B696;
+    -fx-text-fill: white;
+}
+
+.step-label {
+    -fx-text-fill: rgba(0, 78, 100, 0.65);
+    -fx-font-weight: 700;
+    -fx-font-size: 12px;
+}
+
+.step-label-active {
+    -fx-text-fill: #004E64;
+}
+
+.step-line {
+    -fx-text-fill: rgba(0, 78, 100, 0.30);
+    -fx-font-weight: 900;
+}
+
+.section-pill {
+    -fx-background-color: rgba(0, 182, 150, 0.10);
+    -fx-text-fill: #00B696;
+    -fx-font-weight: 800;
+    -fx-padding: 10 18;
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-border-color: rgba(0, 182, 150, 0.30);
+    -fx-border-width: 1;
+    -fx-max-width: 220px;
+}
+
+.soft-separator {
+    -fx-background-color: rgba(0, 78, 100, 0.10);
+}
+
+.form-grid {
+    -fx-padding: 6 0 6 0;
+}
+
+.field-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #004E64;
+}
+
+.field {
+    -fx-background-color: white;
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+    -fx-border-color: rgba(0,182,150,0.30);
+    -fx-border-width: 1.4px;
+    -fx-padding: 12 16;
+    -fx-font-size: 13px;
+    -fx-prompt-text-fill: rgba(0,78,100,0.35);
+}
+
+.field:focused {
+    -fx-border-color: #00B696;
+    -fx-border-width: 1.6px;
+    -fx-effect: dropshadow(gaussian, rgba(0,182,150,0.25), 14, 0.28, 0, 3);
+}
+
+.combo {
+    -fx-background-color: white;
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+    -fx-border-color: rgba(0,182,150,0.30);
+    -fx-border-width: 1.4px;
+    -fx-padding: 10 10;
+}
+
+.combo:focused {
+    -fx-border-color: #00B696;
+    -fx-border-width: 1.6px;
+    -fx-effect: dropshadow(gaussian, rgba(0,182,150,0.25), 14, 0.28, 0, 3);
+}
+
+.combo .arrow {
+    -fx-background-color: #00B696;
+}
+
+.footer-box {
+    -fx-padding: 18 0 0 0;
+    -fx-alignment: center;
+}
+
+.btn-back {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(0,78,100,0.35);
+    -fx-border-width: 1.5px;
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-padding: 12 22;
+    -fx-font-weight: 800;
+    -fx-text-fill: #004E64;
+    -fx-cursor: hand;
+}
+
+.btn-back:hover {
+    -fx-background-color: rgba(0, 78, 100, 0.06);
+}
+
+.btn-back:pressed {
+    -fx-background-color: rgba(0, 78, 100, 0.12);
+}
+
+.btn-next {
+    -fx-background-color: #00B696;
+    -fx-text-fill: white;
+    -fx-font-weight: 900;
+    -fx-font-size: 14px;
+    -fx-background-radius: 999px;
+    -fx-padding: 12 32;
+    -fx-effect: dropshadow(gaussian, rgba(0,182,150,0.45), 20, 0.30, 0, 8);
+    -fx-cursor: hand;
+}
+
+.btn-next:hover {
+    -fx-background-color: #00a88a;
+}
+
+.btn-next:pressed {
+    -fx-background-color: #009a7d;
+    -fx-effect: dropshadow(gaussian, rgba(0,182,150,0.25), 12, 0.25, 0, 4);
+}
+
+.form-grid > .vbox {
+    -fx-fill-width: true;
+    -fx-max-width: Infinity;
+}
+
+.field, .combo {
+    -fx-pref-width: Infinity;
+    -fx-max-width: Infinity;
+}
+
+
+/* Tekst unutar zatvorenog box-a */
+.combo .list-cell {
+    -fx-text-fill: #004E64;
+    -fx-background-color: transparent;
+    -fx-padding: 4 0 4 0;
+}
+
+/* Strelica */
+.combo .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo .arrow {
+    -fx-background-color: #00B696;
+    -fx-scale-x: 0.85;
+    -fx-scale-y: 0.85;
+}
+
+
+/* --- 2. IZGLED PADAJUĆE LISTE (Ono što se otvori) --- */
+
+/* Okvir liste (prozorčić) */
+.combo-box-popup .list-view {
+    -fx-background-color: white;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-border-color: rgba(0,182,150,0.30);
+    -fx-border-width: 1px;
+
+    /* Sjena da "lebdi" kao tvoj meni sa slike */
+    -fx-effect: dropshadow(gaussian, rgba(0,78,100,0.15), 20, 0.25, 0, 8);
+
+    -fx-padding: 6px; /* Razmak unutar liste */
+}
+
+/* Pojedinačni redovi u listi */
+.combo-box-popup .list-cell {
+    -fx-text-fill: #004E64;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+    -fx-padding: 10 14;
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* HOVER EFEKT - Mint boja kad pređeš mišem preko opcije */
+.combo-box-popup .list-cell:filled:hover {
+    -fx-background-color: rgba(0,182,150,0.10); /* Nježna mint boja */
+    -fx-background-radius: 8px; /* Zaobljene ivice itema */
+    -fx-text-fill: #004E64;
+}
+
+/* Kada je opcija odabrana */
+.combo-box-popup .list-cell:filled:selected {
+    -fx-background-color: rgba(0,182,150,0.18);
+    -fx-background-radius: 8px;
+    -fx-text-fill: #004E64;
+}
+
+/* Scrollbar u listi (da i on bude mint) */
+.combo-box-popup .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(0,182,150,0.45);
+    -fx-background-radius: 10px;
+}
+.combo-box-popup .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+

@@ -1,0 +1,361 @@
+
+.root {
+    -fx-font-family: "Inter", "Segoe UI", system-ui;
+}
+
+.anchor-pane {
+    -fx-background-color: #f6fbfb;
+}
+
+.main-vbox {
+    -fx-background-color: white;
+    -fx-background-radius: 26px;
+    -fx-padding: 28 30 30 30;
+    -fx-effect: dropshadow(gaussian, rgba(0,78,100,0.10), 30, 0.28, 0, 14);
+    -fx-border-color: rgba(0,78,100,0.08);
+    -fx-border-width: 1;
+    -fx-border-radius: 26px;
+}
+
+.header-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #004E64;
+}
+
+.search-input {
+    -fx-background-color: white;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-border-color: rgba(0,182,150,0.35);
+    -fx-border-width: 1.5px;
+    -fx-padding: 12 16;
+    -fx-font-size: 13px;
+    -fx-text-fill: #004E64;
+}
+
+.search-input:focused {
+    -fx-border-color: #00B696;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(0,182,150,0.18), 12, 0.25, 0, 6);
+}
+
+
+.menu-btn {
+    -fx-background-color: white;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-border-color: rgba(0,78,100,0.20);
+    -fx-border-width: 1.4px;
+    -fx-padding: 8 16;
+    -fx-font-weight: 800;
+    -fx-text-fill: #004E64;
+    -fx-cursor: hand;
+}
+
+.menu-btn:hover {
+    -fx-background-color: rgba(0,182,150,0.08);
+    -fx-border-color: rgba(0,182,150,0.45);
+}
+
+.menu-btn:showing {
+    -fx-background-color: rgba(0,182,150,0.12);
+    -fx-border-color: rgba(0,182,150,0.60);
+}
+
+.menu-btn .arrow {
+    -fx-background-color: #004E64;
+}
+
+.context-menu {
+    -fx-background-color: white;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-border-color: rgba(0,182,150,0.30);
+    -fx-border-width: 1;
+    -fx-padding: 6;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 20, 0.25, 0, 8);
+}
+
+.menu-item {
+    -fx-padding: 10 18;
+    -fx-font-weight: 700;
+    -fx-text-fill: #004E64;
+}
+
+.menu-item:hover {
+    -fx-background-color: rgba(0,182,150,0.10);
+}
+
+.button.nova-prijava-btn {
+    -fx-background-radius: 16px;
+    -fx-background-color: linear-gradient(to right, #00B696, #00C7A2);
+    -fx-text-fill: white;
+    -fx-font-weight: 900;
+    -fx-font-size: 13px;
+    -fx-padding: 12 28;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,182,150,0.35), 22, 0.35, 0, 10);
+}
+
+.button.nova-prijava-btn:hover {
+    -fx-background-color: linear-gradient(to right, #00A98B, #00B696);
+    -fx-effect: dropshadow(gaussian, rgba(0,182,150,0.50), 26, 0.40, 0, 12);
+}
+
+.button.nova-prijava-btn:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.97;
+}
+
+
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+    -fx-border-color: rgba(0,182,150,0.25);
+    -fx-border-width: 1.4px;
+
+    -fx-effect: dropshadow(gaussian, rgba(0,78,100,0.08), 22, 0.25, 0, 10);
+}
+
+.table-view:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,78,100,0.12), 28, 0.28, 0, 12);
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #00B696;
+    -fx-background-radius: 18 18 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 14 10;
+    -fx-border-color: rgba(255,255,255,0.25);
+    -fx-border-width: 0 1 0 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: 900;
+    -fx-font-size: 12px;
+    -fx-alignment: center;
+}
+
+.table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: rgba(0,182,150,0.08);
+    -fx-border-width: 0 0 1 0;
+    -fx-font-size: 13px;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: rgba(0,182,150,0.03);
+}
+
+.table-row-cell:hover {
+    -fx-background-color: rgba(0,182,150,0.09);
+    -fx-border-width: 0 0 1 5;
+    -fx-border-color: rgba(0,182,150,0.45);
+}
+
+.table-row-cell:selected {
+    -fx-background-color: rgba(0,182,150,0.16);
+    -fx-border-width: 0 0 1 5;
+    -fx-border-color: rgba(0,182,150,0.85);
+}
+
+.table-cell {
+    -fx-padding: 12 10;
+    -fx-border-color: rgba(0,182,150,0.06);
+    -fx-border-width: 0 1 0 0;
+    -fx-text-fill: #004E64;
+}
+
+
+.table-cell.status-approved {
+    -fx-background-color: rgba(0,182,150,0.14);
+    -fx-text-fill: #007f69;
+    -fx-font-weight: 900;
+    -fx-background-radius: 999px;
+    -fx-padding: 6 12;
+    -fx-alignment: center;
+}
+
+.table-cell.status-rejected {
+    -fx-background-color: rgba(231,76,60,0.12);
+    -fx-text-fill: #c0392b;
+    -fx-font-weight: 900;
+    -fx-background-radius: 999px;
+    -fx-padding: 6 12;
+    -fx-alignment: center;
+}
+
+.table-cell.status-review {
+    -fx-background-color: rgba(255,249,165,0.90);
+    -fx-text-fill: #004E64;
+    -fx-font-weight: 900;
+    -fx-background-radius: 999px;
+    -fx-padding: 6 12;
+    -fx-alignment: center;
+}
+
+.table-cell.status-closed {
+    -fx-background-color: rgba(0,78,100,0.12);
+    -fx-text-fill: #004E64;
+    -fx-font-weight: 900;
+    -fx-background-radius: 999px;
+    -fx-padding: 6 12;
+    -fx-alignment: center;
+}
+
+.table-view .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(0,182,150,0.45);
+    -fx-background-radius: 10px;
+}
+
+.table-view .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: rgba(0,182,150,0.65);
+}
+
+.table-view .corner {
+    -fx-background-color: #00B696;
+}
+
+.table-cell.status-approved,
+.table-cell.status-rejected,
+.table-cell.status-review,
+.table-cell.status-closed {
+
+    -fx-alignment: CENTER;
+    -fx-font-weight: 800;
+    -fx-font-size: 12px;
+
+    -fx-padding: 4 10;
+
+    /* pill */
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+
+    -fx-background-insets: 2;
+}
+
+.table-cell.status-approved {
+    -fx-background-color: rgba(0,182,150,0.14);
+    -fx-text-fill: #007d67;
+}
+
+.table-cell.status-rejected {
+    -fx-background-color: rgba(230, 57, 70, 0.12);
+    -fx-text-fill: #d62828;
+}
+
+.table-cell.status-review {
+    -fx-background-color: rgba(255,249,165,0.65);
+    -fx-text-fill: #8a6a00;
+}
+
+.table-cell.status-closed {
+    -fx-background-color: rgba(0,78,100,0.10);
+    -fx-text-fill: #004E64;
+}
+
+.table-cell.status-approved,
+.table-cell.status-rejected,
+.table-cell.status-review,
+.table-cell.status-closed {
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+
+
+.table-view .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(0,182,150,0.45);
+    -fx-background-radius: 10px;
+}
+
+.table-view .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: rgba(0,182,150,0.65);
+}
+
+.table-view .scroll-bar:horizontal .thumb {
+    -fx-background-color: rgba(0,182,150,0.45);
+    -fx-background-radius: 10px;
+}
+
+.table-view .scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: rgba(0,182,150,0.65);
+}
+
+.table-view .scroll-bar:vertical .track,
+.table-view .scroll-bar:horizontal .track {
+    -fx-background-color: rgba(0,182,150,0.08);
+    -fx-background-radius: 10px;
+}
+
+.icon-refresh-btn {
+    -fx-background-color: white;
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-border-color: transparent;
+    -fx-border-width: 1.5px;
+    -fx-padding: 8;
+    -fx-cursor: hand;
+}
+
+.icon-refresh-btn:hover {
+    -fx-background-color: rgba(0,182,150,0.08);
+    -fx-border-color: transparent;
+}
+
+.icon-refresh-btn:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+.refresh-icon {
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #00B696;
+}
+
+
+#btnExportHtmlPdf {
+    -fx-background-color: white;
+    -fx-text-fill: #004E64;
+    -fx-font-weight: 900;
+    -fx-font-size: 13px;
+
+    -fx-padding: 10 18;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+
+    -fx-border-color: rgba(0,182,150,0.55);
+    -fx-border-width: 1.2;
+
+    -fx-cursor: hand;
+
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 12, 0.25, 0, 4);
+}
+
+#btnExportHtmlPdf:hover {
+    -fx-background-color: rgba(0,182,150,0.08);
+    -fx-border-color: rgba(0,182,150,0.85);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 16, 0.25, 0, 6);
+}
+
+#btnExportHtmlPdf:pressed {
+    -fx-background-color: rgba(0,182,150,0.16);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 10, 0.25, 0, 2);
+}
+
+#btnExportHtmlPdf:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor: default;
+}
+
+
+.table-view .centered-cell .table-cell {
+    -fx-alignment: CENTER;
+}
+

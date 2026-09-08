@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.NoviStudentController"
+            stylesheets="@../styles/novi-student-style.css"
+            styleClass="scroll-pane"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED">
+
+    <content>
+
+        <StackPane styleClass="page-wrapper">
+            <padding>
+                <Insets top="30" right="30" bottom="30" left="30"/>
+            </padding>
+
+            <VBox styleClass="card" spacing="18">
+
+                <HBox alignment="CENTER_LEFT" spacing="16">
+                    <VBox spacing="6">
+                        <Label text="Dodavanje novog studenta"
+                               styleClass="page-title"/>
+
+                        <Label text="Unesite osnovne informacije i kontakt podatke."
+                               styleClass="page-subtitle"/>
+                    </VBox>
+
+                    <Region HBox.hgrow="ALWAYS"/>
+
+
+                </HBox>
+
+                <VBox spacing="10">
+                    <ProgressBar progress="0.33"
+                                 styleClass="progress-top"/>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="stepper">
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <Label text="1" styleClass="step-dot step-dot-active"/>
+                            <Label text="Osnovno" styleClass="step-label step-label-active"/>
+                        </HBox>
+
+                        <Label text="—" styleClass="step-line"/>
+
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <Label text="2" styleClass="step-dot"/>
+                            <Label text="Dokumenti" styleClass="step-label"/>
+                        </HBox>
+
+                        <Label text="—" styleClass="step-line"/>
+
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <Label text="3" styleClass="step-dot"/>
+                            <Label text="Pregled" styleClass="step-label"/>
+                        </HBox>
+                    </HBox>
+                </VBox>
+
+                <Label text="Osnovne informacije"
+                       styleClass="section-pill"/>
+
+                <Separator styleClass="soft-separator"/>
+
+                <GridPane hgap="22" vgap="16" styleClass="form-grid">
+
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                    </columnConstraints>
+
+                    <rowConstraints>
+                        <RowConstraints vgrow="NEVER"/>
+                        <RowConstraints vgrow="NEVER"/>
+                        <RowConstraints vgrow="NEVER"/>
+                        <RowConstraints vgrow="NEVER"/>
+                        <RowConstraints vgrow="NEVER"/>
+                        <RowConstraints vgrow="NEVER"/>
+                    </rowConstraints>
+
+                    <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Label text="Ime" styleClass="field-label"/>
+                        <TextField fx:id="txtIme" promptText="Unesite ime" styleClass="field"/>
+                    </VBox>
+
+                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label text="Godina studija" styleClass="field-label"/>
+                        <ComboBox fx:id="cmbGodina" promptText="Odaberi godinu" styleClass="combo"/>
+                    </VBox>
+
+                    <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                        <Label text="Prezime" styleClass="field-label"/>
+                        <TextField fx:id="txtPrezime" promptText="Unesite prezime" styleClass="field"/>
+                    </VBox>
+
+                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label text="Prosjek" styleClass="field-label"/>
+                        <TextField fx:id="txtProsjek" promptText="npr. 8.6" styleClass="field"/>
+                    </VBox>
+
+                    <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                        <Label text="Ime jednog roditelja" styleClass="field-label"/>
+                        <TextField fx:id="txtRoditelj" promptText="Ime roditelja" styleClass="field"/>
+                    </VBox>
+
+                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Label text="Email" styleClass="field-label"/>
+                        <TextField fx:id="txtEmail" promptText="ime.prezime@email.com" styleClass="field"/>
+                    </VBox>
+
+                    <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                        <Label text="JMBG" styleClass="field-label"/>
+                        <TextField fx:id="txtJMBG" promptText="13 cifara" styleClass="field"/>
+                    </VBox>
+
+                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <Label text="Telefon" styleClass="field-label"/>
+                        <TextField fx:id="txtTelefon" promptText="+387..." styleClass="field"/>
+                    </VBox>
+
+                    <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="4">
+                        <Label text="Broj indeksa" styleClass="field-label"/>
+                        <TextField fx:id="txtIndeks" promptText="npr. 421" styleClass="field"/>
+                    </VBox>
+
+                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                        <Label text="Adresa stanovanja" styleClass="field-label"/>
+                        <TextField fx:id="txtAdresa" promptText="Grad, ulica" styleClass="field"/>
+                    </VBox>
+
+                    <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="5">
+                        <Label text="Fakultet" styleClass="field-label"/>
+                        <ComboBox fx:id="cmbFakultet" promptText="Odaberi fakultet" styleClass="combo"/>
+                    </VBox>
+
+                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                        <Label text="Socijalni status" styleClass="field-label"/>
+                        <ComboBox fx:id="cmbSocijalniStatus" promptText="Odaberi status" styleClass="combo"/>
+                    </VBox>
+
+                </GridPane>
+
+                <HBox alignment="CENTER" spacing="16" styleClass="footer-box">
+
+                    <Button text="← Nazad"
+                            onAction="#onBackClicked"
+                            styleClass="btn-back"/>
+
+                    <Button text="Dalje →"
+                            onAction="#onNextClicked"
+                            styleClass="btn-next"/>
+
+                </HBox>
+
+            </VBox>
+        </StackPane>
+
+    </content>
+</ScrollPane>

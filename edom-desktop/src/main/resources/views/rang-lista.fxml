@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.RangListaController"
+            stylesheets="@../styles/rang-lista-style.css"
+            styleClass="rang-root">
+
+    <top>
+        <HBox spacing="12" styleClass="rang-header">
+            <Label text="Rang lista studenata" styleClass="rang-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox styleClass="rang-card" spacing="14">
+
+            <HBox alignment="CENTER_RIGHT">
+            <MenuBar>
+
+                <Menu fx:id="menuKolone" text="Prikaži kolone"/>
+            </MenuBar>
+            </HBox>
+
+            <TableView fx:id="tblRangLista"
+                       VBox.vgrow="ALWAYS"
+                       styleClass="rang-table">
+
+                <columns>
+                    <TableColumn fx:id="colRedniBroj" text="R.br" prefWidth="70"  styleClass="centered-cell"/>
+                    <TableColumn fx:id="colIdPrijave" text="ID prijave" prefWidth="60" styleClass="centered-cell"/>
+                    <TableColumn fx:id="colImePrezime" text="Ime i prezime" prefWidth="250"/>
+                    <TableColumn fx:id="colGodinaStudija" text="Godina studija" prefWidth="100" styleClass="centered-cell"/>
+                    <TableColumn fx:id="colProsjek" text="Prosjek" prefWidth="100" styleClass="centered-cell"/>
+                    <TableColumn fx:id="colOsvojeneNagrade" text="Nagrade" prefWidth="100" styleClass="centered-cell"/>
+                    <TableColumn fx:id="colSocijalniStatus" text="Socijalni" prefWidth="100" styleClass="centered-cell"/>
+                    <TableColumn fx:id="colUdaljenost" text="Udaljenost" prefWidth="100" styleClass="centered-cell"/>
+                    <TableColumn fx:id="colDodatniBodovi" text="Dodatni bodovi" prefWidth="100" styleClass="centered-cell"/>
+
+                    <TableColumn fx:id="colUkupniBodovi" text="Ukupni bodovi" prefWidth="160" styleClass="centered-cell"/>
+                    <TableColumn fx:id="colDetalji" text="" prefWidth="140"/>
+                </columns>
+
+            </TableView>
+
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button fx:id="btnExportHtmlPdf" text="Export PDF (HTML)" onAction="#onExportHtmlPdf"/>
+            </HBox>
+
+        </VBox>
+    </center>
+
+</BorderPane>
