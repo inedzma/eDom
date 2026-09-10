@@ -32,6 +32,16 @@ public class Korisnik {
     @Column(name = "zadnja_prijava")
     private Instant zadnjaPrijava;
 
+    @Column(name = "reset_token_hash", length = 255)
+    private String resetToken;
+
+    @Column(name = "reset_token_istek")
+    private Instant resetTokenIstek;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "studentid_student")
+    private Student student;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ulogaid_uloga")
     private Uloga uloga;
