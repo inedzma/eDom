@@ -1,0 +1,13 @@
+spring.datasource.url=
+spring.datasource.username=
+spring.datasource.password=
+
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+logging.level.org.springframework.security=DEBUG
+logging.level.org.springframework.web=DEBUG
+
+edom.jwt.secret=
+edom.jwt.trajanje-sati=
