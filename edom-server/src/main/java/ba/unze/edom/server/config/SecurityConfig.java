@@ -1,5 +1,6 @@
 package ba.unze.edom.server.config;
 
+import ba.unze.edom.server.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,10 +12,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtFilter jwtFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,7 +44,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .anyRequest().hasRole("ADMIN")
                 )
-                .httpBasic(b -> {});   // privremeno, dok ne dodamo JWT
+                .httpBasic(b -> {})
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -50,12 +56,21 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(a -> a
                         .requestMatchers("/", "/login", "/registracija", "/error",
+                                "/rang-lista",
                                 "/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/student/**").hasRole("Student")
                         .anyRequest().authenticated()
                 )
-                .formLogin(f -> f.permitAll())
-                .logout(l -> l.permitAll());
+                .formLogin(f -> f
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/student/pocetna", true)
+                        .permitAll()
+                )
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(
+                                new LoginUrlAuthenticationEntryPoint("/")
+                        ))
+                .logout(l -> l.logoutSuccessUrl("/").permitAll());
         return http.build();
     }
 }

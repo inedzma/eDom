@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>E-Dom — Registracija</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="kartica">
+    <h1>Registracija studenta</h1>
+
+    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
+
+    <form th:action="@{/registracija}" th:object="${zahtjev}" method="post">
+
+        <label>Ime</label>
+        <input type="text" th:field="*{ime}">
+        <span class="greska" th:if="${#fields.hasErrors('ime')}" th:errors="*{ime}"></span>
+
+        <label>Prezime</label>
+        <input type="text" th:field="*{prezime}">
+        <span class="greska" th:if="${#fields.hasErrors('prezime')}" th:errors="*{prezime}"></span>
+
+        <label>JMBG</label>
+        <input type="text" th:field="*{jmbg}" maxlength="13">
+        <span class="greska" th:if="${#fields.hasErrors('jmbg')}" th:errors="*{jmbg}"></span>
+
+        <label>Broj indeksa</label>
+        <input type="text" th:field="*{brojIndeksa}">
+        <span class="greska" th:if="${#fields.hasErrors('brojIndeksa')}" th:errors="*{brojIndeksa}"></span>
+
+        <label>Ime roditelja</label>
+        <input type="text" th:field="*{imeRoditelja}">
+        <span class="greska" th:if="${#fields.hasErrors('imeRoditelja')}" th:errors="*{imeRoditelja}"></span>
+
+        <label>Fakultet</label>
+        <input type="text" th:field="*{fakultet}">
+        <span class="greska" th:if="${#fields.hasErrors('fakultet')}" th:errors="*{fakultet}"></span>
+
+        <label>Godina studija</label>
+        <input type="number" th:field="*{godinaStudija}" min="1" max="6">
+        <span class="greska" th:if="${#fields.hasErrors('godinaStudija')}" th:errors="*{godinaStudija}"></span>
+
+        <label>Adresa</label>
+        <input type="text" th:field="*{adresa}">
+        <span class="greska" th:if="${#fields.hasErrors('adresa')}" th:errors="*{adresa}"></span>
+
+        <label>E-mail</label>
+        <input type="email" th:field="*{email}">
+        <span class="greska" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+
+        <label>Telefon</label>
+        <input type="text" th:field="*{telefon}">
+
+        <label>Lozinka</label>
+        <input type="password" th:field="*{lozinka}">
+        <span class="greska" th:if="${#fields.hasErrors('lozinka')}" th:errors="*{lozinka}"></span>
+
+        <button type="submit">Registruj se</button>
+    </form>
+
+    <p>Već imate nalog? <a th:href="@{/login}">Prijavite se</a></p>
+</div>
+</body>
+</html>

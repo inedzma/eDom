@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>E-Dom — Prijava za smještaj</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<main>
+    <h1>Prijava za smještaj u Studentskom centru Zenica</h1>
+
+    <p>
+        Putem ovog sistema možete podnijeti prijavu za smještaj,
+        priložiti potrebnu dokumentaciju i pratiti status svoje prijave.
+    </p>
+
+    <h2>Postupak</h2>
+    <ol>
+        <li>Registrujte se ili se prijavite na svoj nalog</li>
+        <li>Popunite prijavu za tekuću akademsku godinu</li>
+        <li>Priložite potrebne dokumente</li>
+        <li>Pratite status prijave i objavu rang liste</li>
+    </ol>
+
+    <p>
+        <a th:href="@{/login}">Prijavi se</a>
+        &nbsp;|&nbsp;
+        <a th:href="@{/registracija}">Registruj se</a>
+    </p>
+
+    <p>
+        <a th:href="@{/rang-lista}">Rang lista</a>
+    </p>
+</main>
+
+</body>
+</html>

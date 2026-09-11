@@ -2,6 +2,8 @@ package ba.unze.edom.server.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,16 @@ public class Prijava {
 
     @OneToMany(mappedBy = "prijava", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Dokument> dokumenti = new ArrayList<>();
+
+    @Column(name = "prosjek", precision = 4, scale = 2)
+    private BigDecimal prosjek;
+
+    @Column(name = "godina_studija")
+    private Integer godinaStudija;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "socijalni_status_id_status")
+    private SocijalniStatus socijalniStatus;
 
     // pomocne metode za odrzavanje obje strane veze
     public void dodajDokument(Dokument d) {

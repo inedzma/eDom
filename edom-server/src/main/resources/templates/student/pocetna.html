@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Dom — Moje prijave</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>E-Dom</h1>
+    <nav>
+        <a th:href="@{/student/profil}">Moj profil</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Odjava</button>
+        </form>
+    </nav>
+</header>
+
+<main>
+
+    <p>Prijavljeni ste kao <strong th:text="${ime}">korisnik</strong></p>
+
+    <h2>Moje prijave</h2>
+
+    <div class="prazno" th:if="${#lists.isEmpty(prijave)}">
+        <p>Još nemate nijednu prijavu.</p>
+        <a class="dugme" th:href="@{/student/prijava/nova}">Podnesi prijavu</a>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(prijave)}">
+        <table>
+            <thead>
+            <tr>
+                <th>Akademska godina</th>
+                <th>Datum prijave</th>
+                <th>Status</th>
+                <th>Bodovi</th>
+                <th>Dokumenti</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${prijave}">
+                <td th:text="${p.akademskaGodina}">2025</td>
+                <td th:text="${p.datumPrijave != null} ? ${#temporals.format(p.datumPrijave, 'dd.MM.yyyy.')} : '—'">—</td>
+                <td><span class="oznaka" th:text="${p.status}">Na pregledu</span></td>
+                <td th:text="${p.ukupniBodovi != null} ? ${p.ukupniBodovi} : '—'">—</td>
+                <td th:text="${p.brojDokumenata}">0</td>
+                <td><a th:href="@{/student/prijava/{id}(id=${p.idPrijava})}">Detalji</a></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <a class="dugme" th:href="@{/student/prijava/nova}">Podnesi novu prijavu</a>
+    </div>
+
+</main>
+
+</body>
+</html>

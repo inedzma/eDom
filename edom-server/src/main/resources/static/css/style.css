@@ -1,0 +1,172 @@
+:root {
+    --zelena: #10a37f;
+    --zelena-tamna: #0b7a5e;
+    --tamna: #0f3b32;
+    --tekst: #1f2937;
+    --sivo: #6b7280;
+    --ivica: #e5e7eb;
+    --pozadina: #f4f7f6;
+    --bijela: #ffffff;
+    --greska: #dc2626;
+    --uspjeh: #059669;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    background: var(--pozadina);
+    color: var(--tekst);
+    line-height: 1.6;
+}
+
+header {
+    background: var(--tamna);
+    color: var(--bijela);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 { font-size: 1.25rem; font-weight: 600; }
+
+header nav { display: flex; gap: 1.5rem; align-items: center; }
+
+header nav a {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+header nav a:hover { color: var(--bijela); }
+
+header nav button {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.4);
+    color: var(--bijela);
+    padding: 0.35rem 0.9rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+header nav button:hover { background: rgba(255,255,255,0.12); }
+
+main {
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+h2 {
+    font-size: 1.3rem;
+    margin: 2rem 0 1rem;
+    color: var(--tamna);
+}
+
+.kartica {
+    background: var(--bijela);
+    border: 1px solid var(--ivica);
+    border-radius: 10px;
+    padding: 2rem;
+    max-width: 480px;
+    margin: 3rem auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.kartica h1 {
+    font-size: 1.4rem;
+    color: var(--tamna);
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 1rem 0 0.35rem;
+    color: var(--sivo);
+}
+
+input, select {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--ivica);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--zelena);
+    box-shadow: 0 0 0 3px rgba(16,163,127,0.12);
+}
+
+button[type="submit"], .dugme {
+    display: inline-block;
+    background: var(--zelena);
+    color: var(--bijela);
+    border: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    text-decoration: none;
+}
+
+button[type="submit"]:hover, .dugme:hover { background: var(--zelena-tamna); }
+
+a { color: var(--zelena); }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bijela);
+    border: 1px solid var(--ivica);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th {
+    background: #eef4f2;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--sivo);
+}
+
+td {
+    padding: 0.85rem 1rem;
+    border-top: 1px solid var(--ivica);
+    font-size: 0.95rem;
+}
+
+tbody tr:hover { background: #fafcfb; }
+
+.oznaka {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: #eef4f2;
+    color: var(--tamna);
+}
+
+.greska { color: var(--greska); font-size: 0.85rem; }
+.uspjeh { color: var(--uspjeh); font-size: 0.9rem; }
+
+.prazno {
+    background: var(--bijela);
+    border: 1px dashed var(--ivica);
+    border-radius: 8px;
+    padding: 2.5rem;
+    text-align: center;
+    color: var(--sivo);
+}
