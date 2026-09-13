@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Dom — Moj profil</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>E-Dom</h1>
+    <nav>
+        <a th:href="@{/student/pocetna}">Moje prijave</a>
+        <a th:href="@{/rang-lista}">Rang lista</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Odjava</button>
+        </form>
+    </nav>
+</header>
+
+<main>
+
+    <h2>Moj profil</h2>
+
+    <p class="uspjeh" th:if="${param.sacuvano}">Podaci su sačuvani.</p>
+    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
+
+    <h3>Lični podaci</h3>
+    <p style="color:var(--sivo); font-size:0.85rem;">
+        Ovi podaci se ne mogu mijenjati putem sistema. Za ispravku se obratite administraciji doma.
+    </p>
+
+    <table>
+        <tbody>
+        <tr><td>Ime i prezime</td>
+            <td th:text="${profil.ime} + ' ' + ${profil.prezime}">—</td></tr>
+        <tr><td>JMBG</td><td th:text="${profil.jmbg}">—</td></tr>
+        <tr><td>Broj indeksa</td><td th:text="${profil.brojIndeksa}">—</td></tr>
+        <tr><td>Ime roditelja</td><td th:text="${profil.imeRoditelja}">—</td></tr>
+        </tbody>
+    </table>
+
+    <h3 style="margin-top:2rem;">Kontakt i studij</h3>
+
+    <form th:action="@{/student/profil}" th:object="${izmjena}" method="post">
+
+        <label>E-mail</label>
+        <input type="email" th:field="*{email}">
+        <span class="greska" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+
+        <label>Telefon</label>
+        <input type="text" th:field="*{telefon}">
+
+        <label>Adresa</label>
+        <input type="text" th:field="*{adresa}">
+        <span class="greska" th:if="${#fields.hasErrors('adresa')}" th:errors="*{adresa}"></span>
+
+        <label>Fakultet</label>
+        <input type="text" th:field="*{fakultet}">
+        <span class="greska" th:if="${#fields.hasErrors('fakultet')}" th:errors="*{fakultet}"></span>
+
+        <label>Godina studija</label>
+        <input type="number" th:field="*{godinaStudija}" min="1" max="6">
+        <span class="greska" th:if="${#fields.hasErrors('godinaStudija')}" th:errors="*{godinaStudija}"></span>
+
+        <button type="submit">Sačuvaj izmjene</button>
+    </form>
+
+    <p style="margin-top:2rem; color:var(--sivo); font-size:0.85rem;">
+        Prosjek ocjena i socijalni status unose se prilikom podnošenja prijave
+        i utvrđuju se na osnovu priložene dokumentacije.
+    </p>
+
+</main>
+
+</body>
+</html>
