@@ -52,6 +52,26 @@ public class Prijava {
     @JoinColumn(name = "socijalni_status_id_status")
     private SocijalniStatus socijalniStatus;
 
+    @Column(name = "udaljenost_km", precision = 6, scale = 2)
+    private BigDecimal udaljenostKm;
+
+    @Column(name = "broj_clanova_domacinstva")
+    private Integer brojClanovaDomacinstva;
+
+    @Column(name = "ukupna_primanja", precision = 10, scale = 2)
+    private BigDecimal ukupnaPrimanja;
+
+    @Column(name = "polozeni_ispiti")
+    private Integer polozeniIspiti;
+
+    @OneToMany(mappedBy = "prijava", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PrijavaKriterij> kriteriji = new ArrayList<>();
+
+    public void dodajKriterij(PrijavaKriterij k) {
+        kriteriji.add(k);
+        k.setPrijava(this);
+    }
+
     // pomocne metode za odrzavanje obje strane veze
     public void dodajDokument(Dokument d) {
         dokumenti.add(d);
