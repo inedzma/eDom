@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Dom — Domaćinstvo</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>E-Dom</h1>
+    <nav>
+        <a th:href="@{/student/pocetna}">Moje prijave</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Odjava</button>
+        </form>
+    </nav>
+</header>
+
+<main class="forma-uska">
+
+    <h2>Podaci o domaćinstvu</h2>
+    <div th:replace="~{fragmenti/koraci :: koraci(${korak})}"></div>
+
+    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
+
+    <form th:action="@{/student/prijava/{id}/domacinstvo(id=${idPrijave})}"
+          th:object="${forma}" method="post">
+
+        <label>Broj članova domaćinstva</label>
+        <input type="number" th:field="*{brojClanovaDomacinstva}" min="1">
+        <span class="greska" th:if="${#fields.hasErrors('brojClanovaDomacinstva')}"
+              th:errors="*{brojClanovaDomacinstva}"></span>
+        <p style="font-size:0.8rem;color:var(--sivo);margin-top:0.3rem;">
+            Uključujući i vas.
+        </p>
+
+        <label>Ukupna mjesečna primanja domaćinstva (KM)</label>
+        <input type="number" step="0.01" th:field="*{ukupnaPrimanja}" min="0">
+        <span class="greska" th:if="${#fields.hasErrors('ukupnaPrimanja')}"
+              th:errors="*{ukupnaPrimanja}"></span>
+        <p style="font-size:0.8rem;color:var(--sivo);margin-top:0.3rem;">
+            Zbir svih primanja članova domaćinstva, dokazuje se priloženom
+            dokumentacijom.
+        </p>
+
+        <label>Udaljenost mjesta stanovanja do doma (km)</label>
+        <input type="number" step="0.1" th:field="*{udaljenostKm}" min="0">
+        <span class="greska" th:if="${#fields.hasErrors('udaljenostKm')}"
+              th:errors="*{udaljenostKm}"></span>
+
+        <div class="akcije">
+            <a class="dugme-sivo"
+               th:href="@{/student/prijava/{id}/studij(id=${idPrijave})}">← Nazad</a>
+            <button type="submit">Dalje →</button>
+        </div>
+    </form>
+
+</main>
+
+</body>
+</html>

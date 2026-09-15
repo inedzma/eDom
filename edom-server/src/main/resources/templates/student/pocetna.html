@@ -53,6 +53,9 @@
             </tbody>
         </table>
 
+        <p class="uspjeh" th:if="${uspjeh}" th:text="${uspjeh}"></p>
+        <p class="greska" th:if="${greska}" th:text="${greska}"></p>
+
         <a class="dugme" th:href="@{/student/prijava/nova}">Podnesi novu prijavu</a>
     </div>
 

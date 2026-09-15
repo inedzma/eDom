@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Dom — Nova prijava</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>E-Dom</h1>
+    <nav>
+        <a th:href="@{/student/pocetna}">Moje prijave</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Odjava</button>
+        </form>
+    </nav>
+</header>
+
+<main class="forma-uska">
+
+    <h2>Nova prijava za smještaj</h2>
+    <div th:replace="~{fragmenti/koraci :: koraci(${korak})}"></div>
+
+    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
+
+    <form th:action="@{/student/prijava/{id}/studij(id=${idPrijave})}"
+          th:object="${forma}" method="post">
+
+        <div class="red-dva">
+            <div>
+                <label>Akademska godina</label>
+                <input type="number" th:field="*{akademskaGodina}">
+                <span class="greska" th:if="${#fields.hasErrors('akademskaGodina')}"
+                      th:errors="*{akademskaGodina}"></span>
+            </div>
+            <div>
+                <label>Godina studija</label>
+                <select th:field="*{godinaStudija}">
+                    <option value="">Odaberite</option>
+                    <option value="1">1. godina</option>
+                    <option value="2">2. godina</option>
+                    <option value="3">3. godina</option>
+                    <option value="4">4. godina</option>
+                    <option value="5">5. godina</option>
+                    <option value="6">6. godina</option>
+                    <option value="7">Apsolvent</option>
+                    <option value="8">Postdiplomac</option>
+                </select>
+                <span class="greska" th:if="${#fields.hasErrors('godinaStudija')}"
+                      th:errors="*{godinaStudija}"></span>
+            </div>
+        </div>
+
+        <div class="red-dva">
+            <div>
+                <label>Prosjek ocjena</label>
+                <input type="number" step="0.01" th:field="*{prosjek}">
+                <span class="greska" th:if="${#fields.hasErrors('prosjek')}"
+                      th:errors="*{prosjek}"></span>
+                <p style="font-size:0.8rem;color:var(--sivo);margin-top:0.3rem;">
+                    Brucoši unose prosjek srednje škole (1.00–5.00),
+                    ostali prosjek na fakultetu (6.00–10.00).
+                </p>
+            </div>
+            <div>
+                <label>Broj položenih ispita</label>
+                <input type="number" th:field="*{polozeniIspiti}" min="0">
+                <span class="greska" th:if="${#fields.hasErrors('polozeniIspiti')}"
+                      th:errors="*{polozeniIspiti}"></span>
+                <p style="font-size:0.8rem;color:var(--sivo);margin-top:0.3rem;">
+                    Brucoši ostavljaju prazno.
+                </p>
+            </div>
+        </div>
+
+        <div class="akcije">
+            <button type="submit">Dalje →</button>
+            <a class="dugme-sivo" th:href="@{/student/pocetna}">Prekini</a>
+        </div>
+    </form>
+
+    <form th:action="@{/student/prijava/{id}/odustani(id=${idPrijave})}"
+          method="post" style="margin-top:2rem;"
+          onsubmit="return confirm('Sigurno želite obrisati ovu prijavu? Uneseni podaci se neće sačuvati.');">
+        <button type="submit" class="dugme-sivo" style="color:var(--greska);">
+            Odustani od prijave
+        </button>
+    </form>
+
+</main>
+
+</body>
+</html>

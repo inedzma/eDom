@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PrijavaRepository extends JpaRepository<Prijava, Integer> {
 
@@ -31,4 +32,7 @@ public interface PrijavaRepository extends JpaRepository<Prijava, Integer> {
     List<Prijava> nadjiZaStudenta(@Param("idStudenta") Integer idStudenta);
 
     long countByStatus_Naziv(String naziv);
+
+    Optional<Prijava> findByStudent_IdStudentAndAkademskaGodina(
+            Integer idStudenta, Integer akademskaGodina);
 }

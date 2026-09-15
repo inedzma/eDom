@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Dom — Dodatni kriteriji</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>E-Dom</h1>
+    <nav>
+        <a th:href="@{/student/pocetna}">Moje prijave</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Odjava</button>
+        </form>
+    </nav>
+</header>
+
+<main class="forma-uska">
+
+    <h2>Dodatni kriteriji</h2>
+    <div th:replace="~{fragmenti/koraci :: koraci(${korak})}"></div>
+
+    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
+
+    <p style="color:var(--sivo);font-size:0.9rem;">
+        Označite kriterije koji se odnose na vas. Za svaki označeni kriterij
+        potrebno je priložiti odgovarajući dokument. Bodovi se dodjeljuju tek
+        nakon što administracija provjeri dokumentaciju.
+    </p>
+
+    <form th:action="@{/student/prijava/{id}/kriteriji(id=${idPrijave})}"
+          th:object="${forma}" method="post">
+
+        <h3 style="margin-top:2rem;">Status branilaca i socijalne kategorije</h3>
+        <p style="font-size:0.8rem;color:var(--sivo);">
+            Ako se na vas odnosi više kriterija iz ove grupe, boduje se
+            samo onaj koji nosi najviše bodova.
+        </p>
+
+        <div th:each="k, stat : *{kriteriji}">
+            <div class="kriterij-red" th:if="${k.grupa == 'BRANIOCI'}">
+                <input type="hidden" th:field="*{kriteriji[__${stat.index}__].idVrsteKriterija}">
+                <label>
+                    <input type="checkbox"
+                           th:field="*{kriteriji[__${stat.index}__].izabran}">
+                    <span th:text="${k.naziv}">Kriterij</span>
+                </label>
+                <div class="parametar" th:if="${k.traziParametar}">
+                    <label th:text="${k.nazivParametra}">Parametar</label>
+                    <input type="number" step="0.01"
+                           th:field="*{kriteriji[__${stat.index}__].parametar}">
+                </div>
+            </div>
+        </div>
+
+        <h3 style="margin-top:2rem;">Ostali kriteriji</h3>
+
+        <div th:each="k, stat : *{kriteriji}">
+            <div class="kriterij-red" th:if="${k.grupa == 'DODATNI'}">
+                <input type="hidden" th:field="*{kriteriji[__${stat.index}__].idVrsteKriterija}">
+                <label>
+                    <input type="checkbox"
+                           th:field="*{kriteriji[__${stat.index}__].izabran}">
+                    <span th:text="${k.naziv}">Kriterij</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="akcije">
+            <a class="dugme-sivo"
+               th:href="@{/student/prijava/{id}/domacinstvo(id=${idPrijave})}">← Nazad</a>
+            <button type="submit">Dalje →</button>
+        </div>
+    </form>
+
+</main>
+
+</body>
+</html>

@@ -170,3 +170,42 @@ tbody tr:hover { background: #fafcfb; }
     text-align: center;
     color: var(--sivo);
 }
+
+.koraci {
+    display: flex;
+    gap: 1.5rem;
+    margin: 1.5rem 0 2rem;
+    font-size: 0.9rem;
+    color: var(--sivo);
+    flex-wrap: wrap;
+}
+.koraci > span { display: flex; gap: 0.4rem; align-items: center; }
+.koraci .aktivan { color: var(--zelena); font-weight: 600; }
+.koraci .gotov { color: var(--tamna); }
+
+.forma-uska { max-width: 640px; }
+.red-dva { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 640px) { .red-dva { grid-template-columns: 1fr; } }
+
+.kriterij-red {
+    background: var(--bijela);
+    border: 1px solid var(--ivica);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.6rem;
+}
+.kriterij-red label {
+    display: flex; align-items: center; gap: 0.6rem;
+    margin: 0; font-weight: 500; color: var(--tekst);
+    font-size: 0.95rem; text-transform: none;
+}
+.kriterij-red input[type="checkbox"] { width: auto; }
+.kriterij-red .parametar { margin-top: 0.6rem; padding-left: 1.8rem; }
+.kriterij-red .parametar input { max-width: 220px; }
+
+.akcije { display: flex; gap: 1rem; margin-top: 2rem; align-items: center; }
+.dugme-sivo {
+    background: var(--bijela); color: var(--tekst);
+    border: 1px solid var(--ivica); padding: 0.7rem 1.4rem;
+    border-radius: 6px; text-decoration: none; font-size: 0.95rem;
+}

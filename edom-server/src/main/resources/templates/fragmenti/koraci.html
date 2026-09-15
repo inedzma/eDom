@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="koraci(trenutni)" class="koraci">
+    <span th:each="i : ${#numbers.sequence(1,4)}"
+          th:classappend="${i == trenutni} ? 'aktivan' : (${i < trenutni} ? 'gotov' : '')">
+        <span th:text="${i}">1</span>
+        <span th:text="${ {'Studij','Domaćinstvo','Kriteriji','Pregled'}[i-1] }">Studij</span>
+    </span>
+</div>
+
+</body>
+</html>
