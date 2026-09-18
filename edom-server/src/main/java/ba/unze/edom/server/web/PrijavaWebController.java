@@ -5,13 +5,18 @@ import ba.unze.edom.server.exception.PrijavaException;
 import ba.unze.edom.server.security.KorisnikPrincipal;
 import ba.unze.edom.server.service.BodovanjeService;
 import ba.unze.edom.server.service.PrijavaService;
+import ba.unze.edom.server.service.DokumentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
@@ -200,5 +205,93 @@ public class PrijavaWebController {
             ra.addFlashAttribute("greska", e.getMessage());
         }
         return "redirect:/student/pocetna";
+    }
+
+    @GetMapping("/{id}")
+    public String detalji(@PathVariable Integer id,
+                          @AuthenticationPrincipal KorisnikPrincipal k,
+                          Model model) {
+
+        var p = prijavaService.dohvatiSvoju(id, k.getIdStudenta());
+
+        model.addAttribute("prijava", p);
+        model.addAttribute("rezultat", bodovanjeService.izracunaj(p));
+        model.addAttribute("uIzradi",
+                p.getStatus() != null && "u izradi".equals(p.getStatus().getNaziv()));
+
+        return "student/prijava/detalji";
+    }
+
+    private final DokumentService dokumentService;   // novo polje
+
+    // ---------- PREGLED ----------
+
+    @GetMapping("/{id}/dokumenti")
+    public String dokumenti(@PathVariable Integer id,
+                            @AuthenticationPrincipal KorisnikPrincipal k,
+                            Model model) {
+
+        var p = prijavaService.dohvatiSvoju(id, k.getIdStudenta());
+
+        model.addAttribute("prijava", p);
+        model.addAttribute("idPrijave", id);
+        model.addAttribute("dokumenti", dokumentService.zaPrijavu(id));
+        model.addAttribute("vrste", dokumentService.sveVrste());
+        model.addAttribute("uIzradi",
+                p.getStatus() != null
+                        && "u izradi".equals(p.getStatus().getNaziv()));
+
+        return "student/prijava/dokumenti";
+    }
+
+    // ---------- DODAVANJE ----------
+
+    @PostMapping("/{id}/dokumenti")
+    public String dodajDokument(@PathVariable Integer id,
+                                @AuthenticationPrincipal KorisnikPrincipal k,
+                                @RequestParam Integer idVrste,
+                                @RequestParam(required = false) String naziv,
+                                @RequestParam MultipartFile fajl,
+                                RedirectAttributes ra) {
+        try {
+            dokumentService.dodaj(id, k.getIdStudenta(), idVrste, fajl, naziv);
+            ra.addFlashAttribute("uspjeh", "Dokument je prilozen.");
+        } catch (RuntimeException e) {
+            ra.addFlashAttribute("greska", e.getMessage());
+        }
+        return "redirect:/student/prijava/" + id + "/dokumenti";
+    }
+
+    // ---------- BRISANJE ----------
+
+    @PostMapping("/{id}/dokumenti/{idDok}/obrisi")
+    public String obrisiDokument(@PathVariable Integer id,
+                                 @PathVariable Integer idDok,
+                                 @AuthenticationPrincipal KorisnikPrincipal k,
+                                 RedirectAttributes ra) {
+        try {
+            dokumentService.obrisi(idDok, k.getIdStudenta());
+            ra.addFlashAttribute("uspjeh", "Dokument je obrisan.");
+        } catch (RuntimeException e) {
+            ra.addFlashAttribute("greska", e.getMessage());
+        }
+        return "redirect:/student/prijava/" + id + "/dokumenti";
+    }
+
+    // ---------- PREUZIMANJE ----------
+
+    @GetMapping("/{id}/dokumenti/{idDok}/preuzmi")
+    public ResponseEntity<byte[]> preuzmi(@PathVariable Integer id,
+                                          @PathVariable Integer idDok,
+                                          @AuthenticationPrincipal KorisnikPrincipal k) {
+
+        String b64 = dokumentService.sadrzaj(idDok, k.getIdStudenta());
+        byte[] podaci = java.util.Base64.getDecoder().decode(b64);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"dokument-" + idDok + "\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(podaci);
     }
 }

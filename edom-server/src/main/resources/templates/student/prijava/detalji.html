@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Dom — Detalji prijave</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>E-Dom</h1>
+    <nav>
+        <a th:href="@{/student/pocetna}">Moje prijave</a>
+        <a th:href="@{/student/profil}">Moj profil</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Odjava</button>
+        </form>
+    </nav>
+</header>
+
+<main>
+
+    <h2>
+        Prijava za akademsku
+        <span th:text="${prijava.akademskaGodina}">2026</span>. godinu
+    </h2>
+
+    <p>
+        Status:
+        <span class="oznaka"
+              th:text="${prijava.status != null} ? ${prijava.status.naziv} : '—'">—</span>
+        <span th:if="${prijava.datumPrijave != null}"
+              style="color:var(--sivo);font-size:0.85rem;">
+            &nbsp;podneseno
+            <span th:text="${#temporals.format(prijava.datumPrijave, 'dd.MM.yyyy.')}"></span>
+        </span>
+    </p>
+
+    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
+    <p class="uspjeh" th:if="${uspjeh}" th:text="${uspjeh}"></p>
+
+    <h3 style="margin-top:2rem;">Podaci o studiju</h3>
+    <table>
+        <tbody>
+        <tr><td>Godina studija</td>
+            <td th:text="${prijava.godinaStudija} ?: '—'">—</td></tr>
+        <tr><td>Prosjek ocjena</td>
+            <td th:text="${prijava.prosjek} ?: '—'">—</td></tr>
+        <tr><td>Položenih ispita</td>
+            <td th:text="${prijava.polozeniIspiti} ?: '—'">—</td></tr>
+        </tbody>
+    </table>
+
+    <h3 style="margin-top:2rem;">Domaćinstvo</h3>
+    <table>
+        <tbody>
+        <tr><td>Broj članova</td>
+            <td th:text="${prijava.brojClanovaDomacinstva} ?: '—'">—</td></tr>
+        <tr><td>Ukupna primanja</td>
+            <td th:text="${prijava.ukupnaPrimanja != null} ? ${prijava.ukupnaPrimanja} + ' KM' : '—'">—</td></tr>
+        <tr><td>Udaljenost do doma</td>
+            <td th:text="${prijava.udaljenostKm != null} ? ${prijava.udaljenostKm} + ' km' : '—'">—</td></tr>
+        </tbody>
+    </table>
+
+    <h3 style="margin-top:2rem;">Prijavljeni kriteriji</h3>
+
+    <div class="prazno" th:if="${#lists.isEmpty(prijava.kriteriji)}">
+        <p>Niste prijavili nijedan dodatni kriterij.</p>
+    </div>
+
+    <table th:unless="${#lists.isEmpty(prijava.kriteriji)}">
+        <thead>
+        <tr><th>Kriterij</th><th>Vrijednost</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="k : ${prijava.kriteriji}">
+            <td th:text="${k.vrsta.naziv}">Kriterij</td>
+            <td th:text="${k.parametar} ?: '—'">—</td>
+            <td>
+                <span class="oznaka"
+                      th:text="${k.verifikovan} ? 'Priznato' : 'Čeka provjeru'">—</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3 style="margin-top:2rem;">Obračun bodova</h3>
+
+    <table>
+        <thead>
+        <tr><th>Osnov</th><th>Bodovi</th><th>Napomena</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${rezultat.stavke}">
+            <td th:text="${s.naziv}">Osnov</td>
+            <td th:text="${s.bodovi}">0</td>
+            <td th:text="${s.obrazlozenje} ?: ''"></td>
+            <td>
+                <span class="oznaka"
+                      th:text="${s.verifikovan} ? 'Priznato' : 'Čeka provjeru'">—</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p style="margin-top:1rem;">
+        <strong>Priznato:</strong>
+        <span th:text="${rezultat.potvrdjeno}">0</span> bodova<br>
+        <strong>Ukupno moguće:</strong>
+        <span th:text="${rezultat.potencijalno}">0</span> bodova
+    </p>
+
+    <p th:if="${rezultat.cekaVerifikaciju()}"
+       style="color:var(--sivo);font-size:0.85rem;">
+        Dio bodova čeka provjeru dokumentacije od strane administracije doma.
+    </p>
+
+    <!-- akcije za prijavu u izradi -->
+    <div class="akcije" th:if="${uIzradi}">
+        <a class="dugme"
+           th:href="@{/student/prijava/{id}/studij(id=${prijava.idPrijava})}">
+            Nastavi uređivanje
+        </a>
+        <form th:action="@{/student/prijava/{id}/odustani(id=${prijava.idPrijava})}"
+              method="post"
+              onsubmit="return confirm('Sigurno želite obrisati ovu prijavu?');">
+            <button type="submit" class="dugme-sivo" style="color:var(--greska);">
+                Obriši prijavu
+            </button>
+        </form>
+    </div>
+
+    <!-- podnesena prijava -->
+    <div th:unless="${uIzradi}" style="margin-top:2rem;">
+        <p style="color:var(--sivo);font-size:0.85rem;">
+            Podnesena prijava se ne može mijenjati. Za izmjene se obratite
+            administraciji Studentskog centra.
+        </p>
+        <a class="dugme-sivo" th:href="@{/student/pocetna}">← Nazad</a>
+    </div>
+
+    <a class="dugme"
+       th:href="@{/student/prijava/{id}/dokumenti(id=${prijava.idPrijava})}">
+        Dokumenti
+    </a>
+
+</main>
+
+</body>
+</html>

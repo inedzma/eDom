@@ -126,6 +126,7 @@ public class PrijavaService {
         // izmjena kriterija ponistava raniju verifikaciju
         p.getKriteriji().clear();
 
+        prijavaRepository.saveAndFlush(p);
         for (KriterijIzborDTO red : forma.getKriteriji()) {
 
             if (!red.isIzabran()) continue;

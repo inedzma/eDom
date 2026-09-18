@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Dom — Dokumenti</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>E-Dom</h1>
+    <nav>
+        <a th:href="@{/student/pocetna}">Moje prijave</a>
+        <a th:href="@{/student/profil}">Moj profil</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Odjava</button>
+        </form>
+    </nav>
+</header>
+
+<main>
+
+    <h2>
+        Dokumenti uz prijavu
+        <span th:text="${prijava.akademskaGodina}">2026</span>.
+    </h2>
+
+    <p class="uspjeh" th:if="${uspjeh}" th:text="${uspjeh}"></p>
+    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
+
+    <p style="color:var(--sivo);font-size:0.9rem;">
+        Dokumenti nisu obavezni za podnošenje prijave, ali kriteriji bez
+        priloženog dokaza ne donose bodove. Dokumente možete priložiti i
+        naknadno, kao i dostaviti lično u Studentski centar.
+    </p>
+
+    <!-- ---------- FORMA ---------- -->
+
+    <h3 style="margin-top:2rem;">Priloži dokument</h3>
+
+    <form th:action="@{/student/prijava/{id}/dokumenti(id=${idPrijave})}"
+          method="post" enctype="multipart/form-data" class="forma-uska">
+
+        <label>Vrsta dokumenta</label>
+        <select name="idVrste" required>
+            <option value="">Odaberite vrstu</option>
+            <option th:each="v : ${vrste}"
+                    th:value="${v.idVrsta}"
+                    th:text="${v.naziv}">Vrsta</option>
+        </select>
+
+        <label>Naziv (neobavezno)</label>
+        <input type="text" name="naziv"
+               placeholder="Ostavite prazno za naziv vrste">
+
+        <label>Datoteka</label>
+        <input type="file" name="fajl" accept=".jpg,.jpeg,.png,.pdf" required>
+        <p style="font-size:0.8rem;color:var(--sivo);margin-top:0.3rem;">
+            JPG, PNG ili PDF. Fotografija dokumenta snimljena telefonom je
+            dovoljna. Veće slike se automatski smanjuju.
+        </p>
+
+        <button type="submit">Priloži</button>
+    </form>
+
+    <!-- ---------- LISTA ---------- -->
+
+    <h3 style="margin-top:2.5rem;">Priloženi dokumenti</h3>
+
+    <div class="prazno" th:if="${#lists.isEmpty(dokumenti)}">
+        <p>Još niste priložili nijedan dokument.</p>
+    </div>
+
+    <table th:unless="${#lists.isEmpty(dokumenti)}">
+        <thead>
+        <tr>
+            <th>Naziv</th>
+            <th>Vrsta</th>
+            <th>Priloženo</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="d : ${dokumenti}">
+            <td th:text="${d.naziv}">Naziv</td>
+            <td th:text="${d.vrstaDokumenta != null}
+                    ? ${d.vrstaDokumenta.naziv} : '—'">—</td>
+            <td th:text="${d.datumUpload != null}
+                    ? ${#temporals.format(d.datumUpload, 'dd.MM.yyyy.')} : '—'">—</td>
+            <td>
+                <a th:href="@{/student/prijava/{id}/dokumenti/{idDok}/preuzmi
+                            (id=${idPrijave}, idDok=${d.idDokument})}"
+                   target="_blank">Pogledaj</a>
+
+                <form th:action="@{/student/prijava/{id}/dokumenti/{idDok}/obrisi
+                                 (id=${idPrijave}, idDok=${d.idDokument})}"
+                      method="post" style="display:inline; margin-left:1rem;"
+                      onsubmit="return confirm('Obrisati ovaj dokument?');">
+                    <button type="submit" class="veza-dugme">Obriši</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="akcije">
+        <a class="dugme-sivo"
+           th:href="@{/student/prijava/{id}(id=${idPrijave})}">← Nazad na prijavu</a>
+
+        <a th:if="${uIzradi}" class="dugme"
+           th:href="@{/student/prijava/{id}/pregled(id=${idPrijave})}">
+            Nastavi na pregled →
+        </a>
+    </div>
+
+</main>
+
+</body>
+</html>

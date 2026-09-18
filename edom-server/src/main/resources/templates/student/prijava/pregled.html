@@ -83,6 +83,10 @@
               method="post"
               onsubmit="return confirm('Nakon podnošenja prijavu više nećete moći mijenjati. Nastaviti?');">
             <button type="submit">Podnesi prijavu</button>
+            <a class="dugme-sivo"
+               th:href="@{/student/prijava/{id}/dokumenti(id=${idPrijave})}">
+                Priloži dokumente
+            </a>
         </form>
     </div>
 
