@@ -10,7 +10,7 @@ import java.util.Properties;
 public class EmailService {
 
     private static final String FROM_EMAIL = "e.dom.zenica@gmail.com";  // tvoj Gmail
-    private static final String PASSWORD = "tvda hvcw vewe moqq";          // 16-znak app password
+    private static final String PASSWORD = "cmbv hdnk pnfl cbpj";          // 16-znak app password
 
     public static void sendResetCode(String toEmail, String code) {
 

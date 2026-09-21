@@ -67,6 +67,15 @@ public class Prijava {
     @OneToMany(mappedBy = "prijava", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PrijavaKriterij> kriteriji = new ArrayList<>();
 
+    @Column(name = "uspjeh_verifikovan", nullable = false)
+    private boolean uspjehVerifikovan = false;
+
+    @Column(name = "primanja_verifikovana", nullable = false)
+    private boolean primanjaVerifikovana = false;
+
+    @Column(name = "udaljenost_verifikovana", nullable = false)
+    private boolean udaljenostVerifikovana = false;
+
     public void dodajKriterij(PrijavaKriterij k) {
         kriteriji.add(k);
         k.setPrijava(this);

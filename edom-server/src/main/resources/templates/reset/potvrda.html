@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Dom — Nova lozinka</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="kartica">
+    <h1>Nova lozinka</h1>
+
+    <p class="uspjeh" th:if="${info}" th:text="${info}"></p>
+    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
+
+    <form th:action="@{/zaboravljena-lozinka/potvrda}" method="post">
+        <input type="hidden" name="email" th:value="${email}">
+
+        <label for="kod">Kod iz e-maila</label>
+        <input type="text" id="kod" name="kod" required
+               inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+
+        <label for="lozinka">Nova lozinka</label>
+        <input type="password" id="lozinka" name="lozinka" required minlength="8"
+               autocomplete="new-password">
+
+        <label for="potvrda">Ponovite lozinku</label>
+        <input type="password" id="potvrda" name="potvrda" required minlength="8"
+               autocomplete="new-password">
+
+        <button type="submit">Postavi lozinku</button>
+    </form>
+
+    <p style="margin-top:1.5rem;font-size:0.9rem;">
+        Niste dobili kod?
+        <a th:href="@{/zaboravljena-lozinka}">Zatražite novi</a>
+    </p>
+</div>
+</body>
+</html>

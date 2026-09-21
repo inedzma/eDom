@@ -45,11 +45,15 @@
         </tbody>
     </table>
 
-    <h3 style="margin-top:2rem;">Okvirni obračun bodova</h3>
-    <p style="color:var(--sivo);font-size:0.85rem;">
+    <h3 style="margin-top:2rem;"
+        th:text="${rezultat.konacno()} ? 'Konačan obračun bodova'
+                                       : 'Okvirni obračun bodova'">Obračun</h3>
+
+    <p style="color:var(--sivo);font-size:0.85rem;"
+       th:unless="${rezultat.konacno()}">
         Ovo je okvirni obračun na osnovu podataka koje ste unijeli.
-        Konačan broj bodova utvrđuje administracija nakon provjere
-        priložene dokumentacije.
+        Bodovi se priznaju tek nakon što administracija doma provjeri
+        priloženu dokumentaciju.
     </p>
 
     <table>
@@ -62,19 +66,31 @@
             <td th:text="${s.bodovi}">0</td>
             <td th:text="${s.obrazlozenje} ?: ''"></td>
             <td>
-                <span class="oznaka" th:text="${s.verifikovan} ? 'Priznato' : 'Čeka provjeru'">—</span>
+                <span class="oznaka"
+                      th:text="${s.verifikovan} ? 'Provjereno' : 'Čeka provjeru'">—</span>
             </td>
         </tr>
         </tbody>
     </table>
 
-    <p style="margin-top:1rem;">
-        <strong>Bez dodatnih kriterija:</strong>
-        <span th:text="${rezultat.potvrdjeno}">0</span> bodova<br>
-        <strong>Ukupno moguće:</strong>
-        <span th:text="${rezultat.potencijalno}">0</span> bodova
+    <!-- dok odluka nije donesena -->
+    <p style="margin-top:1rem;" th:unless="${rezultat.konacno()}">
+        <strong>Ukupno prijavljeno:</strong>
+        <span th:text="${rezultat.potencijalno}">0</span> bodova<br>
+        <strong>Do sada provjereno:</strong>
+        <span th:text="${rezultat.potvrdjeno}">0</span> bodova
     </p>
 
+    <!-- nakon odobrenja -->
+    <p style="margin-top:1rem;" th:if="${rezultat.konacno()}">
+        <strong>Priznato:</strong>
+        <span th:text="${rezultat.potvrdjeno}">0</span> bodova
+    </p>
+
+    <p th:if="${rezultat.cekaVerifikaciju() and !rezultat.konacno()}"
+       style="color:var(--sivo);font-size:0.85rem;">
+        Dio bodova čeka provjeru dokumentacije.
+    </p>
     <div class="akcije">
         <a class="dugme-sivo"
            th:href="@{/student/prijava/{id}/kriteriji(id=${idPrijave})}">← Nazad</a>

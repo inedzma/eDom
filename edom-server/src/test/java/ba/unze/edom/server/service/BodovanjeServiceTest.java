@@ -15,7 +15,12 @@ class BodovanjeServiceTest {
 
     private Prijava prazna() {
         Prijava p = new Prijava();
-        p.setBrojClanovaDomacinstva(1);   // minimum je uvijek 1 - sam student
+        p.setBrojClanovaDomacinstva(1);
+        // ovi testovi provjeravaju racun, pa se osnovni kriteriji
+        // tretiraju kao vec provjereni
+        p.setUspjehVerifikovan(true);
+        p.setPrimanjaVerifikovana(true);
+        p.setUdaljenostVerifikovana(true);
         return p;
     }
 
@@ -329,17 +334,50 @@ class BodovanjeServiceTest {
     }
 
     @Test
-    @DisplayName("Uspjeh i udaljenost ulaze u oba zbira")
-    void osnovniKriterijiUvijekUlaze() {
+    @DisplayName("Neverifikovan uspjeh ne ulazi u potvrdjene bodove")
+    void neverifikovanUspjeh() {
+        Prijava p = new Prijava();
+        p.setBrojClanovaDomacinstva(1);
+        p.setGodinaStudija(1);
+        p.setProsjek(new BigDecimal("4.00"));
+        // uspjehVerifikovan ostaje false
+
+        var r = service.izracunaj(p);
+        assertEquals(0.0, r.potvrdjeno(), 0.001);
+        assertEquals(37.0, r.potencijalno(), 0.001);
+        assertTrue(r.cekaVerifikaciju());
+    }
+
+    @Test
+    @DisplayName("Verifikacija uspjeha ne priznaje primanja")
+    void verifikacijaJePoStavci() {
+        Prijava p = new Prijava();
+        p.setBrojClanovaDomacinstva(4);
+        p.setGodinaStudija(1);
+        p.setProsjek(new BigDecimal("4.00"));       // 37
+        p.setUkupnaPrimanja(new BigDecimal("400")); // 20
+        p.setUspjehVerifikovan(true);
+        // primanjaVerifikovana ostaje false
+
+        var r = service.izracunaj(p);
+        assertEquals(37.0, r.potvrdjeno(), 0.001);
+        assertEquals(57.0, r.potencijalno(), 0.001);
+    }
+
+    @Test
+    @DisplayName("Bodovi su konacni tek kad je prijava odobrena")
+    void konacnoTekNakonOdobrenja() {
         Prijava p = prazna();
         p.setGodinaStudija(1);
         p.setProsjek(new BigDecimal("4.00"));
-        p.setUdaljenostKm(new BigDecimal("100"));
 
-        var r = service.izracunaj(p);
-        assertEquals(45.0, r.potvrdjeno(), 0.001);     // 37 + 8
-        assertEquals(45.0, r.potencijalno(), 0.001);
-        assertFalse(r.cekaVerifikaciju());
+        assertFalse(service.izracunaj(p).konacno());
+
+        StatusPrijave odobreno = new StatusPrijave();
+        odobreno.setNaziv(Statusi.ODOBRENO);
+        p.setStatus(odobreno);
+
+        assertTrue(service.izracunaj(p).konacno());
     }
 
     @Test

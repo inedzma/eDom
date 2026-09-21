@@ -15,4 +15,7 @@ public class VrstaDokumenta {
 
     @Column(name = "naziv", length = 100)
     private String naziv;
+
+    @Column(name = "kategorija", length = 30, nullable = false)
+    private String kategorija = "Ostalo";
 }

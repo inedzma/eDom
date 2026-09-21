@@ -86,7 +86,16 @@
         </tbody>
     </table>
 
-    <h3 style="margin-top:2rem;">Obračun bodova</h3>
+    <h3 style="margin-top:2rem;"
+        th:text="${rezultat.konacno()} ? 'Konačan obračun bodova'
+                                       : 'Okvirni obračun bodova'">Obračun</h3>
+
+    <p style="color:var(--sivo);font-size:0.85rem;"
+       th:unless="${rezultat.konacno()}">
+        Ovo je okvirni obračun na osnovu podataka koje ste unijeli.
+        Bodovi se priznaju tek nakon što administracija doma provjeri
+        priloženu dokumentaciju.
+    </p>
 
     <table>
         <thead>
@@ -99,24 +108,30 @@
             <td th:text="${s.obrazlozenje} ?: ''"></td>
             <td>
                 <span class="oznaka"
-                      th:text="${s.verifikovan} ? 'Priznato' : 'Čeka provjeru'">—</span>
+                      th:text="${s.verifikovan} ? 'Provjereno' : 'Čeka provjeru'">—</span>
             </td>
         </tr>
         </tbody>
     </table>
 
-    <p style="margin-top:1rem;">
+    <!-- dok odluka nije donesena -->
+    <p style="margin-top:1rem;" th:unless="${rezultat.konacno()}">
+        <strong>Ukupno prijavljeno:</strong>
+        <span th:text="${rezultat.potencijalno}">0</span> bodova<br>
+        <strong>Do sada provjereno:</strong>
+        <span th:text="${rezultat.potvrdjeno}">0</span> bodova
+    </p>
+
+    <!-- nakon odobrenja -->
+    <p style="margin-top:1rem;" th:if="${rezultat.konacno()}">
         <strong>Priznato:</strong>
-        <span th:text="${rezultat.potvrdjeno}">0</span> bodova<br>
-        <strong>Ukupno moguće:</strong>
-        <span th:text="${rezultat.potencijalno}">0</span> bodova
+        <span th:text="${rezultat.potvrdjeno}">0</span> bodova
     </p>
 
-    <p th:if="${rezultat.cekaVerifikaciju()}"
+    <p th:if="${rezultat.cekaVerifikaciju() and !rezultat.konacno()}"
        style="color:var(--sivo);font-size:0.85rem;">
-        Dio bodova čeka provjeru dokumentacije od strane administracije doma.
+        Dio bodova čeka provjeru dokumentacije.
     </p>
-
     <!-- akcije za prijavu u izradi -->
     <div class="akcije" th:if="${uIzradi}">
         <a class="dugme"

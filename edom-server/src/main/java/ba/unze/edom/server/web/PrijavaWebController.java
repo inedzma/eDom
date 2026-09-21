@@ -236,7 +236,7 @@ public class PrijavaWebController {
         model.addAttribute("prijava", p);
         model.addAttribute("idPrijave", id);
         model.addAttribute("dokumenti", dokumentService.zaPrijavu(id));
-        model.addAttribute("vrste", dokumentService.sveVrste());
+        model.addAttribute("vrste", dokumentService.vrstePoKategoriji());
         model.addAttribute("uIzradi",
                 p.getStatus() != null
                         && "u izradi".equals(p.getStatus().getNaziv()));

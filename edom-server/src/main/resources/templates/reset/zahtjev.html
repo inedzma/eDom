@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Dom — Zaboravljena lozinka</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="kartica">
+    <h1>Zaboravljena lozinka</h1>
+
+    <p style="color:var(--sivo);font-size:0.9rem;">
+        Unesite e-mail adresu sa kojom ste se registrovali.
+        Poslaćemo vam kod za postavljanje nove lozinke.
+    </p>
+
+    <form th:action="@{/zaboravljena-lozinka}" method="post">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" required autofocus>
+        <button type="submit">Pošalji kod</button>
+    </form>
+
+    <p style="margin-top:1.5rem;">
+        <a th:href="@{/login}">← Nazad na prijavu</a>
+    </p>
+</div>
+</body>
+</html>

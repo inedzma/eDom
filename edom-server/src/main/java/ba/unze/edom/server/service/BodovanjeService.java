@@ -29,49 +29,59 @@ public class BodovanjeService {
     public RezultatBodovanja izracunaj(Prijava p) {
 
         if (p == null) {
-            return new RezultatBodovanja(0, 0, List.of());
+            return new RezultatBodovanja(0, 0, false, List.of());
         }
 
         validator.provjeri(p);
 
-        List<StavkaBodovanja> stavke = new ArrayList<>();
+        // --- osnovni kriteriji, svaki sa svojim flagom verifikacije ---
+        StavkaBodovanja uspjeh     = bodoviUspjeh(p);
+        StavkaBodovanja udaljenost = bodoviUdaljenost(p);
+        StavkaBodovanja primanja   = bodoviPrimanja(p);
 
-        // --- osnovni kriteriji: ne traze verifikaciju kriterija,
-        //     jer proizlaze iz podataka koje admin ionako provjerava ---
-        stavke.add(bodoviUspjeh(p));
-        stavke.add(bodoviUdaljenost(p));
-        stavke.add(bodoviPrimanja(p));
-
-        // --- branioci: uzima se najveci, odvojeno za potvrdjeno/potencijalno ---
-        var braniociSvi = najveciBranilac(p, false);
-        var braniociPotvrdjeni = najveciBranilac(p, true);
-
-        braniociSvi.ifPresent(stavke::add);
+        // --- branioci: najveci, odvojeno za potvrdjeno i potencijalno ---
+        var braniociSvi         = najveciBranilac(p, false);
+        var braniociPotvrdjeni  = najveciBranilac(p, true);
 
         // --- dodatni: zbrajaju se ---
         List<StavkaBodovanja> dodatni = dodatniKriteriji(p);
+
+        // --- prikaz ---
+        List<StavkaBodovanja> stavke = new ArrayList<>();
+        stavke.add(uspjeh);
+        stavke.add(udaljenost);
+        stavke.add(primanja);
+        braniociSvi.ifPresent(stavke::add);
         stavke.addAll(dodatni);
 
-        double osnovni = stavke.stream()
-                .filter(s -> s.naziv().startsWith("Uspjeh")
-                        || s.naziv().startsWith("Udaljenost")
-                        || s.naziv().startsWith("Primanja"))
-                .mapToDouble(StavkaBodovanja::bodovi)
-                .sum();
+        // --- zbirovi ---
+        List<StavkaBodovanja> osnovni = List.of(uspjeh, udaljenost, primanja);
 
-        double potvrdjeno = osnovni
-                + braniociPotvrdjeni.map(StavkaBodovanja::bodovi).orElse(0.0)
-                + dodatni.stream()
-                .filter(StavkaBodovanja::verifikovan)
-                .mapToDouble(StavkaBodovanja::bodovi).sum();
+        double potvrdjeno =
+                zbir(osnovni, true)
+                        + braniociPotvrdjeni.map(StavkaBodovanja::bodovi).orElse(0.0)
+                        + zbir(dodatni, true);
 
-        double potencijalno = osnovni
-                + braniociSvi.map(StavkaBodovanja::bodovi).orElse(0.0)
-                + dodatni.stream()
-                .mapToDouble(StavkaBodovanja::bodovi).sum();
+        double potencijalno =
+                zbir(osnovni, false)
+                        + braniociSvi.map(StavkaBodovanja::bodovi).orElse(0.0)
+                        + zbir(dodatni, false);
+
+        boolean konacno = Statusi.ODOBRENO.equals(nazivStatusa(p));
 
         return new RezultatBodovanja(
-                zaokruzi(potvrdjeno), zaokruzi(potencijalno), stavke);
+                zaokruzi(potvrdjeno), zaokruzi(potencijalno), konacno, stavke);
+    }
+
+    private double zbir(List<StavkaBodovanja> stavke, boolean samoVerifikovane) {
+        return stavke.stream()
+                .filter(s -> !samoVerifikovane || s.verifikovan())
+                .mapToDouble(StavkaBodovanja::bodovi)
+                .sum();
+    }
+
+    private String nazivStatusa(Prijava p) {
+        return p.getStatus() != null ? p.getStatus().getNaziv() : null;
     }
 
     // ---------------- USPJEH ----------------
@@ -80,19 +90,19 @@ public class BodovanjeService {
 
         Integer godina = p.getGodinaStudija();
         BigDecimal prosjek = p.getProsjek();
+        boolean ver = p.isUspjehVerifikovan();          // <-- flag iz prijave
 
         if (godina == null || prosjek == null) {
             return new StavkaBodovanja("Uspjeh", 0,
-                    "Prosjek ili godina studija nisu uneseni", true);
+                    "Prosjek ili godina studija nisu uneseni", ver);
         }
 
         double pr = prosjek.doubleValue();
 
         if (godina == GodineStudija.PRVA) {
-            // skala 1.0-5.0 iz srednje skole
             double b = pr * 9 + 1;
             return new StavkaBodovanja("Uspjeh (brucoš)", zaokruzi(b),
-                    "Prosjek " + pr, true);
+                    "Prosjek " + pr, ver);
         }
 
         int ispiti = p.getPolozeniIspiti() != null ? p.getPolozeniIspiti() : 0;
@@ -100,7 +110,7 @@ public class BodovanjeService {
 
         return new StavkaBodovanja("Uspjeh", zaokruzi(b),
                 "Prosjek " + pr + ", položenih ispita: " + ispiti
-                        + ", " + GodineStudija.naziv(godina), true);
+                        + ", " + GodineStudija.naziv(godina), ver);
     }
 
     private double bonusGodine(int godina) {
@@ -120,8 +130,10 @@ public class BodovanjeService {
 
     private StavkaBodovanja bodoviUdaljenost(Prijava p) {
 
+        boolean ver = p.isUdaljenostVerifikovana();
+
         if (p.getUdaljenostKm() == null) {
-            return new StavkaBodovanja("Udaljenost", 0, "Nije uneseno", true);
+            return new StavkaBodovanja("Udaljenost", 0, "Nije uneseno", ver);
         }
 
         double km = p.getUdaljenostKm().doubleValue();
@@ -133,19 +145,21 @@ public class BodovanjeService {
                 : 15;
 
         return new StavkaBodovanja("Udaljenost", b,
-                String.format("%.1f km", km), true);
+                String.format("%.1f km", km), ver);
     }
 
     // ---------------- PRIMANJA ----------------
 
     private StavkaBodovanja bodoviPrimanja(Prijava p) {
 
+        boolean ver = p.isPrimanjaVerifikovana();
+
         Integer clanova = p.getBrojClanovaDomacinstva();
         BigDecimal ukupno = p.getUkupnaPrimanja();
 
         if (ukupno == null || clanova == null || clanova < 1) {
             return new StavkaBodovanja("Primanja domaćinstva", 0,
-                    "Nije uneseno", true);
+                    "Nije uneseno", ver);
         }
 
         double poClanu = ukupno.doubleValue() / clanova;
@@ -159,7 +173,7 @@ public class BodovanjeService {
 
         return new StavkaBodovanja("Primanja domaćinstva", b,
                 String.format("%.2f KM po članu (%d članova)", poClanu, clanova),
-                true);
+                ver);
     }
 
     // ---------------- BRANIOCI ----------------

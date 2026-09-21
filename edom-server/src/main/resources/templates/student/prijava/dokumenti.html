@@ -45,11 +45,11 @@
         <label>Vrsta dokumenta</label>
         <select name="idVrste" required>
             <option value="">Odaberite vrstu</option>
-            <option th:each="v : ${vrste}"
-                    th:value="${v.idVrsta}"
-                    th:text="${v.naziv}">Vrsta</option>
+            <optgroup th:each="kat : ${vrste}" th:label="${kat.key}">
+                <option th:each="v : ${kat.value}"
+                        th:value="${v.idVrsta}" th:text="${v.naziv}">Vrsta</option>
+            </optgroup>
         </select>
-
         <label>Naziv (neobavezno)</label>
         <input type="text" name="naziv"
                placeholder="Ostavite prazno za naziv vrste">

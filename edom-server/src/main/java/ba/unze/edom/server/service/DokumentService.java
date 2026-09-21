@@ -23,9 +23,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Base64;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -60,8 +59,13 @@ public class DokumentService {
     }
 
     @Transactional(readOnly = true)
-    public List<VrstaDokumenta> sveVrste() {
-        return vrstaDokumentaRepository.findAll(Sort.by("naziv"));
+    public Map<String, List<VrstaDokumenta>> vrstePoKategoriji() {
+        return vrstaDokumentaRepository.findAll(Sort.by("kategorija", "naziv"))
+                .stream()
+                .collect(Collectors.groupingBy(
+                        VrstaDokumenta::getKategorija,
+                        LinkedHashMap::new,
+                        Collectors.toList()));
     }
 
     /** Vraca Base64 sadrzaj. Poziva se samo pri preuzimanju. */
