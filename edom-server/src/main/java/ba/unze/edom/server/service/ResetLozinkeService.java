@@ -3,6 +3,7 @@ package ba.unze.edom.server.service;
 import ba.unze.edom.server.entity.Korisnik;
 import ba.unze.edom.server.exception.RegistracijaException;
 import ba.unze.edom.server.repository.KorisnikRepository;
+import ba.unze.edom.server.validation.LozinkaPravila;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,24 +34,29 @@ public class ResetLozinkeService {
     @Transactional
     public void zatraziKod(String email) {
 
-        if (email == null || email.isBlank()) return;
+        if (email == null || email.isBlank()) {
+            throw new RegistracijaException("Unesite e-mail adresu.");
+        }
 
-        korisnikRepository.findByEmail(email.trim()).ifPresent(k -> {
-            String kod = generisiKod();
+        Korisnik k = korisnikRepository.findByEmail(email.trim())
+                .orElseThrow(() -> new RegistracijaException(
+                        "Ne postoji nalog sa tom e-mail adresom."));
 
-            k.setResetTokenHash(passwordEncoder.encode(kod));
-            k.setResetTokenIstek(Instant.now().plus(TRAJANJE_MINUTA, ChronoUnit.MINUTES));
-            k.setResetPokusaji(0);
+        String kod = generisiKod();
 
-            emailService.posaljiResetKod(k.getEmail(), kod);
-        });
+        k.setResetTokenHash(passwordEncoder.encode(kod));
+        k.setResetTokenIstek(Instant.now().plus(TRAJANJE_MINUTA, ChronoUnit.MINUTES));
+        k.setResetPokusaji(0);
+
+        emailService.posaljiResetKod(k.getEmail(), kod);
     }
 
     @Transactional(noRollbackFor = RegistracijaException.class)
     public void promijeniLozinku(String email, String kod,
                                  String nova, String potvrda) {
 
-        // ista poruka za nepostojeci nalog i pogresan kod
+        System.out.println(">>> SERVIS ulaz, email=" + email);
+
         final String NEISPRAVNO = "Kod nije ispravan ili je istekao.";
 
         Korisnik k = korisnikRepository.findByEmail(email == null ? "" : email.trim())
@@ -72,13 +78,13 @@ public class ResetLozinkeService {
         }
 
         if (kod == null || !passwordEncoder.matches(kod.trim(), k.getResetTokenHash())) {
-            k.setResetPokusaji(k.getResetPokusaji() + 1);   // ostaje sacuvano
+            k.setResetPokusaji(k.getResetPokusaji() + 1);
             throw new RegistracijaException(NEISPRAVNO);
         }
 
-        if (nova == null || nova.length() < MIN_DUZINA_LOZINKE) {
-            throw new RegistracijaException(
-                    "Lozinka mora imati najmanje " + MIN_DUZINA_LOZINKE + " znakova.");
+        String greskaLozinke = LozinkaPravila.poruka(nova);
+        if (greskaLozinke != null) {
+            throw new RegistracijaException(greskaLozinke);
         }
 
         if (!nova.equals(potvrda)) {
@@ -86,9 +92,15 @@ public class ResetLozinkeService {
         }
 
         k.setPasswordHash(passwordEncoder.encode(nova));
-        ponisti(k);   // kod se moze iskoristiti samo jednom
-    }
 
+        korisnikRepository.save(k);          // dodaj i ovo
+
+        System.out.println(">>> UPISANO id=" + k.getIdKorisnik()
+                + " novi hash=" + k.getPasswordHash());
+
+        ponisti(k);
+
+    }
     private void ponisti(Korisnik k) {
         k.setResetTokenHash(null);
         k.setResetTokenIstek(null);

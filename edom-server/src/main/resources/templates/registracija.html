@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>E-Dom — Registracija</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/validacija.js}" defer></script>
 </head>
 <body>
 <div class="kartica">
@@ -55,7 +56,9 @@
         <label>Lozinka</label>
         <input type="password" th:field="*{lozinka}">
         <span class="greska" th:if="${#fields.hasErrors('lozinka')}" th:errors="*{lozinka}"></span>
-
+        <p style="font-size:0.8rem;color:var(--sivo);margin-top:0.3rem;">
+            Najmanje 8 znakova, veliko i malo slovo, cifra i poseban znak.
+        </p>
         <button type="submit">Registruj se</button>
     </form>
 

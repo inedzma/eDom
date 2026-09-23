@@ -1,6 +1,7 @@
 package ba.unze.edom.server.config;
 
 import ba.unze.edom.server.security.JwtFilter;
+import ba.unze.edom.server.security.PrijavaUspjeh;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+
+    private final PrijavaUspjeh prijavaUspjeh;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -55,15 +58,15 @@ public class SecurityConfig {
     public SecurityFilterChain webChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(a -> a
-                        .requestMatchers("/", "/login", "/registracija", "/error",
-                                "/rang-lista",
+                        .requestMatchers("/", "/login", "/registracija", "/error", "/rang-lista",
+                                "/zaboravljena-lozinka", "/zaboravljena-lozinka/**",
                                 "/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/student/**").hasRole("Student")
                         .anyRequest().authenticated()
                 )
                 .formLogin(f -> f
                         .loginPage("/login")
-                        .defaultSuccessUrl("/student/pocetna", true)
+                        .successHandler(prijavaUspjeh)
                         .permitAll()
                 )
                 .exceptionHandling(e -> e

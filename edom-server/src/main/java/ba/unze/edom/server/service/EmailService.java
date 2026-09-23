@@ -1,5 +1,6 @@
 package ba.unze.edom.server.service;
 
+import ba.unze.edom.server.exception.RegistracijaException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,9 @@ public class EmailService {
             h.setText(tekst);
             mailSender.send(poruka);
         } catch (Exception e) {
-            // ne prekidamo tok zbog maila, ali biljezimo
             log.error("Slanje e-maila na {} nije uspjelo", kome, e);
+            throw new RegistracijaException(
+                    "Trenutno nije moguće poslati e-mail. Pokušajte kasnije.");
         }
     }
 

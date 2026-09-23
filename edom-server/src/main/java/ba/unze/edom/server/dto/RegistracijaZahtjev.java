@@ -1,5 +1,6 @@
 package ba.unze.edom.server.dto;
 
+import ba.unze.edom.server.validation.JakaLozinka;
 import jakarta.validation.constraints.*;
 
 public record RegistracijaZahtjev(
@@ -41,8 +42,6 @@ public record RegistracijaZahtjev(
         @NotBlank(message = "Ime roditelja je obavezno")
         @Size(max = 20)
         String imeRoditelja,
-
-        @NotBlank(message = "Lozinka je obavezna")
-        @Size(min = 8, message = "Lozinka mora imati najmanje 8 znakova")
+        @JakaLozinka
         String lozinka
 ) {}

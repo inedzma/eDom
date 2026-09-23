@@ -21,12 +21,15 @@ public class ResetLozinkeWebController {
 
     @PostMapping
     public String posaljiKod(@RequestParam String email, Model model) {
-        resetService.zatraziKod(email);
-        // uvijek ista poruka i isti sljedeci korak
+        try {
+            resetService.zatraziKod(email);
+        } catch (RuntimeException e) {
+            model.addAttribute("greska", e.getMessage());
+            model.addAttribute("email", email);
+            return "reset/zahtjev";          // ostaje na istoj stranici
+        }
         model.addAttribute("email", email);
-        model.addAttribute("info",
-                "Ako postoji nalog sa tom adresom, poslali smo kod. "
-                        + "Provjerite i neželjenu poštu.");
+        model.addAttribute("info", "Kod je poslan na " + email + ".");
         return "reset/potvrda";
     }
 
@@ -36,6 +39,7 @@ public class ResetLozinkeWebController {
                           @RequestParam String lozinka,
                           @RequestParam String potvrda,
                           Model model) {
+        System.out.println(">>> KONTROLER potvrdi: email=" + email + " kod=" + kod);
         try {
             resetService.promijeniLozinku(email, kod, lozinka, potvrda);
             return "redirect:/login?resetovano";
@@ -44,5 +48,6 @@ public class ResetLozinkeWebController {
             model.addAttribute("greska", e.getMessage());
             return "reset/potvrda";
         }
+
     }
 }

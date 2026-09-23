@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>E-Dom — Prijava</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/validacija.js}" defer></script>
 </head>
 <body>
 <div class="kartica">
@@ -11,6 +12,10 @@
 
     <p class="greska" th:if="${param.error}">
         Neispravna e-mail adresa ili lozinka.
+    </p>
+    <p class="greska" th:if="${param['samo-studenti']}">
+        Web pristup je namijenjen studentima. Administratori koriste
+        desktop aplikaciju.
     </p>
     <p class="uspjeh" th:if="${param.registrovan}">
         Registracija uspješna. Možete se prijaviti.
@@ -28,6 +33,14 @@
 
         <button type="submit">Prijavi se</button>
     </form>
+
+    <p class="uspjeh" th:if="${param.resetovano}">
+        Lozinka je promijenjena. Prijavite se novom lozinkom.
+    </p>
+
+    <p style="font-size:0.9rem;">
+        <a th:href="@{/zaboravljena-lozinka}">Zaboravili ste lozinku?</a>
+    </p>
 
     <p>Nemate nalog? <a th:href="@{/registracija}">Registrujte se</a></p>
 </div>

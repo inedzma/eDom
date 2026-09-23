@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>E-Dom — Zaboravljena lozinka</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/validacija.js}" defer></script>
 </head>
 <body>
 <div class="kartica">
@@ -14,10 +15,12 @@
         Unesite e-mail adresu sa kojom ste se registrovali.
         Poslaćemo vam kod za postavljanje nove lozinke.
     </p>
+    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
 
     <form th:action="@{/zaboravljena-lozinka}" method="post">
         <label for="email">E-mail</label>
-        <input type="email" id="email" name="email" required autofocus>
+        <input type="email" id="email" name="email" required autofocus
+               th:value="${email}">
         <button type="submit">Pošalji kod</button>
     </form>
 

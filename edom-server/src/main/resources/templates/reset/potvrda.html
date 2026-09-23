@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>E-Dom — Nova lozinka</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/validacija.js}" defer></script>
 </head>
 <body>
 <div class="kartica">
@@ -29,11 +30,17 @@
                autocomplete="new-password">
 
         <button type="submit">Postavi lozinku</button>
+        <p style="font-size:0.8rem;color:var(--sivo);margin-top:0.3rem;">
+            Najmanje 8 znakova, veliko i malo slovo, cifra i poseban znak.
+        </p>
     </form>
 
     <p style="margin-top:1.5rem;font-size:0.9rem;">
         Niste dobili kod?
         <a th:href="@{/zaboravljena-lozinka}">Zatražite novi</a>
+    </p>
+    <p style="margin-top:1.5rem;">
+        <a th:href="@{/zaboravljena-lozinka}">← Nazad</a>
     </p>
 </div>
 </body>
