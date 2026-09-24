@@ -1,48 +1,158 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
     <title>E-Dom — Prijava</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
     <script th:src="@{/js/validacija.js}" defer></script>
 </head>
 <body>
-<div class="kartica">
-    <h1>Prijava u E-Dom</h1>
+<div class="page">
 
-    <p class="greska" th:if="${param.error}">
-        Neispravna e-mail adresa ili lozinka.
-    </p>
-    <p class="greska" th:if="${param['samo-studenti']}">
-        Web pristup je namijenjen studentima. Administratori koriste
-        desktop aplikaciju.
-    </p>
-    <p class="uspjeh" th:if="${param.registrovan}">
-        Registracija uspješna. Možete se prijaviti.
-    </p>
-    <p class="uspjeh" th:if="${param.odjava}">
-        Uspješno ste odjavljeni.
-    </p>
+    <!-- ================= LIJEVI PANEL ================= -->
+    <aside class="brand">
+        <a class="back-link" href="https://sc.unze.ba/">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Nazad na sajt Studentskog centra
+        </a>
 
-    <form th:action="@{/login}" method="post">
-        <label for="username">E-mail</label>
-        <input type="email" id="username" name="username" required autofocus>
+        <div class="logo-wrap">
+            <img th:src="@{/img/studentski-centar-logo.png}" alt="Studentski centar Univerziteta u Zenici">
+        </div>
+        <div class="logo-caption">Studentski centar Zenica</div>
 
-        <label for="password">Lozinka</label>
-        <input type="password" id="password" name="password" required>
+        <h2>Digitalni sistem studentskog doma</h2>
+        <p class="lead">Prijavi se na konkurs za smještaj, prati status svoje prijave i bodove — sve na jednom mjestu.</p>
 
-        <button type="submit">Prijavi se</button>
-    </form>
+        <ul class="features">
+            <li><span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>Online prijava na konkurs bez papirologije</li>
+            <li><span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>Praćenje statusa prijave i bodova u realnom vremenu</li>
+            <li><span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>Uvid u rang listu i obavještenja doma</li>
+        </ul>
 
-    <p class="uspjeh" th:if="${param.resetovano}">
-        Lozinka je promijenjena. Prijavite se novom lozinkom.
-    </p>
+        <div class="tagline">Pouzdano. Brzo. Precizno.</div>
+    </aside>
 
-    <p style="font-size:0.9rem;">
-        <a th:href="@{/zaboravljena-lozinka}">Zaboravili ste lozinku?</a>
-    </p>
+    <!-- ================= DESNI DIO ================= -->
+    <main class="main">
+        <div class="main-center">
+            <div class="login-card" th:classappend="${param.error} ? 'has-error'">
+                <h1>Prijava u E-Dom</h1>
+                <p class="sub">Dobrodošli! Prijavite se svojim e-mailom i lozinkom.</p>
 
-    <p>Nemate nalog? <a th:href="@{/registracija}">Registrujte se</a></p>
+                <!-- ============ PORUKE ============ -->
+                <div class="messages">
+                    <div class="alert alert--error" role="alert" th:if="${param.error}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                        <span>Neispravna e-mail adresa ili lozinka.</span>
+                    </div>
+
+                    <div class="alert alert--warning" role="alert" th:if="${param['samo-studenti']}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+                        <span>Web pristup je namijenjen studentima. Administratori koriste desktop aplikaciju.</span>
+                    </div>
+
+                    <div class="alert alert--success" role="status" th:if="${param.registrovan}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
+                        <span>Registracija uspješna. Možete se prijaviti.</span>
+                    </div>
+
+                    <div class="alert alert--success" role="status" th:if="${param.resetovano}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
+                        <span>Lozinka je promijenjena. Prijavite se novom lozinkom.</span>
+                    </div>
+
+                    <div class="alert alert--success" role="status" th:if="${param.odjava}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
+                        <span>Uspješno ste odjavljeni.</span>
+                    </div>
+                </div>
+
+                <!-- ============ FORMA ============ -->
+                <form th:action="@{/login}" method="post" id="loginForm">
+                    <div class="field">
+                        <label for="username">E-mail</label>
+                        <div class="input">
+                            <input type="email" id="username" name="username"
+                                   placeholder="ime.prezime@primjer.ba"
+                                   autocomplete="username" required autofocus>
+                            <svg class="lead-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Lozinka</label>
+                        <div class="input">
+                            <input type="password" id="password" name="password"
+                                   placeholder="Unesite lozinku"
+                                   autocomplete="current-password" required>
+                            <svg class="lead-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <button type="button" class="toggle-pass" id="togglePass" aria-label="Prikaži lozinku">
+                                <svg class="eye" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg class="eye-off" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+                            </button>
+                        </div>
+                        <div class="caps" id="caps">⚠ Caps Lock je uključen</div>
+                    </div>
+
+                    <div class="row">
+                        <!-- radi tek kad se u SecurityConfig doda .rememberMe(...) – vidi napomenu -->
+                        <label class="remember"><input type="checkbox" name="remember-me"> Zapamti me</label>
+                        <a class="link" th:href="@{/zaboravljena-lozinka}">Zaboravili ste lozinku?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-login" id="submitBtn">Prijavi se</button>
+                </form>
+
+                <div class="signup">
+                    <span>Nemate nalog?</span>
+                    <a class="pill" th:href="@{/registracija}">Registrujte se</a>
+                </div>
+            </div>
+        </div>
+
+        <footer th:replace="~{fragments/layout :: footer(true)}"></footer>
+    </main>
+
 </div>
+
+<script>
+    (function () {
+        const form = document.getElementById('loginForm');
+        const pass = document.getElementById('password');
+        const toggle = document.getElementById('togglePass');
+        const btn = document.getElementById('submitBtn');
+
+        // prikaži / sakrij lozinku
+        toggle.addEventListener('click', function () {
+            const show = pass.type === 'password';
+            pass.type = show ? 'text' : 'password';
+            toggle.classList.toggle('on', show);
+            toggle.setAttribute('aria-label', show ? 'Sakrij lozinku' : 'Prikaži lozinku');
+        });
+
+        // upozorenje za Caps Lock
+        pass.addEventListener('keyup', function (e) {
+            document.getElementById('caps')
+                .classList.toggle('show', e.getModifierState && e.getModifierState('CapsLock'));
+        });
+
+        // stanje učitavanja – samo ako forma stvarno ide na server
+        // (ako validacija.js zaustavi slanje, dugme ostaje normalno)
+        form.addEventListener('submit', function (e) {
+            setTimeout(function () {
+                if (e.defaultPrevented || !form.checkValidity()) return;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Prijava…';
+            }, 0);
+        });
+
+        // ako se korisnik vrati "Back" dugmetom, vrati dugme u normalno stanje
+        window.addEventListener('pageshow', function () {
+            btn.disabled = false;
+            btn.textContent = 'Prijavi se';
+        });
+    })();
+</script>
 </body>
 </html>

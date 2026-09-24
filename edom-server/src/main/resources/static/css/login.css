@@ -1,0 +1,173 @@
+/* =========================================================
+   E-Dom – stilovi SAMO za stranicu prijave (login.html)
+   Zajednički stilovi (boje, dugmad, alerti, footer) su u edom.css
+   ========================================================= */
+.page{display:flex;min-height:100vh}
+
+/* ---------- lijevi panel ---------- */
+.brand{
+  position:relative;overflow:hidden;
+  flex:0 0 38%;max-width:560px;
+  background:linear-gradient(170deg,var(--teal-800) 0%,var(--teal-900) 100%);
+  color:#fff;padding:40px 56px 48px;
+  display:flex;flex-direction:column;
+}
+.brand::before,.brand::after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+.brand::before{width:900px;height:900px;left:62%;top:32%;background:rgba(255,255,255,.035)}
+.brand::after{width:420px;height:420px;left:-180px;top:-160px;background:rgba(0,191,154,.07)}
+.brand > *{position:relative;z-index:1}
+
+.back-link{
+  align-self:flex-start;display:inline-flex;align-items:center;gap:8px;
+  color:#a9d4d9;text-decoration:none;font-size:14px;font-weight:700;
+  padding:8px 12px 8px 8px;border-radius:10px;margin-left:-8px;transition:.15s;
+}
+.back-link:hover{color:#fff;background:rgba(255,255,255,.07)}
+
+.logo-wrap{
+    align-self:center;margin-top:28px;
+    width:200px;height:200px;border-radius:50%;background:#fff;
+  display:grid;place-items:center;
+  box-shadow:0 12px 40px rgba(0,0,0,.25),0 0 0 6px rgba(0,191,154,.22);
+}
+.logo-wrap img{width:190px;height:190px;object-fit:contain}
+.logo-caption{
+  align-self:center;text-align:center;margin:30px 0 70px;
+  font-weight:800;letter-spacing:.14em;font-size:13px;color:#5fd6b4;text-transform:uppercase;
+}
+.brand h2{font-size:27px;font-weight:800;line-height:1.25;margin-bottom:18px}
+.brand .lead{font-size:17px;line-height:1.6;color:#d0e4e8;max-width:420px;margin-bottom:32px}
+.features{list-style:none;display:grid;gap:14px;margin-bottom:40px}
+.features li{display:flex;align-items:flex-start;gap:12px;font-size:16px;color:#e8f2f4;line-height:1.45}
+.features .ic{
+  flex:none;width:26px;height:26px;border-radius:8px;
+  background:rgba(0,191,154,.18);color:#5fe0bd;display:grid;place-items:center;
+}
+.tagline{font-weight:800;font-size:15px;margin-top:auto;color:#fff}
+
+/* ---------- desni dio ---------- */
+.main{
+  position:relative;overflow:hidden;flex:1;
+  display:flex;flex-direction:column;
+  padding:32px 40px 24px;
+  background:
+    radial-gradient(circle at 32% 44%,#e2f7f1 0,#e2f7f1 30%,transparent 30.2%),
+    radial-gradient(circle at 72% 56%,#ecfaf6 0,#ecfaf6 38%,transparent 38.2%),
+    linear-gradient(135deg,#eefaf7,#ffffff);
+}
+.main-center{flex:1;display:grid;place-items:center;padding:24px 0}
+.main .footer{position:relative;z-index:1}
+
+.login-card{
+  position:relative;z-index:1;width:100%;max-width:520px;
+  background:#fff;border-radius:28px;padding:56px 60px 48px;box-shadow:var(--shadow);
+}
+.login-card h1{font-size:38px;font-weight:800;color:var(--heading);letter-spacing:-.01em}
+.login-card .sub{color:var(--muted);font-size:16px;margin:8px 0 30px}
+.messages{margin-bottom:10px}
+
+.field{margin-bottom:22px}
+.field label{display:block;font-size:15px;font-weight:700;color:var(--label);margin-bottom:9px}
+.input{position:relative}
+.input .lead-ic{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:#9dc3c2;pointer-events:none;transition:color .15s}
+.input input{
+  width:100%;height:60px;border:2px solid var(--border);border-radius:14px;
+  padding:0 56px 0 54px;font:inherit;font-size:17px;color:var(--heading);
+  background:#fcfffe;outline:none;transition:border-color .15s,box-shadow .15s;
+}
+.input input::placeholder{color:#a9c4c9}
+.input input:focus{border-color:var(--mint);box-shadow:0 0 0 4px rgba(0,191,154,.12)}
+.input input:focus ~ .lead-ic{color:var(--mint)}
+/* crveni okvir kad je greška u prijavi */
+.has-error .input input{border-color:#eab4b4}
+.has-error .input input:focus{border-color:var(--mint)}
+
+.toggle-pass{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:0;cursor:pointer;padding:7px;color:var(--mint);
+  display:grid;place-items:center;border-radius:8px;
+}
+.toggle-pass:hover{background:var(--mint-soft)}
+.toggle-pass .eye-off{display:none}
+.toggle-pass.on .eye{display:none}
+.toggle-pass.on .eye-off{display:block}
+
+.caps{display:none;color:#b8741a;font-size:13px;font-weight:700;margin-top:7px}
+.caps.show{display:block}
+
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 26px;flex-wrap:wrap}
+.remember{display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--muted);font-size:16px;user-select:none}
+.remember input{appearance:none;width:24px;height:24px;border-radius:7px;border:2px solid var(--border);display:grid;place-items:center;cursor:pointer;transition:.15s;flex:none}
+.remember input:checked{background:var(--mint);border-color:var(--mint)}
+.remember input:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.remember input:focus-visible{outline:3px solid rgba(0,191,154,.35);outline-offset:2px}
+.link{color:var(--mint);font-weight:800;font-size:15px;text-decoration:none}
+.link:hover{text-decoration:underline}
+
+.btn-login{width:100%;height:62px;border-radius:16px;font-size:18px}
+
+.signup{
+  display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;
+  margin-top:32px;padding-top:26px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:16px;
+}
+.pill{background:var(--info-soft);color:var(--heading);font-weight:800;font-size:15px;text-decoration:none;padding:9px 18px;border-radius:999px;transition:background .15s}
+.pill:hover{background:#d3edf8}
+
+/* ---------- responsive ---------- */
+@media (max-width:1100px){
+  .brand{padding:36px 36px 40px}
+  .login-card{padding:44px 40px 40px}
+}
+@media (max-width:880px){
+  .page{flex-direction:column}
+  .brand{flex:none;max-width:none;padding:18px 20px 30px;align-items:center;text-align:center}
+  .brand::before,.brand::after{display:none}
+  .back-link{font-size:13px}
+  .logo-wrap{margin-top:8px;width:112px;height:112px}
+  .logo-wrap img{width:98px;height:98px}
+  .logo-caption{margin:14px 0}
+  .brand h2{font-size:21px;margin-bottom:8px}
+  .brand .lead{font-size:15px;margin:0 auto}
+  .features,.tagline{display:none}
+  .main{padding:24px 16px 16px}
+  .main-center{padding:0}
+  .login-card{padding:32px 22px 28px;border-radius:22px}
+  .login-card h1{font-size:29px}
+  .login-card .sub{margin-bottom:24px}
+  .footer--minimal .footer-inner{padding-top:24px}
+}
+
+/* ---------- manji ekrani (laptop) ---------- */
+@media (min-width:881px) and (max-height:900px){
+    /* lijevi panel */
+    .brand{padding:24px 40px 28px}
+    .back-link{font-size:13px}
+    .logo-wrap{margin-top:10px;width:220px;height:220px}
+    .logo-wrap img{width:200px;height:200px}
+    .logo-caption{margin:12px 0 24px;font-size:12px}
+    .brand h2{font-size:22px;margin-bottom:10px}
+    .brand .lead{font-size:15px;margin-bottom:18px}
+    .features{gap:9px;margin-bottom:20px}
+    .features li{font-size:14.5px}
+    .features .ic{width:22px;height:22px}
+    .tagline{font-size:13px}
+
+    /* desni dio + kartica */
+    .main{padding:16px 32px 12px}
+    .main-center{padding:8px 0}
+    .login-card{max-width:440px;padding:32px 40px 28px;border-radius:22px}
+    .login-card h1{font-size:28px}
+    .login-card .sub{font-size:14.5px;margin:6px 0 20px}
+    .field{margin-bottom:14px}
+    .field label{font-size:14px;margin-bottom:6px}
+    .input input{height:48px;font-size:15px;border-radius:12px;padding:0 50px 0 48px}
+    .input .lead-ic{left:16px}
+    .row{margin:2px 0 18px}
+    .remember{font-size:14.5px}
+    .remember input{width:21px;height:21px}
+    .link{font-size:14px}
+    .btn-login{height:50px;font-size:16px;border-radius:13px}
+    .signup{margin-top:20px;padding-top:16px;font-size:14.5px}
+    .pill{font-size:14px;padding:7px 16px}
+}

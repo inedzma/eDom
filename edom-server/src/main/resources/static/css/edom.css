@@ -1,0 +1,159 @@
+/* =========================================================
+   E-Dom – zajednički stilovi (boje, dugmad, navbar, footer)
+   Koristi se na SVIM stranicama.
+   ========================================================= */
+:root{
+  --teal-900:#063a4a;
+  --teal-800:#0a4a5c;
+  --teal-700:#0d5a6e;
+  --mint:#00bf9a;
+  --mint-dark:#00a886;
+  --mint-soft:#e6f8f3;
+  --heading:#0b4a5e;
+  --text:#2c4f59;
+  --label:#5b7f8a;
+  --muted:#8aa5ad;
+  --border:#bfe9de;
+  --line:#e3efec;
+  --bg:#f3fbf9;
+  --danger:#d64545;
+  --danger-soft:#fdecec;
+  --warn:#e8a23a;
+  --warn-soft:#fdf4e6;
+  --info-soft:#e3f4fb;
+  --radius:16px;
+  --shadow:0 20px 60px rgba(10,74,92,.08),0 2px 6px rgba(10,74,92,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg);color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+img{display:block}
+
+/* ---------- Dugmad ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  height:48px;padding:0 22px;border:0;border-radius:12px;cursor:pointer;
+  font:inherit;font-weight:800;font-size:16px;text-decoration:none;
+  transition:background .15s,box-shadow .15s,transform .1s;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--mint);color:#fff;box-shadow:0 10px 24px rgba(0,191,154,.25)}
+.btn-primary:hover{background:var(--mint-dark)}
+.btn-primary[disabled]{opacity:.8;cursor:progress}
+.btn-ghost{background:var(--info-soft);color:var(--heading)}
+.btn-ghost:hover{background:#d3edf8}
+.spinner{
+  width:20px;height:20px;border-radius:50%;
+  border:3px solid rgba(255,255,255,.4);border-top-color:#fff;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- NAVBAR (unutrašnje stranice) ---------- */
+.navbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.navbar-inner{
+  max-width:1280px;margin:0 auto;height:72px;padding:0 24px;
+  display:flex;align-items:center;gap:32px;
+}
+.nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.nav-brand img{width:44px;height:44px;object-fit:contain}
+.nav-brand-text{display:flex;flex-direction:column;line-height:1.1}
+.nav-brand-text strong{font-size:20px;font-weight:800;color:var(--heading)}
+.nav-brand-text span{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+.nav-links{display:flex;gap:4px;list-style:none;flex:1}
+.nav-links a{
+  display:block;padding:10px 16px;border-radius:10px;
+  text-decoration:none;font-weight:700;font-size:15px;color:var(--label);
+  transition:background .15s,color .15s;
+}
+.nav-links a:hover{background:var(--mint-soft);color:var(--heading)}
+.nav-links a.active{background:var(--mint-soft);color:var(--mint-dark)}
+
+.nav-actions{display:flex;align-items:center;gap:8px}
+.icon-btn{
+  position:relative;width:42px;height:42px;border-radius:12px;border:0;cursor:pointer;
+  background:transparent;color:var(--label);display:grid;place-items:center;
+}
+.icon-btn:hover{background:var(--mint-soft);color:var(--heading)}
+.badge-dot{position:absolute;top:9px;right:10px;width:9px;height:9px;border-radius:50%;background:var(--danger);border:2px solid #fff}
+
+.user{position:relative}
+.user-btn{
+  display:flex;align-items:center;gap:10px;padding:5px 10px 5px 5px;
+  border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font:inherit;
+}
+.user-btn:hover{border-color:var(--border)}
+.avatar{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--mint),var(--teal-700));
+  color:#fff;font-weight:800;font-size:14px;display:grid;place-items:center;
+}
+.user-name{font-weight:700;font-size:14px;color:var(--heading)}
+.user-menu{
+  position:absolute;right:0;top:calc(100% + 8px);min-width:220px;
+  background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+  padding:8px;display:none;
+}
+.user.open .user-menu{display:block}
+.user-menu a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px;color:var(--text)}
+.user-menu a:hover{background:var(--mint-soft)}
+.user-menu hr{border:0;border-top:1px solid var(--line);margin:6px 0}
+.user-menu a.danger{color:var(--danger)}
+.user-menu a.danger:hover{background:var(--danger-soft)}
+
+.nav-toggle{display:none}
+
+@media (max-width:960px){
+  .navbar-inner{gap:12px}
+  .nav-toggle{display:grid;margin-left:auto}
+  .user-name{display:none}
+  .nav-brand-text span{display:none}
+  .nav-links{
+    position:absolute;left:0;right:0;top:72px;
+    flex-direction:column;gap:2px;padding:12px 16px 16px;
+    background:#fff;border-bottom:1px solid var(--line);box-shadow:0 20px 30px rgba(10,74,92,.08);
+    display:none;
+  }
+  .navbar.menu-open .nav-links{display:flex}
+  .nav-links a{padding:12px 14px}
+}
+
+/* ---------- FOOTER (sve stranice) ---------- */
+.footer{border-top:1px solid var(--line);background:#fff}
+.footer-inner{
+  max-width:1280px;margin:0 auto;padding:22px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  font-size:14px;color:var(--muted);
+}
+.footer-links{display:flex;gap:22px;flex-wrap:wrap;list-style:none}
+.footer-links a{text-decoration:none;font-weight:600;color:var(--label)}
+.footer-links a:hover{color:var(--mint-dark)}
+/* varijanta za login – prozirna, bez linije */
+.footer--minimal{background:transparent;border-top:0}
+.footer--minimal .footer-inner{padding:20px 0 0;max-width:none}
+
+@media (max-width:640px){
+  .footer-inner{flex-direction:column;align-items:flex-start;gap:10px}
+}
+
+/* ---------- PORUKE / ALERTI (sve stranice) ---------- */
+.alert{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:14px 16px;border-radius:12px;border:1px solid;
+  font-size:15px;font-weight:600;line-height:1.45;margin-bottom:16px;
+}
+.alert svg{flex:none;margin-top:1px}
+.alert--error  {background:var(--danger-soft);color:#a33030;border-color:#f6caca;animation:shake .35s}
+.alert--warning{background:var(--warn-soft);color:#9a6112;border-color:#f5ddb4}
+.alert--success{background:var(--mint-soft);color:#08775f;border-color:#bfe9de}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}

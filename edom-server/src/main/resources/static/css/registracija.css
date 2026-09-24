@@ -1,0 +1,100 @@
+/* =========================================================
+   E-Dom – registracija
+   Učitava se POSLIJE login.css i mijenja samo ono što je drugačije.
+   ========================================================= */
+
+/* lijevi panel ostaje "zalijepljen" dok se forma skrola */
+.brand{position:sticky;top:0;height:100vh;align-self:flex-start}
+
+/* šira kartica, jer su polja u dvije kolone */
+.login-card.reg-card{max-width:760px;padding:44px 52px 40px}
+.reg-card .sub{margin-bottom:20px}
+
+/* naslovi sekcija */
+.section-title{
+    display:flex;align-items:center;gap:12px;
+    font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--mint-dark);margin:26px 0 14px;
+}
+.section-title::after{content:"";flex:1;height:1px;background:var(--line)}
+.reg-card form > .section-title:first-child{margin-top:4px}
+
+/* dvije kolone */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;column-gap:20px}
+.grid-2 .span-2{grid-column:1 / -1}
+.reg-card .field{margin-bottom:16px}
+
+/* polja bez ikonice lijevo */
+.reg-card .input input,
+.reg-card .input select{
+    width:100%;height:52px;padding:0 18px;
+    border:2px solid var(--border);border-radius:12px;
+    font:inherit;font-size:16px;color:var(--heading);background:#fcfffe;outline:none;
+    transition:border-color .15s,box-shadow .15s;
+}
+.reg-card .input.with-toggle input{padding-right:52px}
+.reg-card .input input:focus,
+.reg-card .input select:focus{border-color:var(--mint);box-shadow:0 0 0 4px rgba(0,191,154,.12)}
+
+/* padajući meni (godina studija) */
+.reg-card .input.select select{appearance:none;cursor:pointer;padding-right:44px}
+.reg-card .input.select::after{
+    content:"";position:absolute;right:20px;top:50%;width:8px;height:8px;margin-top:-6px;
+    border:solid var(--mint);border-width:0 2.5px 2.5px 0;transform:rotate(45deg);pointer-events:none;
+}
+.reg-card .input select:invalid,
+.reg-card .input select option[value=""]{color:#a9c4c9}
+
+.opt{font-weight:600;color:var(--muted);font-size:13px}
+
+/* greške ispod polja (dolaze sa servera preko th:errors) */
+.reg-card .input .is-invalid{border-color:var(--danger);background:#fffafa}
+.reg-card .input .is-invalid:focus{box-shadow:0 0 0 4px rgba(214,69,69,.1)}
+.field-err{display:block;color:var(--danger);font-size:13.5px;font-weight:600;margin-top:6px}
+
+/* pravila lozinke */
+.pass-rules{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.pass-rules li{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:5px 11px;border-radius:999px;background:#f1f6f5;
+    font-size:13px;font-weight:700;color:var(--muted);transition:.2s;
+}
+.pass-rules li::before{content:"";width:7px;height:7px;border-radius:50%;background:#c7d9d6;transition:.2s}
+.pass-rules li.ok{background:var(--mint-soft);color:var(--mint-dark)}
+.pass-rules li.ok::before{background:var(--mint)}
+
+.reg-card .btn-login{margin-top:18px}
+
+/* koraci u lijevom panelu */
+.reg-steps{list-style:none;display:grid;gap:16px;margin-bottom:40px}
+.reg-steps li{display:flex;gap:14px;align-items:flex-start}
+.reg-steps .num{
+    flex:none;width:32px;height:32px;border-radius:10px;
+    background:rgba(0,191,154,.18);color:#5fe0bd;font-weight:800;font-size:15px;
+    display:grid;place-items:center;
+}
+.reg-steps b{display:block;font-size:16px;color:#fff}
+.reg-steps small{display:block;font-size:14px;color:#a9cdd3;margin-top:2px}
+
+/* ---------- laptop (niži ekrani) ---------- */
+@media (min-width:881px) and (max-height:900px){
+    .login-card.reg-card{max-width:680px;padding:30px 40px 28px}
+    .section-title{margin:18px 0 10px;font-size:12px}
+    .reg-card .field{margin-bottom:12px}
+    .reg-card .input input,
+    .reg-card .input select{height:44px;font-size:15px}
+    .reg-steps{gap:12px;margin-bottom:24px}
+    .reg-steps .num{width:28px;height:28px;font-size:14px}
+    .reg-steps b{font-size:15px}
+    .reg-steps small{font-size:13px}
+}
+
+/* ---------- mobitel ---------- */
+@media (max-width:880px){
+    .brand{position:relative;height:auto}
+    .reg-steps{display:none}
+    .login-card.reg-card{padding:30px 20px 26px}
+}
+@media (max-width:600px){
+    .grid-2{grid-template-columns:1fr}
+}

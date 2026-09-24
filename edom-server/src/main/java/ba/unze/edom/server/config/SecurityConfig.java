@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a -> a
                         .requestMatchers("/", "/login", "/registracija", "/error", "/rang-lista",
                                 "/zaboravljena-lozinka", "/zaboravljena-lozinka/**",
-                                "/css/**", "/js/**", "/images/**").permitAll()
+                                "/css/**", "/js/**", "/img/**").permitAll()
                         .requestMatchers("/student/**").hasRole("Student")
                         .anyRequest().authenticated()
                 )
