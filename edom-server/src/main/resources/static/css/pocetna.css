@@ -1,0 +1,116 @@
+/* =========================================================
+   E-Dom – javna početna stranica (index.html)
+   Navbar, dugmad i footer dolaze iz edom.css
+   ========================================================= */
+body.landing{display:flex;flex-direction:column;min-height:100vh;background:#fff}
+body.landing main{flex:1}
+
+/* ---------- dodatne veličine dugmadi ---------- */
+.btn-sm{height:42px;padding:0 18px;font-size:15px;border-radius:11px}
+.btn-lg{height:54px;padding:0 28px;font-size:17px;border-radius:14px}
+.btn-outline{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.35)}
+.btn-outline:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.6)}
+
+/* ---------- javni navbar ---------- */
+.pub-links{display:flex;gap:4px;flex:1}
+.pub-links a{
+    padding:10px 16px;border-radius:10px;text-decoration:none;
+    font-weight:700;font-size:15px;color:var(--label);transition:.15s;
+}
+.pub-links a:hover{background:var(--mint-soft);color:var(--heading)}
+.pub-actions{display:flex;gap:10px}
+
+/* ---------- hero ---------- */
+.hero{
+    position:relative;overflow:hidden;
+    background:linear-gradient(160deg,var(--teal-800) 0%,var(--teal-900) 100%);
+    color:#fff;
+}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+.hero::before{width:620px;height:620px;right:-140px;top:-120px;background:rgba(0,191,154,.08)}
+.hero::after{width:900px;height:900px;left:-420px;bottom:-640px;background:rgba(255,255,255,.035)}
+
+.hero-inner{
+    position:relative;z-index:1;max-width:1280px;margin:0 auto;
+    padding:clamp(48px,9vh,96px) 24px clamp(56px,10vh,110px);
+    display:grid;grid-template-columns:1.25fr 1fr;gap:48px;align-items:center;
+}
+.eyebrow{
+    display:inline-block;font-size:13px;font-weight:800;letter-spacing:.14em;
+    text-transform:uppercase;color:#5fd6b4;margin-bottom:18px;
+}
+.eyebrow.dark{color:var(--mint-dark);margin-bottom:10px}
+.hero h1{font-size:clamp(32px,4.2vw,52px);font-weight:800;line-height:1.12;letter-spacing:-.01em;max-width:640px}
+.hero p{font-size:clamp(16px,1.4vw,19px);line-height:1.6;color:#cfe3e7;max-width:560px;margin:20px 0 32px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.hero-link{
+    display:inline-flex;align-items:center;gap:8px;margin-top:26px;
+    color:#5fd6b4;font-weight:800;text-decoration:none;font-size:16px;
+}
+.hero-link:hover{color:#8ff0d3}
+.hero-link svg{transition:transform .15s}
+.hero-link:hover svg{transform:translateX(4px)}
+
+.hero-visual{display:grid;place-items:center}
+.hero-logo{
+    width:clamp(220px,26vw,340px);aspect-ratio:1;border-radius:50%;background:#fff;
+    display:grid;place-items:center;
+    box-shadow:0 30px 80px rgba(0,0,0,.3),0 0 0 10px rgba(0,191,154,.18),0 0 0 22px rgba(255,255,255,.04);
+}
+.hero-logo img{width:92%;height:92%;object-fit:contain}
+
+/* ---------- sekcije ---------- */
+.section{padding:clamp(56px,9vh,96px) 0}
+.section--tight{padding-top:0}
+.section-inner{max-width:1280px;margin:0 auto;padding:0 24px}
+.section h2{font-size:clamp(26px,2.6vw,36px);font-weight:800;color:var(--heading)}
+.section-lead{color:var(--muted);font-size:17px;margin:8px 0 36px}
+
+/* koraci */
+.steps-grid{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.step-card{
+    position:relative;background:var(--bg);border:1px solid var(--line);border-radius:20px;
+    padding:28px 24px 26px;transition:transform .2s,box-shadow .2s,border-color .2s;
+}
+.step-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--border);background:#fff}
+.step-num{
+    position:absolute;top:20px;right:22px;
+    font-size:44px;font-weight:800;line-height:1;color:#dcefea;
+}
+.step-ic{
+    width:54px;height:54px;border-radius:16px;margin-bottom:18px;
+    background:#fff;color:var(--mint-dark);display:grid;place-items:center;
+    box-shadow:0 6px 16px rgba(10,74,92,.08);
+}
+.step-card h3{font-size:18px;font-weight:800;color:var(--heading);margin-bottom:6px}
+.step-card p{font-size:15px;line-height:1.5;color:var(--label)}
+
+/* CTA rang lista */
+.cta-card{
+    display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+    padding:36px 40px;border-radius:24px;
+    background:linear-gradient(135deg,var(--mint-soft),#eaf6fb);
+    border:1px solid var(--line);
+}
+.cta-card h2{font-size:26px}
+.cta-card p{color:var(--label);font-size:16px;margin-top:6px}
+
+/* ---------- responsive ---------- */
+@media (max-width:1000px){
+    .steps-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:880px){
+    .hero-inner{grid-template-columns:1fr;text-align:center;gap:32px}
+    .hero-visual{order:-1}
+    .hero-logo{width:170px}
+    .hero h1,.hero p{margin-left:auto;margin-right:auto}
+    .hero-cta{justify-content:center}
+    .pub-links{display:none}
+    .nav-brand-text span{display:none}
+}
+@media (max-width:560px){
+    .steps-grid{grid-template-columns:1fr}
+    .pub-actions .btn-ghost{display:none}
+    .hero-cta .btn{flex:1;padding:0 14px;font-size:16px;white-space:nowrap}
+    .cta-card{padding:28px 22px}
+}

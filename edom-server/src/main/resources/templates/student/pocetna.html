@@ -1,65 +1,111 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
     <title>E-Dom — Moje prijave</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/student.css}">
 </head>
-<body>
+<body class="app">
 
-<header>
-    <h1>E-Dom</h1>
-    <nav>
-        <a th:href="@{/student/profil}">Moj profil</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit">Odjava</button>
-        </form>
-    </nav>
-</header>
+<header th:replace="~{fragments/layout :: navbarStudent('prijave')}"></header>
 
-<main>
+<main class="content">
 
-    <p>Prijavljeni ste kao <strong th:text="${ime}">korisnik</strong></p>
+    <!-- ======================= DOBRODOŠLICA ======================= -->
+    <section class="welcome">
+        <div>
+            <span class="eyebrow">Studentski portal</span>
+            <h1>Dobro došli, <span th:text="${ime}">korisnik</span></h1>
+            <p>Ovdje možete podnijeti prijavu za smještaj, pratiti njen status i bodove.</p>
+        </div>
+        <a class="btn btn-primary btn-lg" th:href="@{/student/prijava/nova}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Podnesi novu prijavu
+        </a>
+    </section>
 
-    <h2>Moje prijave</h2>
+    <!-- ======================= MOJE PRIJAVE ======================= -->
+    <section class="panel">
+        <div class="panel-head">
+            <div>
+                <h2>Moje prijave</h2>
+                <p class="muted" th:unless="${#lists.isEmpty(prijave)}"
+                   th:text="'Ukupno prijava: ' + ${#lists.size(prijave)}">Ukupno prijava: 1</p>
+            </div>
+        </div>
 
-    <div class="prazno" th:if="${#lists.isEmpty(prijave)}">
-        <p>Još nemate nijednu prijavu.</p>
-        <a class="dugme" th:href="@{/student/prijava/nova}">Podnesi prijavu</a>
-    </div>
+        <!-- nema prijava -->
+        <div class="empty" th:if="${#lists.isEmpty(prijave)}">
+            <div class="empty-ic">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg>
+            </div>
+            <h3>Još nemate nijednu prijavu</h3>
+            <p>Podnesite prijavu za smještaj za tekuću akademsku godinu. Traje samo nekoliko minuta.</p>
+            <a class="btn btn-primary" th:href="@{/student/prijava/nova}">Podnesi prijavu</a>
+        </div>
 
-    <div th:unless="${#lists.isEmpty(prijave)}">
-        <table>
-            <thead>
-            <tr>
-                <th>Akademska godina</th>
-                <th>Datum prijave</th>
-                <th>Status</th>
-                <th>Bodovi</th>
-                <th>Dokumenti</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="p : ${prijave}">
-                <td th:text="${p.akademskaGodina}">2025</td>
-                <td th:text="${p.datumPrijave != null} ? ${#temporals.format(p.datumPrijave, 'dd.MM.yyyy.')} : '—'">—</td>
-                <td><span class="oznaka" th:text="${p.status}">Na pregledu</span></td>
-                <td th:text="${p.ukupniBodovi != null} ? ${p.ukupniBodovi} : '—'">—</td>
-                <td th:text="${p.brojDokumenata}">0</td>
-                <td><a th:href="@{/student/prijava/{id}(id=${p.idPrijava})}">Detalji</a></td>
-            </tr>
-            </tbody>
-        </table>
+        <!-- tabela prijava -->
+        <div class="table-wrap" th:unless="${#lists.isEmpty(prijave)}">
+            <table class="tbl">
+                <thead>
+                <tr>
+                    <th>Akademska godina</th>
+                    <th>Datum prijave</th>
+                    <th>Status</th>
+                    <th class="num">Bodovi</th>
+                    <th class="num">Dokumenti</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${prijave}"
+                    th:with="s=${p.status != null} ? ${#strings.toLowerCase(p.status.toString())} : ''">
+                    <td data-label="Akademska godina"><b th:text="${p.akademskaGodina}">2025</b></td>
+                    <td data-label="Datum prijave"
+                        th:text="${p.datumPrijave != null} ? ${#temporals.format(p.datumPrijave, 'dd.MM.yyyy.')} : '—'">—</td>
+                    <td data-label="Status">
+                        <!-- boja oznake prema tekstu statusa: odobren/prihvaćen = zelena, odbijen = crvena, ostalo = narandžasta -->
+                        <span class="badge"
+                              th:classappend="${#strings.contains(s,'odobr') or #strings.contains(s,'prihva') or #strings.contains(s,'primlj')} ? 'badge--ok' : (${#strings.contains(s,'odbij')} ? 'badge--bad' : 'badge--wait')"
+                              th:text="${p.status}">Na pregledu</span>
+                    </td>
+                    <td data-label="Bodovi" class="num">
+                        <b th:text="${p.ukupniBodovi != null} ? ${p.ukupniBodovi} : '—'">—</b>
+                    </td>
+                    <td data-label="Dokumenti" class="num">
+                        <span class="doc-count">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                            <span th:text="${p.brojDokumenata}">0</span>
+                        </span>
+                    </td>
+                    <td class="actions">
+                        <a class="btn-link" th:href="@{/student/prijava/{id}(id=${p.idPrijava})}">
+                            Detalji
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-        <p class="uspjeh" th:if="${uspjeh}" th:text="${uspjeh}"></p>
-        <p class="greska" th:if="${greska}" th:text="${greska}"></p>
-
-        <a class="dugme" th:href="@{/student/prijava/nova}">Podnesi novu prijavu</a>
-    </div>
+    <!-- ======================= BRZI LINKOVI ======================= -->
+    <section class="quick">
+        <a class="quick-card" th:href="@{/rang-lista}">
+            <span class="quick-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></span>
+            <div><b>Rang lista</b><span>Pogledajte trenutni poredak kandidata</span></div>
+        </a>
+        <a class="quick-card" th:href="@{/student/profil}">
+            <span class="quick-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <div><b>Moj profil</b><span>Lični podaci i promjena lozinke</span></div>
+        </a>
+    </section>
 
 </main>
 
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
 </body>
 </html>

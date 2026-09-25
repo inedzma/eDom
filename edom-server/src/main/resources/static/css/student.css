@@ -1,0 +1,115 @@
+/* =========================================================
+   E-Dom – stranice za prijavljenog studenta
+   (Moje prijave, a kasnije i profil, detalji prijave...)
+   Navbar, dugmad i footer dolaze iz edom.css
+   ========================================================= */
+body.app{display:flex;flex-direction:column;min-height:100vh}
+.content{flex:1;width:100%;max-width:1200px;margin:0 auto;padding:32px 24px 56px}
+
+.btn-lg{height:52px;padding:0 24px;font-size:16px;border-radius:14px}
+.eyebrow{
+    display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;
+    text-transform:uppercase;color:#5fd6b4;margin-bottom:8px;
+}
+.muted{color:var(--muted);font-size:14px;margin-top:4px}
+
+/* odjava u padajućem meniju (forma, pa je dugme) */
+.user-menu form{margin:0}
+.menu-logout{
+    width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border:0;border-radius:10px;
+    background:none;cursor:pointer;font:inherit;font-weight:600;font-size:15px;color:var(--danger);text-align:left;
+}
+.menu-logout:hover{background:var(--danger-soft)}
+.user-menu a{gap:10px}
+
+/* ---------- dobrodošlica ---------- */
+.welcome{
+    position:relative;overflow:hidden;
+    display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+    padding:34px 40px;border-radius:24px;color:#fff;
+    background:linear-gradient(135deg,var(--teal-800),var(--teal-900));
+}
+.welcome::after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;right:-120px;top:-200px;background:rgba(0,191,154,.12)}
+.welcome > *{position:relative;z-index:1}
+.welcome h1{font-size:clamp(24px,2.6vw,32px);font-weight:800;margin-bottom:6px}
+.welcome p{color:#cfe3e7;font-size:16px;max-width:560px;line-height:1.5}
+
+/* ---------- panel ---------- */
+.panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px;margin-top:24px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.panel h2{font-size:20px;font-weight:800;color:var(--heading)}
+
+/* ---------- prazno stanje ---------- */
+.empty{text-align:center;padding:36px 16px 20px}
+.empty-ic{
+    width:76px;height:76px;margin:0 auto 18px;border-radius:22px;
+    background:var(--mint-soft);color:var(--mint-dark);display:grid;place-items:center;
+}
+.empty h3{font-size:19px;font-weight:800;color:var(--heading);margin-bottom:6px}
+.empty p{color:var(--label);font-size:15px;max-width:420px;margin:0 auto 22px;line-height:1.5}
+
+/* ---------- tabela ---------- */
+.table-wrap{overflow-x:auto;margin:0 -8px}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:15px}
+.tbl th{
+    text-align:left;padding:12px 16px;font-size:12px;font-weight:800;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:16px;border-bottom:1px solid var(--line);color:var(--text);vertical-align:middle}
+.tbl tbody tr{transition:background .15s}
+.tbl tbody tr:hover{background:var(--bg)}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl b{color:var(--heading);font-weight:800}
+.tbl .num{text-align:center}
+.tbl .actions{text-align:right;white-space:nowrap}
+
+.badge{
+    display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
+    padding:6px 12px;border-radius:999px;font-size:13px;font-weight:800;
+}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.badge--wait{background:var(--warn-soft);color:#b8741a}
+.badge--ok{background:var(--mint-soft);color:var(--mint-dark)}
+.badge--bad{background:var(--danger-soft);color:var(--danger)}
+
+.doc-count{display:inline-flex;align-items:center;gap:6px;color:var(--label);font-weight:700}
+
+.btn-link{
+    display:inline-flex;align-items:center;gap:4px;padding:8px 12px;border-radius:10px;
+    color:var(--mint-dark);font-weight:800;font-size:14px;text-decoration:none;transition:.15s;
+}
+.btn-link:hover{background:var(--mint-soft)}
+
+/* ---------- brzi linkovi ---------- */
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+.quick-card{
+    display:flex;align-items:center;gap:16px;padding:20px 22px;border-radius:18px;
+    background:#fff;border:1px solid var(--line);text-decoration:none;transition:.2s;
+}
+.quick-card:hover{border-color:var(--border);box-shadow:var(--shadow);transform:translateY(-2px)}
+.quick-ic{
+    flex:none;width:46px;height:46px;border-radius:14px;
+    background:var(--mint-soft);color:var(--mint-dark);display:grid;place-items:center;
+}
+.quick-card b{display:block;font-size:16px;color:var(--heading)}
+.quick-card span{font-size:14px;color:var(--muted)}
+
+/* ---------- mobitel: tabela postaje kartice ---------- */
+@media (max-width:720px){
+    .content{padding:18px 16px 40px}
+    .welcome{padding:26px 22px}
+    .welcome .btn{width:100%}
+    .panel{padding:20px 16px}
+    .quick{grid-template-columns:1fr}
+
+    .table-wrap{margin:0}
+    .tbl thead{display:none}
+    .tbl, .tbl tbody, .tbl tr, .tbl td{display:block;width:100%}
+    .tbl tr{border:1px solid var(--line);border-radius:14px;padding:6px 14px;margin-bottom:12px}
+    .tbl tbody tr:last-child td{border-bottom:1px solid var(--line)}
+    .tbl td{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0}
+    .tbl td::before{content:attr(data-label);font-size:13px;font-weight:700;color:var(--muted)}
+    .tbl td.num{text-align:right}
+    .tbl td.actions{border-bottom:0 !important;justify-content:flex-end}
+    .tbl td.actions::before{content:none}
+}

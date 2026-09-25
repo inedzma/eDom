@@ -43,6 +43,70 @@
     </div>
 </footer>
 
+<header th:fragment="navbarStudent(aktivna)" class="navbar" id="navbar">
+    <div class="navbar-inner">
+        <a class="nav-brand" th:href="@{/student}">
+            <img th:src="@{/img/studentski-centar-logo.png}" alt="Studentski centar Zenica">
+            <div class="nav-brand-text">
+                <strong>E-Dom</strong>
+                <span>Studentski centar Zenica</span>
+            </div>
+        </a>
+
+        <ul class="nav-links">
+            <li><a th:href="@{/student}" th:classappend="${aktivna == 'prijave'} ? 'active'">Moje prijave</a></li>
+            <li><a th:href="@{/rang-lista}" th:classappend="${aktivna == 'rang'} ? 'active'">Rang lista</a></li>
+            <li><a th:href="@{/student/profil}" th:classappend="${aktivna == 'profil'} ? 'active'">Moj profil</a></li>
+        </ul>
+
+        <div class="nav-actions">
+            <div class="user" id="user">
+                <button type="button" class="user-btn" id="userBtn" aria-haspopup="true" aria-expanded="false">
+                    <span class="avatar" th:text="${ime != null and !#strings.isEmpty(ime)} ? ${#strings.toUpperCase(#strings.substring(ime, 0, 1))} : 'S'">S</span>
+                    <span class="user-name" th:text="${ime != null} ? ${ime} : 'Student'">Student</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="user-menu" role="menu">
+                    <a th:href="@{/student/profil}">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Moj profil
+                    </a>
+                    <hr>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="menu-logout">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                            Odjava
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <button type="button" class="icon-btn nav-toggle" id="navToggle" aria-label="Meni">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var user = document.getElementById('user');
+            var btn = document.getElementById('userBtn');
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var open = user.classList.toggle('open');
+                btn.setAttribute('aria-expanded', open);
+            });
+            document.addEventListener('click', function (e) {
+                if (!user.contains(e.target)) user.classList.remove('open');
+            });
+            document.getElementById('navToggle').addEventListener('click', function () {
+                document.getElementById('navbar').classList.toggle('menu-open');
+            });
+        })();
+    </script>
+</header>
+
+
 <th:block th:fragment="toasts">
     <div id="toasts" class="toasts">
         <div class="toast toast--greska" data-tip="greska" th:if="${param.error}">
@@ -68,6 +132,9 @@
         </div>
         <div class="toast toast--uspjeh" data-tip="uspjeh" th:if="${info}">
             <div class="toast-tekst"><b>Obavijest</b><span th:text="${info}">Poruka</span></div>
+        </div>
+        <div class="toast toast--uspjeh" data-tip="uspjeh" th:if="${uspjeh}">
+            <div class="toast-tekst"><b>Uspješno</b><span th:text="${uspjeh}">Poruka</span></div>
         </div>
     </div>
     <script th:src="@{/js/toast.js}"></script>
