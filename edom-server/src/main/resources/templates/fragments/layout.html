@@ -28,6 +28,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/edom.css}">
+    <link rel="stylesheet" th:href="@{/css/toast.css}">
 </th:block>
 
 <!-- ============ FOOTER ============ -->
@@ -41,6 +42,36 @@
         </ul>
     </div>
 </footer>
+
+<th:block th:fragment="toasts">
+    <div id="toasts" class="toasts">
+        <div class="toast toast--greska" data-tip="greska" th:if="${param.error}">
+            <div class="toast-tekst"><b>Prijava nije uspjela</b><span>Neispravna e-mail adresa ili lozinka.</span></div>
+        </div>
+        <div class="toast toast--upozorenje" data-tip="upozorenje" th:if="${param['samo-studenti']}">
+            <div class="toast-tekst"><b>Pristup nije dozvoljen</b><span>Web pristup je namijenjen studentima. Administratori koriste desktop aplikaciju.</span></div>
+        </div>
+        <div class="toast toast--uspjeh" data-tip="uspjeh" th:if="${param.prijava}">
+            <div class="toast-tekst"><b>Dobro došli!</b><span>Uspješno ste se prijavili.</span></div>
+        </div>
+        <div class="toast toast--uspjeh" data-tip="uspjeh" th:if="${param.odjava}">
+            <div class="toast-tekst"><b>Odjavljeni ste</b><span>Uspješno ste se odjavili iz E-Doma.</span></div>
+        </div>
+        <div class="toast toast--uspjeh" data-tip="uspjeh" th:if="${param.registrovan}">
+            <div class="toast-tekst"><b>Registracija uspješna</b><span>Vaš nalog je kreiran. Možete se prijaviti.</span></div>
+        </div>
+        <div class="toast toast--uspjeh" data-tip="uspjeh" th:if="${param.resetovano}">
+            <div class="toast-tekst"><b>Lozinka promijenjena</b><span>Prijavite se novom lozinkom.</span></div>
+        </div>
+        <div class="toast toast--greska" data-tip="greska" th:if="${greska}">
+            <div class="toast-tekst"><b>Greška</b><span th:text="${greska}">Poruka</span></div>
+        </div>
+        <div class="toast toast--uspjeh" data-tip="uspjeh" th:if="${info}">
+            <div class="toast-tekst"><b>Obavijest</b><span th:text="${info}">Poruka</span></div>
+        </div>
+    </div>
+    <script th:src="@{/js/toast.js}"></script>
+</th:block>
 
 </body>
 </html>

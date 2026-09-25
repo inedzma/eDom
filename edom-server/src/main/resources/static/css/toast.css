@@ -1,0 +1,50 @@
+/* E-Dom – iskačuće obavijesti (toast). Povezano u fragments/layout.html -> head */
+/* ---------- TOAST / ISKAČUĆE OBAVIJESTI (sve stranice) ---------- */
+.toasts{
+    position:fixed;top:20px;right:20px;z-index:1000;
+    display:flex;flex-direction:column;gap:12px;
+    width:min(380px,calc(100vw - 32px));pointer-events:none;
+}
+.toast{
+    position:relative;overflow:hidden;pointer-events:auto;
+    display:flex;align-items:flex-start;gap:12px;
+    padding:16px 44px 18px 16px;border-radius:14px;
+    background:#fff;border:1px solid var(--line);border-left:5px solid;
+    box-shadow:0 14px 40px rgba(10,74,92,.16);
+    animation:toastUlaz .35s cubic-bezier(.2,.9,.3,1.2);
+}
+.toast.izlaz{animation:toastIzlaz .25s ease-in forwards}
+.toast--uspjeh{border-left-color:var(--mint)}
+.toast--greska{border-left-color:var(--danger)}
+.toast--upozorenje{border-left-color:var(--warn)}
+
+.toast-ikona{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center}
+.toast--uspjeh .toast-ikona{background:var(--mint-soft);color:var(--mint-dark)}
+.toast--greska .toast-ikona{background:var(--danger-soft);color:var(--danger)}
+.toast--upozorenje .toast-ikona{background:var(--warn-soft);color:#b8741a}
+
+.toast-tekst{flex:1;padding-top:1px}
+.toast-tekst b{display:block;font-size:15px;font-weight:800;color:var(--heading);margin-bottom:2px}
+.toast-tekst span{display:block;font-size:14px;line-height:1.45;color:var(--text)}
+
+.toast-x{
+    position:absolute;top:10px;right:10px;width:28px;height:28px;border:0;border-radius:8px;
+    background:transparent;color:var(--muted);font-size:22px;line-height:1;cursor:pointer;
+}
+.toast-x:hover{background:#f1f6f5;color:var(--heading)}
+
+.toast-traka{position:absolute;left:0;bottom:0;height:3px;width:100%;transform-origin:left;animation:toastTraka linear forwards}
+.toast--uspjeh .toast-traka{background:var(--mint)}
+.toast--greska .toast-traka{background:var(--danger)}
+.toast--upozorenje .toast-traka{background:var(--warn)}
+.toast.pauza .toast-traka{animation-play-state:paused}
+
+@keyframes toastUlaz{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes toastIzlaz{to{opacity:0;transform:translateX(40px)}}
+@keyframes toastTraka{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+@media (max-width:600px){
+    .toasts{top:12px;right:16px;left:16px;width:auto}
+    @keyframes toastUlaz{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
+    @keyframes toastIzlaz{to{opacity:0;transform:translateY(-20px)}}
+}
