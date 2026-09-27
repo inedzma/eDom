@@ -1,64 +1,149 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
     <title>E-Dom — Domaćinstvo</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/student.css}">
+    <link rel="stylesheet" th:href="@{/css/prijava.css}">
     <script th:src="@{/js/validacija.js}" defer></script>
 </head>
-<body>
+<body class="app">
 
-<header>
-    <h1>E-Dom</h1>
-    <nav>
-        <a th:href="@{/student/pocetna}">Moje prijave</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit">Odjava</button>
-        </form>
-    </nav>
-</header>
+<header th:replace="~{fragments/layout :: navbarStudent('prijave')}"></header>
 
-<main class="forma-uska">
+<main class="content wizard">
 
-    <h2>Podaci o domaćinstvu</h2>
-    <div th:replace="~{fragmenti/koraci :: koraci(${korak})}"></div>
+    <!-- ======================= NASLOV ======================= -->
+    <a class="back" th:href="@{/student/pocetna}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Moje prijave
+    </a>
+    <div class="wizard-head">
+        <span class="eyebrow dark">Nova prijava</span>
+        <h1>Prijava za smještaj</h1>
+        <p class="muted">Popunite podatke korak po korak.</p>
+    </div>
 
-    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
+    <div class="wizard-steps">
+        <div th:replace="~{fragments/koraci :: koraci(${korak})}"></div>
+    </div>
 
-    <form th:action="@{/student/prijava/{id}/domacinstvo(id=${idPrijave})}"
-          th:object="${forma}" method="post">
-
-        <label>Broj članova domaćinstva</label>
-        <input type="number" th:field="*{brojClanovaDomacinstva}" min="1">
-        <span class="greska" th:if="${#fields.hasErrors('brojClanovaDomacinstva')}"
-              th:errors="*{brojClanovaDomacinstva}"></span>
-        <p style="font-size:0.8rem;color:var(--sivo);margin-top:0.3rem;">
-            Uključujući i vas.
-        </p>
-
-        <label>Ukupna mjesečna primanja domaćinstva (KM)</label>
-        <input type="number" step="0.01" th:field="*{ukupnaPrimanja}" min="0">
-        <span class="greska" th:if="${#fields.hasErrors('ukupnaPrimanja')}"
-              th:errors="*{ukupnaPrimanja}"></span>
-        <p style="font-size:0.8rem;color:var(--sivo);margin-top:0.3rem;">
-            Zbir svih primanja članova domaćinstva, dokazuje se priloženom
-            dokumentacijom.
-        </p>
-
-        <label>Udaljenost mjesta stanovanja do doma (km)</label>
-        <input type="number" step="0.1" th:field="*{udaljenostKm}" min="0">
-        <span class="greska" th:if="${#fields.hasErrors('udaljenostKm')}"
-              th:errors="*{udaljenostKm}"></span>
-
-        <div class="akcije">
-            <a class="dugme-sivo"
-               th:href="@{/student/prijava/{id}/studij(id=${idPrijave})}">← Nazad</a>
-            <button type="submit">Dalje →</button>
+    <!-- ======================= FORMA ======================= -->
+    <section class="panel form-card">
+        <div class="form-card-head">
+            <span class="form-card-ic">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+            </span>
+            <div>
+                <h2>Podaci o domaćinstvu</h2>
+                <p class="muted">Članovi domaćinstva, primanja i udaljenost.</p>
+            </div>
         </div>
-    </form>
+
+        <form th:action="@{/student/prijava/{id}/domacinstvo(id=${idPrijave})}"
+              th:object="${forma}" method="post" id="domForm">
+
+            <div class="grid-2">
+                <div class="f-field">
+                    <label for="brojClanovaDomacinstva">Broj članova domaćinstva</label>
+                    <div class="unit-input">
+                        <input type="number" th:field="*{brojClanovaDomacinstva}" th:errorclass="is-invalid" min="1" placeholder="npr. 4">
+                        <span class="unit">osoba</span>
+                    </div>
+                    <span class="field-err" th:if="${#fields.hasErrors('brojClanovaDomacinstva')}" th:errors="*{brojClanovaDomacinstva}"></span>
+                    <p class="hint">Uključujući i vas.</p>
+                </div>
+
+                <div class="f-field">
+                    <label for="ukupnaPrimanja">Ukupna mjesečna primanja domaćinstva</label>
+                    <div class="unit-input">
+                        <input type="number" step="0.01" th:field="*{ukupnaPrimanja}" th:errorclass="is-invalid" min="0" placeholder="npr. 1850.00">
+                        <span class="unit">KM</span>
+                    </div>
+                    <span class="field-err" th:if="${#fields.hasErrors('ukupnaPrimanja')}" th:errors="*{ukupnaPrimanja}"></span>
+                    <p class="hint">Zbir svih primanja članova domaćinstva, dokazuje se priloženom dokumentacijom.</p>
+                </div>
+
+                <!-- izračun uživo – samo informativno, ne šalje se -->
+                <div class="calc span-2" id="calc" hidden>
+                    <span class="calc-label">Primanja po članu domaćinstva</span>
+                    <b class="calc-value" id="calcValue">—</b>
+                </div>
+
+                <div class="f-field span-2">
+                    <label for="udaljenostKm">Udaljenost mjesta stanovanja do doma</label>
+                    <div class="unit-input unit-input--short">
+                        <input type="number" step="0.1" th:field="*{udaljenostKm}" th:errorclass="is-invalid" min="0" placeholder="npr. 45.5">
+                        <span class="unit">km</span>
+                    </div>
+                    <span class="field-err" th:if="${#fields.hasErrors('udaljenostKm')}" th:errors="*{udaljenostKm}"></span>
+                </div>
+            </div>
+
+            <!-- dno forme -->
+            <div class="form-footer">
+                <a class="btn btn-ghost"
+                   th:href="@{/student/prijava/{id}/studij(id=${idPrijave})}">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>
+                    Nazad
+                </a>
+                <button type="submit" class="btn btn-primary btn-lg" id="nextBtn">
+                    Dalje
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+        </form>
+    </section>
 
 </main>
 
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+
+<script>
+    (function () {
+        const form = document.getElementById('domForm');
+        const clanovi = document.getElementById('brojClanovaDomacinstva');
+        const primanja = document.getElementById('ukupnaPrimanja');
+        const calc = document.getElementById('calc');
+        const calcValue = document.getElementById('calcValue');
+        const btn = document.getElementById('nextBtn');
+
+        // primanja po članu (informativno)
+        function izracunaj() {
+            const n = parseInt(clanovi.value, 10);
+            const p = parseFloat(primanja.value);
+            if (n > 0 && p >= 0) {
+                calcValue.textContent = (p / n).toFixed(2) + ' KM';
+                calc.hidden = false;
+            } else {
+                calc.hidden = true;
+            }
+        }
+        clanovi.addEventListener('input', izracunaj);
+        primanja.addEventListener('input', izracunaj);
+        izracunaj();
+
+        // skini crveni okvir čim korisnik ispravi polje
+        form.querySelectorAll('.is-invalid').forEach(function (el) {
+            el.addEventListener('input', function () {
+                el.classList.remove('is-invalid');
+                const err = el.closest('.f-field').querySelector('.field-err');
+                if (err) err.style.display = 'none';
+            }, { once: true });
+        });
+
+        // stanje učitavanja
+        form.addEventListener('submit', function (e) {
+            setTimeout(function () {
+                if (e.defaultPrevented || !form.checkValidity()) return;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Spremam…';
+            }, 0);
+        });
+        window.addEventListener('pageshow', function () { btn.disabled = false; });
+    })();
+</script>
 </body>
 </html>

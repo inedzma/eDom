@@ -1,96 +1,176 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
     <title>E-Dom — Nova prijava</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/student.css}">
+    <link rel="stylesheet" th:href="@{/css/prijava.css}">
     <script th:src="@{/js/validacija.js}" defer></script>
 </head>
-<body>
+<body class="app">
 
-<header>
-    <h1>E-Dom</h1>
-    <nav>
-        <a th:href="@{/student/pocetna}">Moje prijave</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit">Odjava</button>
+<header th:replace="~{fragments/layout :: navbarStudent('prijave')}"></header>
+
+<main class="content wizard">
+
+    <!-- ======================= NASLOV ======================= -->
+    <a class="back" th:href="@{/student/pocetna}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Moje prijave
+    </a>
+    <div class="wizard-head">
+        <span class="eyebrow dark">Nova prijava</span>
+        <h1>Prijava za smještaj</h1>
+        <p class="muted">Popunite podatke korak po korak.</p>
+    </div>
+
+    <!-- koraci (tvoj postojeći fragment) -->
+    <div class="wizard-steps">
+        <div th:replace="~{fragments/koraci :: koraci(${korak})}"></div>
+    </div>
+
+    <!-- ======================= FORMA ======================= -->
+    <section class="panel form-card">
+        <div class="form-card-head">
+            <span class="form-card-ic">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg>
+            </span>
+            <div>
+                <h2>Podaci o studiju</h2>
+                <p class="muted">Akademska godina, godina studija i uspjeh.</p>
+            </div>
+        </div>
+
+        <form th:action="@{/student/prijava/{id}/studij(id=${idPrijave})}"
+              th:object="${forma}" method="post" id="studijForm">
+
+            <div class="grid-2">
+                <div class="f-field">
+                    <label for="akademskaGodina">Akademska godina</label>
+                    <input type="number" th:field="*{akademskaGodina}" th:errorclass="is-invalid" placeholder="npr. 2025">
+                    <span class="field-err" th:if="${#fields.hasErrors('akademskaGodina')}" th:errors="*{akademskaGodina}"></span>
+                </div>
+
+                <div class="f-field">
+                    <label for="godinaStudija">Godina studija</label>
+                    <div class="select-wrap">
+                        <select th:field="*{godinaStudija}" th:errorclass="is-invalid">
+                            <option value="">Odaberite</option>
+                            <option value="1">1. godina (brucoš)</option>
+                            <option value="2">2. godina</option>
+                            <option value="3">3. godina</option>
+                            <option value="4">4. godina</option>
+                            <option value="5">5. godina</option>
+                            <option value="6">6. godina</option>
+                            <option value="7">Apsolvent</option>
+                            <option value="8">Postdiplomac</option>
+                        </select>
+                    </div>
+                    <span class="field-err" th:if="${#fields.hasErrors('godinaStudija')}" th:errors="*{godinaStudija}"></span>
+                </div>
+
+                <div class="f-field">
+                    <label for="prosjek">Prosjek ocjena</label>
+                    <input type="number" step="0.01" th:field="*{prosjek}" th:errorclass="is-invalid" placeholder="npr. 8.45">
+                    <span class="field-err" th:if="${#fields.hasErrors('prosjek')}" th:errors="*{prosjek}"></span>
+                    <p class="hint" id="prosjekHint">
+                        Brucoši unose prosjek srednje škole (1.00–5.00),
+                        ostali prosjek na fakultetu (6.00–10.00).
+                    </p>
+                </div>
+
+                <div class="f-field" id="ispitiField">
+                    <label for="polozeniIspiti">Broj položenih ispita</label>
+                    <input type="number" th:field="*{polozeniIspiti}" th:errorclass="is-invalid" min="0" placeholder="npr. 12">
+                    <span class="field-err" th:if="${#fields.hasErrors('polozeniIspiti')}" th:errors="*{polozeniIspiti}"></span>
+                    <p class="hint" id="ispitiHint">Brucoši ostavljaju prazno.</p>
+                </div>
+            </div>
+
+            <!-- dno forme -->
+            <div class="form-footer">
+                <a class="btn btn-ghost" th:href="@{/student/pocetna}">Prekini</a>
+                <button type="submit" class="btn btn-primary btn-lg" id="nextBtn">
+                    Dalje
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </button>
+            </div>
         </form>
-    </nav>
-</header>
+    </section>
 
-<main class="forma-uska">
-
-    <h2>Nova prijava za smještaj</h2>
-    <div th:replace="~{fragmenti/koraci :: koraci(${korak})}"></div>
-
-    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
-
-    <form th:action="@{/student/prijava/{id}/studij(id=${idPrijave})}"
-          th:object="${forma}" method="post">
-
-        <div class="red-dva">
-            <div>
-                <label>Akademska godina</label>
-                <input type="number" th:field="*{akademskaGodina}">
-                <span class="greska" th:if="${#fields.hasErrors('akademskaGodina')}"
-                      th:errors="*{akademskaGodina}"></span>
-            </div>
-            <div>
-                <label>Godina studija</label>
-                <select th:field="*{godinaStudija}">
-                    <option value="">Odaberite</option>
-                    <option value="1">1. godina</option>
-                    <option value="2">2. godina</option>
-                    <option value="3">3. godina</option>
-                    <option value="4">4. godina</option>
-                    <option value="5">5. godina</option>
-                    <option value="6">6. godina</option>
-                    <option value="7">Apsolvent</option>
-                    <option value="8">Postdiplomac</option>
-                </select>
-                <span class="greska" th:if="${#fields.hasErrors('godinaStudija')}"
-                      th:errors="*{godinaStudija}"></span>
-            </div>
-        </div>
-
-        <div class="red-dva">
-            <div>
-                <label>Prosjek ocjena</label>
-                <input type="number" step="0.01" th:field="*{prosjek}">
-                <span class="greska" th:if="${#fields.hasErrors('prosjek')}"
-                      th:errors="*{prosjek}"></span>
-                <p style="font-size:0.8rem;color:var(--sivo);margin-top:0.3rem;">
-                    Brucoši unose prosjek srednje škole (1.00–5.00),
-                    ostali prosjek na fakultetu (6.00–10.00).
-                </p>
-            </div>
-            <div>
-                <label>Broj položenih ispita</label>
-                <input type="number" th:field="*{polozeniIspiti}" min="0">
-                <span class="greska" th:if="${#fields.hasErrors('polozeniIspiti')}"
-                      th:errors="*{polozeniIspiti}"></span>
-                <p style="font-size:0.8rem;color:var(--sivo);margin-top:0.3rem;">
-                    Brucoši ostavljaju prazno.
-                </p>
-            </div>
-        </div>
-
-        <div class="akcije">
-            <button type="submit">Dalje →</button>
-            <a class="dugme-sivo" th:href="@{/student/pocetna}">Prekini</a>
-        </div>
-    </form>
-
-    <form th:action="@{/student/prijava/{id}/odustani(id=${idPrijave})}"
-          method="post" style="margin-top:2rem;"
+    <!-- ======================= ODUSTANI ======================= -->
+    <form class="cancel-form"
+          th:action="@{/student/prijava/{id}/odustani(id=${idPrijave})}" method="post"
           onsubmit="return confirm('Sigurno želite obrisati ovu prijavu? Uneseni podaci se neće sačuvati.');">
-        <button type="submit" class="dugme-sivo" style="color:var(--greska);">
+        <button type="submit" class="danger-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
             Odustani od prijave
         </button>
     </form>
 
 </main>
 
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+
+<script>
+    (function () {
+        const form = document.getElementById('studijForm');
+        const godina = document.getElementById('godinaStudija');
+        const prosjek = document.getElementById('prosjek');
+        const ispiti = document.getElementById('polozeniIspiti');
+        const ispitiField = document.getElementById('ispitiField');
+        const prosjekHint = document.getElementById('prosjekHint');
+        const btn = document.getElementById('nextBtn');
+
+        // prilagodi polja kad se odabere godina studija
+        function azuriraj() {
+            const brucos = godina.value === '1';
+            const odabrano = godina.value !== '';
+
+            if (brucos) {
+                prosjek.min = '1'; prosjek.max = '5';
+                prosjek.placeholder = 'npr. 4.75';
+                prosjekHint.textContent = 'Unesite prosjek iz srednje škole (1.00–5.00).';
+                ispiti.value = '';
+                ispiti.disabled = true;
+                ispitiField.classList.add('is-off');
+            } else {
+                prosjek.min = odabrano ? '6' : '';
+                prosjek.max = odabrano ? '10' : '';
+                prosjek.placeholder = 'npr. 8.45';
+                prosjekHint.textContent = odabrano
+                    ? 'Unesite prosjek ocjena na fakultetu (6.00–10.00).'
+                    : 'Brucoši unose prosjek srednje škole (1.00–5.00), ostali prosjek na fakultetu (6.00–10.00).';
+                ispiti.disabled = false;
+                ispitiField.classList.remove('is-off');
+            }
+        }
+        godina.addEventListener('change', azuriraj);
+        azuriraj();
+
+        // skini crveni okvir čim korisnik ispravi polje
+        form.querySelectorAll('.is-invalid').forEach(function (el) {
+            el.addEventListener('input', function () {
+                el.classList.remove('is-invalid');
+                const err = el.closest('.f-field').querySelector('.field-err');
+                if (err) err.style.display = 'none';
+            }, { once: true });
+        });
+
+        // stanje učitavanja
+        form.addEventListener('submit', function (e) {
+            setTimeout(function () {
+                if (e.defaultPrevented || !form.checkValidity()) return;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Spremam…';
+            }, 0);
+        });
+        window.addEventListener('pageshow', function () {
+            btn.disabled = false;
+        });
+    })();
+</script>
 </body>
 </html>

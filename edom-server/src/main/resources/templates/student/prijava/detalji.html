@@ -1,168 +1,190 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
     <title>E-Dom — Detalji prijave</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/student.css}">
+    <link rel="stylesheet" th:href="@{/css/prijava.css}">
     <script th:src="@{/js/validacija.js}" defer></script>
 </head>
-<body>
+<body class="app">
 
-<header>
-    <h1>E-Dom</h1>
-    <nav>
-        <a th:href="@{/student/pocetna}">Moje prijave</a>
-        <a th:href="@{/student/profil}">Moj profil</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit">Odjava</button>
-        </form>
-    </nav>
-</header>
+<header th:replace="~{fragments/layout :: navbarStudent('prijave')}"></header>
 
-<main>
+<main class="content wizard wizard--wide"
+      th:with="st=${prijava.status != null} ? ${#strings.toLowerCase(prijava.status.naziv)} : ''">
 
-    <h2>
-        Prijava za akademsku
-        <span th:text="${prijava.akademskaGodina}">2026</span>. godinu
-    </h2>
+    <a class="back" th:href="@{/student/pocetna}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Moje prijave
+    </a>
 
-    <p>
-        Status:
-        <span class="oznaka"
-              th:text="${prijava.status != null} ? ${prijava.status.naziv} : '—'">—</span>
-        <span th:if="${prijava.datumPrijave != null}"
-              style="color:var(--sivo);font-size:0.85rem;">
-            &nbsp;podneseno
-            <span th:text="${#temporals.format(prijava.datumPrijave, 'dd.MM.yyyy.')}"></span>
-        </span>
-    </p>
+    <!-- ======================= ZAGLAVLJE SA STATUSOM ======================= -->
+    <section class="welcome detail-hero">
+        <div>
+            <span class="eyebrow">Detalji prijave</span>
+            <h1>Prijava za akademsku <span th:text="${prijava.akademskaGodina}">2026</span>. godinu</h1>
+            <div class="detail-meta">
+                <span class="badge"
+                      th:classappend="${#strings.contains(st,'odobr') or #strings.contains(st,'prihva')} ? 'badge--ok' : (${#strings.contains(st,'odbij')} ? 'badge--bad' : 'badge--wait')"
+                      th:text="${prijava.status != null} ? ${prijava.status.naziv} : '—'">Status</span>
+                <span class="detail-date" th:if="${prijava.datumPrijave != null}">
+                    Podneseno <b th:text="${#temporals.format(prijava.datumPrijave, 'dd.MM.yyyy.')}">01.01.2026.</b>
+                </span>
+            </div>
+        </div>
 
-    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
-    <p class="uspjeh" th:if="${uspjeh}" th:text="${uspjeh}"></p>
+        <div class="detail-actions">
+            <a class="btn btn-light"
+               th:href="@{/student/prijava/{id}/dokumenti(id=${prijava.idPrijava})}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                Dokumenti
+            </a>
+            <a class="btn btn-primary" th:if="${uIzradi}"
+               th:href="@{/student/prijava/{id}/studij(id=${prijava.idPrijava})}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+                Nastavi uređivanje
+            </a>
+        </div>
+    </section>
 
-    <h3 style="margin-top:2rem;">Podaci o studiju</h3>
-    <table>
-        <tbody>
-        <tr><td>Godina studija</td>
-            <td th:text="${prijava.godinaStudija} ?: '—'">—</td></tr>
-        <tr><td>Prosjek ocjena</td>
-            <td th:text="${prijava.prosjek} ?: '—'">—</td></tr>
-        <tr><td>Položenih ispita</td>
-            <td th:text="${prijava.polozeniIspiti} ?: '—'">—</td></tr>
-        </tbody>
-    </table>
-
-    <h3 style="margin-top:2rem;">Domaćinstvo</h3>
-    <table>
-        <tbody>
-        <tr><td>Broj članova</td>
-            <td th:text="${prijava.brojClanovaDomacinstva} ?: '—'">—</td></tr>
-        <tr><td>Ukupna primanja</td>
-            <td th:text="${prijava.ukupnaPrimanja != null} ? ${prijava.ukupnaPrimanja} + ' KM' : '—'">—</td></tr>
-        <tr><td>Udaljenost do doma</td>
-            <td th:text="${prijava.udaljenostKm != null} ? ${prijava.udaljenostKm} + ' km' : '—'">—</td></tr>
-        </tbody>
-    </table>
-
-    <h3 style="margin-top:2rem;">Prijavljeni kriteriji</h3>
-
-    <div class="prazno" th:if="${#lists.isEmpty(prijava.kriteriji)}">
-        <p>Niste prijavili nijedan dodatni kriterij.</p>
+    <!-- obavijest za podnesenu prijavu -->
+    <div class="info-note locked-note" th:unless="${uIzradi}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>Podnesena prijava se ne može mijenjati. Za izmjene se obratite administraciji Studentskog centra.</span>
     </div>
 
-    <table th:unless="${#lists.isEmpty(prijava.kriteriji)}">
-        <thead>
-        <tr><th>Kriterij</th><th>Vrijednost</th><th>Status</th></tr>
-        </thead>
-        <tbody>
-        <tr th:each="k : ${prijava.kriteriji}">
-            <td th:text="${k.vrsta.naziv}">Kriterij</td>
-            <td th:text="${k.parametar} ?: '—'">—</td>
-            <td>
-                <span class="oznaka"
-                      th:text="${k.verifikovan} ? 'Priznato' : 'Čeka provjeru'">—</span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="review-grid">
 
-    <h3 style="margin-top:2rem;"
-        th:text="${rezultat.konacno()} ? 'Konačan obračun bodova'
-                                       : 'Okvirni obračun bodova'">Obračun</h3>
+        <!-- ======================= LIJEVO: PODACI + KRITERIJI ======================= -->
+        <div class="stack">
+            <section class="panel form-card">
+                <div class="review-block">
+                    <div class="review-block-head"><h3>Podaci o studiju</h3></div>
+                    <dl class="info-list">
+                        <div><dt>Godina studija</dt>
+                            <dd th:with="g=${prijava.godinaStudija}"
+                                th:text="${g == null} ? '—' : (${g == 7} ? 'Apsolvent' : (${g == 8} ? 'Postdiplomac' : ${g} + '. godina'))">—</dd></div>
+                        <div><dt>Prosjek ocjena</dt><dd th:text="${prijava.prosjek} ?: '—'">—</dd></div>
+                        <div><dt>Položenih ispita</dt><dd th:text="${prijava.polozeniIspiti} ?: '—'">—</dd></div>
+                    </dl>
+                </div>
 
-    <p style="color:var(--sivo);font-size:0.85rem;"
-       th:unless="${rezultat.konacno()}">
-        Ovo je okvirni obračun na osnovu podataka koje ste unijeli.
-        Bodovi se priznaju tek nakon što administracija doma provjeri
-        priloženu dokumentaciju.
-    </p>
+                <div class="review-block">
+                    <div class="review-block-head"><h3>Domaćinstvo</h3></div>
+                    <dl class="info-list">
+                        <div><dt>Broj članova</dt><dd th:text="${prijava.brojClanovaDomacinstva} ?: '—'">—</dd></div>
+                        <div><dt>Ukupna primanja</dt><dd th:text="${prijava.ukupnaPrimanja != null} ? ${prijava.ukupnaPrimanja} + ' KM' : '—'">—</dd></div>
+                        <div><dt>Udaljenost do doma</dt><dd th:text="${prijava.udaljenostKm != null} ? ${prijava.udaljenostKm} + ' km' : '—'">—</dd></div>
+                    </dl>
+                </div>
+            </section>
 
-    <table>
-        <thead>
-        <tr><th>Osnov</th><th>Bodovi</th><th>Napomena</th><th>Status</th></tr>
-        </thead>
-        <tbody>
-        <tr th:each="s : ${rezultat.stavke}">
-            <td th:text="${s.naziv}">Osnov</td>
-            <td th:text="${s.bodovi}">0</td>
-            <td th:text="${s.obrazlozenje} ?: ''"></td>
-            <td>
-                <span class="oznaka"
-                      th:text="${s.verifikovan} ? 'Provjereno' : 'Čeka provjeru'">—</span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            <section class="panel form-card">
+                <div class="review-block-head"><h3>Prijavljeni kriteriji</h3></div>
 
-    <!-- dok odluka nije donesena -->
-    <p style="margin-top:1rem;" th:unless="${rezultat.konacno()}">
-        <strong>Ukupno prijavljeno:</strong>
-        <span th:text="${rezultat.potencijalno}">0</span> bodova<br>
-        <strong>Do sada provjereno:</strong>
-        <span th:text="${rezultat.potvrdjeno}">0</span> bodova
-    </p>
+                <p class="empty-line" th:if="${#lists.isEmpty(prijava.kriteriji)}">
+                    Niste prijavili nijedan dodatni kriterij.
+                </p>
 
-    <!-- nakon odobrenja -->
-    <p style="margin-top:1rem;" th:if="${rezultat.konacno()}">
-        <strong>Priznato:</strong>
-        <span th:text="${rezultat.potvrdjeno}">0</span> bodova
-    </p>
+                <ul class="krit-rows" th:unless="${#lists.isEmpty(prijava.kriteriji)}">
+                    <li th:each="k : ${prijava.kriteriji}">
+                        <div>
+                            <b th:text="${k.vrsta.naziv}">Kriterij</b>
+                            <span class="muted" th:if="${k.parametar != null}" th:text="'Vrijednost: ' + ${k.parametar}">Vrijednost</span>
+                        </div>
+                        <span class="badge" th:classappend="${k.verifikovan} ? 'badge--ok' : 'badge--wait'"
+                              th:text="${k.verifikovan} ? 'Priznato' : 'Čeka provjeru'">—</span>
+                    </li>
+                </ul>
+            </section>
+        </div>
 
-    <p th:if="${rezultat.cekaVerifikaciju() and !rezultat.konacno()}"
-       style="color:var(--sivo);font-size:0.85rem;">
-        Dio bodova čeka provjeru dokumentacije.
-    </p>
-    <!-- akcije za prijavu u izradi -->
-    <div class="akcije" th:if="${uIzradi}">
-        <a class="dugme"
-           th:href="@{/student/prijava/{id}/studij(id=${prijava.idPrijava})}">
-            Nastavi uređivanje
+        <!-- ======================= DESNO: OBRAČUN ======================= -->
+        <section class="panel form-card">
+            <div class="form-card-head">
+                <span class="form-card-ic">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                </span>
+                <div>
+                    <h2 th:text="${rezultat.konacno()} ? 'Konačan obračun bodova' : 'Okvirni obračun bodova'">Obračun</h2>
+                    <p class="muted" th:unless="${rezultat.konacno()}">Na osnovu podataka koje ste unijeli.</p>
+                    <p class="muted" th:if="${rezultat.konacno()}">Bodovi su provjereni i priznati.</p>
+                </div>
+            </div>
+
+            <div class="info-note calc-note" th:unless="${rezultat.konacno()}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                <span>Bodovi se priznaju tek nakon što administracija doma provjeri priloženu dokumentaciju.</span>
+            </div>
+
+            <ul class="score-list">
+                <li class="score" th:each="s : ${rezultat.stavke}">
+                    <div class="score-body">
+                        <b th:text="${s.naziv}">Osnov</b>
+                        <span class="score-note" th:if="${s.obrazlozenje}" th:text="${s.obrazlozenje}">Napomena</span>
+                        <span class="badge" th:classappend="${s.verifikovan} ? 'badge--ok' : 'badge--wait'"
+                              th:text="${s.verifikovan} ? 'Provjereno' : 'Čeka provjeru'">—</span>
+                    </div>
+                    <b class="score-pts" th:text="${s.bodovi}">0</b>
+                </li>
+            </ul>
+
+            <div class="total" th:unless="${rezultat.konacno()}">
+                <div class="total-row">
+                    <span>Ukupno prijavljeno</span>
+                    <b id="totalPot" th:text="${rezultat.potencijalno}">0</b>
+                </div>
+                <div class="total-row total-row--sub">
+                    <span>Do sada provjereno</span>
+                    <b id="totalPotv" th:text="${rezultat.potvrdjeno}">0</b>
+                </div>
+                <div class="progress"><span id="progressBar"></span></div>
+                <p class="hint" th:if="${rezultat.cekaVerifikaciju()}">Dio bodova čeka provjeru dokumentacije.</p>
+            </div>
+
+            <div class="total total--final" th:if="${rezultat.konacno()}">
+                <div class="total-row">
+                    <span>Priznato</span>
+                    <b th:text="${rezultat.potvrdjeno}">0</b>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ======================= DNO ======================= -->
+    <div class="detail-footer">
+        <a class="btn btn-ghost" th:href="@{/student/pocetna}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>
+            Nazad
         </a>
-        <form th:action="@{/student/prijava/{id}/odustani(id=${prijava.idPrijava})}"
-              method="post"
+        <form th:if="${uIzradi}"
+              th:action="@{/student/prijava/{id}/odustani(id=${prijava.idPrijava})}" method="post"
               onsubmit="return confirm('Sigurno želite obrisati ovu prijavu?');">
-            <button type="submit" class="dugme-sivo" style="color:var(--greska);">
+            <button type="submit" class="danger-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
                 Obriši prijavu
             </button>
         </form>
     </div>
 
-    <!-- podnesena prijava -->
-    <div th:unless="${uIzradi}" style="margin-top:2rem;">
-        <p style="color:var(--sivo);font-size:0.85rem;">
-            Podnesena prijava se ne može mijenjati. Za izmjene se obratite
-            administraciji Studentskog centra.
-        </p>
-        <a class="dugme-sivo" th:href="@{/student/pocetna}">← Nazad</a>
-    </div>
-
-    <a class="dugme"
-       th:href="@{/student/prijava/{id}/dokumenti(id=${prijava.idPrijava})}">
-        Dokumenti
-    </a>
-
 </main>
 
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+
+<script>
+    (function () {
+        const pot = document.getElementById('totalPot');
+        const potv = document.getElementById('totalPotv');
+        const bar = document.getElementById('progressBar');
+        if (pot && potv && bar) {
+            const a = parseFloat(pot.textContent.replace(',', '.')) || 0;
+            const b = parseFloat(potv.textContent.replace(',', '.')) || 0;
+            bar.style.width = (a > 0 ? Math.min(100, b / a * 100) : 0) + '%';
+        }
+    })();
+</script>
 </body>
 </html>

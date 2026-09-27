@@ -1,121 +1,213 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
     <title>E-Dom — Dokumenti</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/student.css}">
+    <link rel="stylesheet" th:href="@{/css/prijava.css}">
     <script th:src="@{/js/validacija.js}" defer></script>
 </head>
-<body>
+<body class="app">
 
-<header>
-    <h1>E-Dom</h1>
-    <nav>
-        <a th:href="@{/student/pocetna}">Moje prijave</a>
-        <a th:href="@{/student/profil}">Moj profil</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit">Odjava</button>
-        </form>
-    </nav>
-</header>
+<header th:replace="~{fragments/layout :: navbarStudent('prijave')}"></header>
 
-<main>
+<main class="content wizard wizard--wide">
 
-    <h2>
-        Dokumenti uz prijavu
-        <span th:text="${prijava.akademskaGodina}">2026</span>.
-    </h2>
-
-    <p class="uspjeh" th:if="${uspjeh}" th:text="${uspjeh}"></p>
-    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
-
-    <p style="color:var(--sivo);font-size:0.9rem;">
-        Dokumenti nisu obavezni za podnošenje prijave, ali kriteriji bez
-        priloženog dokaza ne donose bodove. Dokumente možete priložiti i
-        naknadno, kao i dostaviti lično u Studentski centar.
-    </p>
-
-    <!-- ---------- FORMA ---------- -->
-
-    <h3 style="margin-top:2rem;">Priloži dokument</h3>
-
-    <form th:action="@{/student/prijava/{id}/dokumenti(id=${idPrijave})}"
-          method="post" enctype="multipart/form-data" class="forma-uska">
-
-        <label>Vrsta dokumenta</label>
-        <select name="idVrste" required>
-            <option value="">Odaberite vrstu</option>
-            <optgroup th:each="kat : ${vrste}" th:label="${kat.key}">
-                <option th:each="v : ${kat.value}"
-                        th:value="${v.idVrsta}" th:text="${v.naziv}">Vrsta</option>
-            </optgroup>
-        </select>
-        <label>Naziv (neobavezno)</label>
-        <input type="text" name="naziv"
-               placeholder="Ostavite prazno za naziv vrste">
-
-        <label>Datoteka</label>
-        <input type="file" name="fajl" accept=".jpg,.jpeg,.png,.pdf" required>
-        <p style="font-size:0.8rem;color:var(--sivo);margin-top:0.3rem;">
-            JPG, PNG ili PDF. Fotografija dokumenta snimljena telefonom je
-            dovoljna. Veće slike se automatski smanjuju.
-        </p>
-
-        <button type="submit">Priloži</button>
-    </form>
-
-    <!-- ---------- LISTA ---------- -->
-
-    <h3 style="margin-top:2.5rem;">Priloženi dokumenti</h3>
-
-    <div class="prazno" th:if="${#lists.isEmpty(dokumenti)}">
-        <p>Još niste priložili nijedan dokument.</p>
+    <!-- ======================= NASLOV ======================= -->
+    <a class="back" th:href="@{/student/prijava/{id}(id=${idPrijave})}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Nazad na prijavu
+    </a>
+    <div class="wizard-head">
+        <span class="eyebrow dark">
+            Prijava <span th:text="${prijava.akademskaGodina}">2026</span>.
+        </span>
+        <h1>Dokumenti uz prijavu</h1>
     </div>
 
-    <table th:unless="${#lists.isEmpty(dokumenti)}">
-        <thead>
-        <tr>
-            <th>Naziv</th>
-            <th>Vrsta</th>
-            <th>Priloženo</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="d : ${dokumenti}">
-            <td th:text="${d.naziv}">Naziv</td>
-            <td th:text="${d.vrstaDokumenta != null}
-                    ? ${d.vrstaDokumenta.naziv} : '—'">—</td>
-            <td th:text="${d.datumUpload != null}
-                    ? ${#temporals.format(d.datumUpload, 'dd.MM.yyyy.')} : '—'">—</td>
-            <td>
-                <a th:href="@{/student/prijava/{id}/dokumenti/{idDok}/preuzmi
-                            (id=${idPrijave}, idDok=${d.idDokument})}"
-                   target="_blank">Pogledaj</a>
+    <div class="info-note docs-note">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <span>Dokumenti nisu obavezni za podnošenje prijave, ali kriteriji bez priloženog dokaza ne donose bodove.
+            Dokumente možete priložiti i naknadno, kao i dostaviti lično u Studentski centar.</span>
+    </div>
 
-                <form th:action="@{/student/prijava/{id}/dokumenti/{idDok}/obrisi
-                                 (id=${idPrijave}, idDok=${d.idDokument})}"
-                      method="post" style="display:inline; margin-left:1rem;"
-                      onsubmit="return confirm('Obrisati ovaj dokument?');">
-                    <button type="submit" class="veza-dugme">Obriši</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="docs-grid">
 
-    <div class="akcije">
-        <a class="dugme-sivo"
-           th:href="@{/student/prijava/{id}(id=${idPrijave})}">← Nazad na prijavu</a>
+        <!-- ======================= PRILOŽI DOKUMENT ======================= -->
+        <section class="panel form-card">
+            <div class="form-card-head">
+                <span class="form-card-ic">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                </span>
+                <div>
+                    <h2>Priloži dokument</h2>
+                    <p class="muted">JPG, PNG ili PDF.</p>
+                </div>
+            </div>
 
-        <a th:if="${uIzradi}" class="dugme"
+            <form th:action="@{/student/prijava/{id}/dokumenti(id=${idPrijave})}"
+                  method="post" enctype="multipart/form-data" id="uploadForm">
+
+                <div class="f-field">
+                    <label for="idVrste">Vrsta dokumenta</label>
+                    <div class="select-wrap">
+                        <select id="idVrste" name="idVrste" required>
+                            <option value="">Odaberite vrstu</option>
+                            <optgroup th:each="kat : ${vrste}" th:label="${kat.key}">
+                                <option th:each="v : ${kat.value}"
+                                        th:value="${v.idVrsta}" th:text="${v.naziv}">Vrsta</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="f-field">
+                    <label for="naziv">Naziv <span class="opt">(neobavezno)</span></label>
+                    <input type="text" id="naziv" name="naziv" placeholder="Ostavite prazno za naziv vrste">
+                </div>
+
+                <div class="f-field">
+                    <label>Datoteka</label>
+                    <label class="drop" id="drop">
+                        <input type="file" name="fajl" id="fajl" accept=".jpg,.jpeg,.png,.pdf" required>
+                        <span class="drop-ic">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15l3-3 3 3"/></svg>
+                        </span>
+                        <span class="drop-text" id="dropText">
+                            <b>Kliknite za odabir</b> ili prevucite datoteku ovdje
+                        </span>
+                        <span class="drop-file" id="dropFile" hidden></span>
+                    </label>
+                    <p class="hint">Fotografija dokumenta snimljena telefonom je dovoljna. Veće slike se automatski smanjuju.</p>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg upload-btn" id="uploadBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                    Priloži
+                </button>
+            </form>
+        </section>
+
+        <!-- ======================= PRILOŽENI DOKUMENTI ======================= -->
+        <section class="panel form-card">
+            <div class="form-card-head">
+                <span class="form-card-ic">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                </span>
+                <div>
+                    <h2>Priloženi dokumenti</h2>
+                    <p class="muted" th:text="${#lists.isEmpty(dokumenti)} ? 'Nema priloženih dokumenata' : 'Ukupno: ' + ${#lists.size(dokumenti)}">Ukupno: 0</p>
+                </div>
+            </div>
+
+            <div class="empty empty--small" th:if="${#lists.isEmpty(dokumenti)}">
+                <div class="empty-ic">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                </div>
+                <p>Još niste priložili nijedan dokument.</p>
+            </div>
+
+            <ul class="doc-list" th:unless="${#lists.isEmpty(dokumenti)}">
+                <li class="doc" th:each="d : ${dokumenti}">
+                    <span class="doc-ic">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                    </span>
+                    <div class="doc-body">
+                        <b class="doc-name" th:text="${d.naziv}">Naziv</b>
+                        <span class="doc-meta">
+                            <span th:text="${d.vrstaDokumenta != null} ? ${d.vrstaDokumenta.naziv} : '—'">Vrsta</span>
+                            <span class="dot">·</span>
+                            <span th:text="${d.datumUpload != null} ? ${#temporals.format(d.datumUpload, 'dd.MM.yyyy.')} : '—'">—</span>
+                        </span>
+                    </div>
+                    <div class="doc-actions">
+                        <a class="icon-action"
+                           th:href="@{/student/prijava/{id}/dokumenti/{idDok}/preuzmi(id=${idPrijave}, idDok=${d.idDokument})}"
+                           target="_blank" title="Pogledaj" aria-label="Pogledaj">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </a>
+                        <form th:action="@{/student/prijava/{id}/dokumenti/{idDok}/obrisi(id=${idPrijave}, idDok=${d.idDokument})}"
+                              method="post" onsubmit="return confirm('Obrisati ovaj dokument?');">
+                            <button type="submit" class="icon-action icon-action--danger" title="Obriši" aria-label="Obriši">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                            </button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    <!-- ======================= DNO ======================= -->
+    <div class="form-footer page-footer">
+        <a class="btn btn-ghost" th:href="@{/student/prijava/{id}(id=${idPrijave})}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>
+            Nazad na prijavu
+        </a>
+        <a th:if="${uIzradi}" class="btn btn-primary btn-lg"
            th:href="@{/student/prijava/{id}/pregled(id=${idPrijave})}">
-            Nastavi na pregled →
+            Nastavi na pregled
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
         </a>
     </div>
 
 </main>
 
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+
+<script>
+    (function () {
+        const drop = document.getElementById('drop');
+        const input = document.getElementById('fajl');
+        const text = document.getElementById('dropText');
+        const fileBox = document.getElementById('dropFile');
+        const form = document.getElementById('uploadForm');
+        const btn = document.getElementById('uploadBtn');
+
+        function velicina(b) {
+            return b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.round(b / 1024) + ' KB';
+        }
+        function prikazi() {
+            const f = input.files[0];
+            if (f) {
+                fileBox.textContent = f.name + ' · ' + velicina(f.size);
+                fileBox.hidden = false;
+                text.hidden = true;
+                drop.classList.add('has-file');
+            } else {
+                fileBox.hidden = true;
+                text.hidden = false;
+                drop.classList.remove('has-file');
+            }
+        }
+        input.addEventListener('change', prikazi);
+
+        // prevlačenje datoteke
+        ['dragenter', 'dragover'].forEach(function (ev) {
+            drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('over'); });
+        });
+        ['dragleave', 'drop'].forEach(function (ev) {
+            drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('over'); });
+        });
+        drop.addEventListener('drop', function (e) {
+            if (e.dataTransfer.files.length) {
+                input.files = e.dataTransfer.files;
+                prikazi();
+            }
+        });
+
+        // stanje učitavanja
+        form.addEventListener('submit', function (e) {
+            setTimeout(function () {
+                if (e.defaultPrevented || !form.checkValidity()) return;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Šaljem…';
+            }, 0);
+        });
+        window.addEventListener('pageshow', function () { btn.disabled = false; });
+    })();
+</script>
 </body>
 </html>

@@ -1,83 +1,164 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
     <title>E-Dom — Dodatni kriteriji</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/student.css}">
+    <link rel="stylesheet" th:href="@{/css/prijava.css}">
     <script th:src="@{/js/validacija.js}" defer></script>
 </head>
-<body>
+<body class="app">
 
-<header>
-    <h1>E-Dom</h1>
-    <nav>
-        <a th:href="@{/student/pocetna}">Moje prijave</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit">Odjava</button>
-        </form>
-    </nav>
-</header>
+<header th:replace="~{fragments/layout :: navbarStudent('prijave')}"></header>
 
-<main class="forma-uska">
+<main class="content wizard">
 
-    <h2>Dodatni kriteriji</h2>
-    <div th:replace="~{fragmenti/koraci :: koraci(${korak})}"></div>
+    <!-- ======================= NASLOV ======================= -->
+    <a class="back" th:href="@{/student/pocetna}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Moje prijave
+    </a>
+    <div class="wizard-head">
+        <span class="eyebrow dark">Nova prijava</span>
+        <h1>Prijava za smještaj</h1>
+        <p class="muted">Popunite podatke korak po korak.</p>
+    </div>
 
-    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
+    <div class="wizard-steps">
+        <div th:replace="~{fragments/koraci :: koraci(${korak})}"></div>
+    </div>
 
-    <p style="color:var(--sivo);font-size:0.9rem;">
-        Označite kriterije koji se odnose na vas. Za svaki označeni kriterij
-        potrebno je priložiti odgovarajući dokument. Bodovi se dodjeljuju tek
-        nakon što administracija provjeri dokumentaciju.
-    </p>
+    <!-- ======================= FORMA ======================= -->
+    <section class="panel form-card">
+        <div class="form-card-head">
+            <span class="form-card-ic">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </span>
+            <div>
+                <h2>Dodatni kriteriji</h2>
+                <p class="muted">Označite kriterije koji se odnose na vas.</p>
+            </div>
+        </div>
 
-    <form th:action="@{/student/prijava/{id}/kriteriji(id=${idPrijave})}"
-          th:object="${forma}" method="post">
+        <div class="info-note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span>Za svaki označeni kriterij potrebno je priložiti odgovarajući dokument.
+                Bodovi se dodjeljuju tek nakon što administracija provjeri dokumentaciju.</span>
+        </div>
 
-        <h3 style="margin-top:2rem;">Status branilaca i socijalne kategorije</h3>
-        <p style="font-size:0.8rem;color:var(--sivo);">
-            Ako se na vas odnosi više kriterija iz ove grupe, boduje se
-            samo onaj koji nosi najviše bodova.
-        </p>
+        <form th:action="@{/student/prijava/{id}/kriteriji(id=${idPrijave})}"
+              th:object="${forma}" method="post" id="kriterijiForm">
 
-        <div th:each="k, stat : *{kriteriji}">
-            <div class="kriterij-red" th:if="${k.grupa == 'BRANIOCI'}">
-                <input type="hidden" th:field="*{kriteriji[__${stat.index}__].idVrsteKriterija}">
-                <label>
-                    <input type="checkbox"
-                           th:field="*{kriteriji[__${stat.index}__].izabran}">
-                    <span th:text="${k.naziv}">Kriterij</span>
-                </label>
-                <div class="parametar" th:if="${k.traziParametar}">
-                    <label th:text="${k.nazivParametra}">Parametar</label>
-                    <input type="number" step="0.01"
-                           th:field="*{kriteriji[__${stat.index}__].parametar}">
+            <!-- ============ BRANIOCI / SOCIJALNE KATEGORIJE ============ -->
+            <div class="krit-group">
+                <h3 class="krit-title">Status branilaca i socijalne kategorije</h3>
+                <p class="hint">Ako se na vas odnosi više kriterija iz ove grupe, boduje se samo onaj koji nosi najviše bodova.</p>
+
+                <div class="krit-list">
+                    <th:block th:each="k, stat : *{kriteriji}">
+                        <div class="krit" th:if="${k.grupa == 'BRANIOCI'}">
+                            <input type="hidden" th:field="*{kriteriji[__${stat.index}__].idVrsteKriterija}">
+
+                            <label class="krit-main">
+                                <input type="checkbox" class="krit-check"
+                                       th:field="*{kriteriji[__${stat.index}__].izabran}">
+                                <span class="krit-box"></span>
+                                <span class="krit-name" th:text="${k.naziv}">Kriterij</span>
+                                <span class="krit-doc">Potreban dokument</span>
+                            </label>
+
+                            <div class="krit-param" th:if="${k.traziParametar}">
+                                <label th:for="${'kriteriji' + stat.index + '.parametar'}"
+                                       th:text="${k.nazivParametra}">Parametar</label>
+                                <input type="number" step="0.01"
+                                       th:field="*{kriteriji[__${stat.index}__].parametar}">
+                            </div>
+                        </div>
+                    </th:block>
                 </div>
             </div>
-        </div>
 
-        <h3 style="margin-top:2rem;">Ostali kriteriji</h3>
+            <!-- ============ OSTALI KRITERIJI ============ -->
+            <div class="krit-group">
+                <h3 class="krit-title">Ostali kriteriji</h3>
 
-        <div th:each="k, stat : *{kriteriji}">
-            <div class="kriterij-red" th:if="${k.grupa == 'DODATNI'}">
-                <input type="hidden" th:field="*{kriteriji[__${stat.index}__].idVrsteKriterija}">
-                <label>
-                    <input type="checkbox"
-                           th:field="*{kriteriji[__${stat.index}__].izabran}">
-                    <span th:text="${k.naziv}">Kriterij</span>
-                </label>
+                <div class="krit-list">
+                    <th:block th:each="k, stat : *{kriteriji}">
+                        <div class="krit" th:if="${k.grupa == 'DODATNI'}">
+                            <input type="hidden" th:field="*{kriteriji[__${stat.index}__].idVrsteKriterija}">
+
+                            <label class="krit-main">
+                                <input type="checkbox" class="krit-check"
+                                       th:field="*{kriteriji[__${stat.index}__].izabran}">
+                                <span class="krit-box"></span>
+                                <span class="krit-name" th:text="${k.naziv}">Kriterij</span>
+                                <span class="krit-doc">Potreban dokument</span>
+                            </label>
+                        </div>
+                    </th:block>
+                </div>
             </div>
-        </div>
 
-        <div class="akcije">
-            <a class="dugme-sivo"
-               th:href="@{/student/prijava/{id}/domacinstvo(id=${idPrijave})}">← Nazad</a>
-            <button type="submit">Dalje →</button>
-        </div>
-    </form>
+            <!-- dno forme -->
+            <div class="form-footer">
+                <a class="btn btn-ghost"
+                   th:href="@{/student/prijava/{id}/domacinstvo(id=${idPrijave})}">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>
+                    Nazad
+                </a>
+                <span class="krit-count" id="kritCount"></span>
+                <button type="submit" class="btn btn-primary btn-lg" id="nextBtn">
+                    Dalje
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+        </form>
+    </section>
 
 </main>
 
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+
+<script>
+    (function () {
+        const form = document.getElementById('kriterijiForm');
+        const btn = document.getElementById('nextBtn');
+        const count = document.getElementById('kritCount');
+        const checks = form.querySelectorAll('.krit-check');
+
+        // označi karticu + prikaži parametar samo kad je kriterij izabran
+        function osvjezi() {
+            let n = 0;
+            checks.forEach(function (c) {
+                const krit = c.closest('.krit');
+                krit.classList.toggle('on', c.checked);
+                if (c.checked) n++;
+            });
+            count.textContent = n === 0 ? 'Nijedan kriterij nije označen'
+                : n === 1 ? 'Označen 1 kriterij'
+                    : 'Označeno ' + n + ' kriterija';
+        }
+        checks.forEach(function (c) {
+            c.addEventListener('change', function () {
+                osvjezi();
+                const p = c.closest('.krit').querySelector('.krit-param input');
+                if (c.checked && p) p.focus();
+            });
+        });
+        osvjezi();
+
+        // stanje učitavanja
+        form.addEventListener('submit', function (e) {
+            setTimeout(function () {
+                if (e.defaultPrevented || !form.checkValidity()) return;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Spremam…';
+            }, 0);
+        });
+        window.addEventListener('pageshow', function () { btn.disabled = false; });
+    })();
+</script>
 </body>
 </html>
