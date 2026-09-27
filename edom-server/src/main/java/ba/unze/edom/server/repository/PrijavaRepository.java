@@ -31,6 +31,9 @@ public interface PrijavaRepository extends JpaRepository<Prijava, Integer> {
            """)
     List<Prijava> nadjiZaStudenta(@Param("idStudenta") Integer idStudenta);
 
+    @Query("select max(p.akademskaGodina) from Prijava p")
+    Integer zadnjaAkademskaGodina();
+
     long countByStatus_Naziv(String naziv);
 
     Optional<Prijava> findByStudent_IdStudentAndAkademskaGodina(

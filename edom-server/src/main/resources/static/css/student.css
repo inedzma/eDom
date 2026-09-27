@@ -113,3 +113,74 @@ body.app{display:flex;flex-direction:column;min-height:100vh}
     .tbl td.actions{border-bottom:0 !important;justify-content:flex-end}
     .tbl td.actions::before{content:none}
 }
+
+/* =========================================================
+   PROFIL (student/profil.html)
+   ========================================================= */
+.eyebrow.dark{color:var(--mint-dark)}
+.page-head{margin-bottom:22px}
+.page-head h1{font-size:clamp(26px,2.6vw,32px);font-weight:800;color:var(--heading)}
+
+.profil-grid{display:grid;grid-template-columns:360px 1fr;gap:24px;align-items:start}
+.profil-grid .panel{margin-top:0}
+
+/* kartica studenta */
+.profil-top{text-align:center;padding:6px 0 22px;border-bottom:1px solid var(--line)}
+.profil-avatar{
+    width:92px;height:92px;margin:0 auto 14px;border-radius:50%;
+    background:linear-gradient(135deg,var(--mint),var(--teal-700));
+    color:#fff;font-size:32px;font-weight:800;letter-spacing:.02em;
+    display:grid;place-items:center;
+    box-shadow:0 10px 24px rgba(0,191,154,.25),0 0 0 6px var(--mint-soft);
+}
+.profil-top h2{font-size:21px}
+
+.lock-note,.info-note{
+    display:flex;gap:10px;align-items:flex-start;
+    padding:12px 14px;border-radius:12px;font-size:13.5px;line-height:1.45;
+}
+.lock-note{margin:18px 0 6px;background:var(--bg);color:var(--label)}
+.lock-note svg,.info-note svg{flex:none;margin-top:1px}
+.lock-note svg{color:var(--muted)}
+.info-note{margin-top:24px;background:#e9f5fb;color:#2d5d70}
+.info-note svg{color:#3a8bb0}
+
+.info-list{margin-top:6px}
+.info-list > div{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.info-list > div:last-child{border-bottom:0;padding-bottom:0}
+.info-list dt{font-size:14px;font-weight:700;color:var(--muted)}
+.info-list dd{font-size:15px;font-weight:700;color:var(--heading);text-align:right}
+
+/* forma */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;column-gap:20px}
+.grid-2 .span-2{grid-column:1 / -1}
+.f-field{margin-bottom:18px}
+.f-field label{display:block;font-size:14px;font-weight:700;color:var(--label);margin-bottom:8px}
+.opt{font-weight:600;color:var(--muted);font-size:13px}
+.f-field input,.f-field select{
+    width:100%;height:50px;padding:0 16px;
+    border:2px solid var(--border);border-radius:12px;background:#fcfffe;
+    font:inherit;font-size:16px;color:var(--heading);outline:none;
+    transition:border-color .15s,box-shadow .15s;
+}
+.f-field input:focus,.f-field select:focus{border-color:var(--mint);box-shadow:0 0 0 4px rgba(0,191,154,.12)}
+.f-field input::placeholder{color:#a9c4c9}
+.f-field .is-invalid{border-color:var(--danger);background:#fffafa}
+.field-err{display:block;color:var(--danger);font-size:13.5px;font-weight:600;margin-top:6px}
+
+.select-wrap{position:relative}
+.select-wrap select{appearance:none;cursor:pointer;padding-right:44px}
+.select-wrap::after{
+    content:"";position:absolute;right:18px;top:50%;width:8px;height:8px;margin-top:-6px;
+    border:solid var(--mint);border-width:0 2.5px 2.5px 0;transform:rotate(45deg);pointer-events:none;
+}
+
+.form-actions{display:flex;justify-content:flex-end;padding-top:6px}
+
+@media (max-width:960px){
+    .profil-grid{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+    .grid-2{grid-template-columns:1fr}
+    .form-actions .btn{width:100%}
+}

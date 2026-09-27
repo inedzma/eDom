@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
+    <title>E-Dom — Rang lista</title>
+    <link rel="stylesheet" th:href="@{/css/student.css}">
+    <link rel="stylesheet" th:href="@{/css/rang-lista.css}">
+</head>
+<body class="app">
+
+<!-- prijavljen student vidi svoj meni, posjetilac javni -->
+<th:block th:if="${mojId != null}">
+    <header th:replace="~{fragments/layout :: navbarStudent('rang')}"></header>
+</th:block>
+<th:block th:unless="${mojId != null}">
+    <header th:replace="~{fragments/layout :: navbarJavni('rang')}"></header>
+</th:block>
+
+<main class="content">
+
+    <!-- ======================= NASLOV ======================= -->
+    <section class="welcome rang-hero">
+        <div>
+            <span class="eyebrow">Studentski centar Univerziteta u Zenici</span>
+            <h1>Rang lista</h1>
+            <p>
+                Rang lista kandidata za smještaj i ishranu
+                <th:block th:if="${akademskaGodina}">za akademsku <b th:text="${akademskaGodina}">2025/2026</b>. godinu</th:block>.
+            </p>
+        </div>
+
+        <!-- vidi se samo prijavljenom studentu koji je na listi -->
+        <div class="me-card" id="meCard" hidden>
+            <span class="me-label">Vaša pozicija</span>
+            <div class="me-row">
+                <b class="me-rank" id="meRank">—</b>
+                <div>
+                    <span class="me-group" id="meGroup">—</span>
+                    <span class="me-points" id="mePoints">—</span>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" id="findMe">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
+                Pronađi me na listi
+            </button>
+        </div>
+    </section>
+
+    <!-- ======================= ALATI ======================= -->
+    <div class="rang-tools">
+        <nav class="chips">
+            <a href="#brucosi" class="chip">
+                Brucoši <span th:text="${brucosi != null} ? ${#lists.size(brucosi)} : 0">0</span>
+            </a>
+            <a href="#visegodisnji" class="chip">
+                Studenti viših godina <span th:text="${visegodisnji != null} ? ${#lists.size(visegodisnji)} : 0">0</span>
+            </a>
+        </nav>
+        <label class="search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="search" id="search" placeholder="Pretraži po imenu ili prezimenu" autocomplete="off">
+        </label>
+    </div>
+
+    <!-- ======================= BRUCOŠI ======================= -->
+    <section class="panel rang-panel" id="brucosi">
+        <div class="rang-head">
+            <span class="rang-dot rang-dot--green"></span>
+            <h2>Brucoši</h2>
+        </div>
+
+        <div class="empty-small" th:if="${brucosi == null or #lists.isEmpty(brucosi)}">Nema kandidata na ovoj listi.</div>
+
+        <table class="tbl rang-tbl" th:unless="${brucosi == null or #lists.isEmpty(brucosi)}">
+            <thead>
+            <tr>
+                <th class="c-rank">#</th>
+                <th>Prezime (ime oca) i ime studenta</th>
+                <th class="c-pts">Bodovi</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="s, st : ${brucosi}"
+                th:classappend="${mojId != null and s.idStudenta == mojId} ? 'ja'"
+                th:attr="data-group='Brucoši'">
+                <td class="c-rank"><span class="rank" th:classappend="${st.count <= 3} ? 'rank--top'" th:text="${st.count}">1</span></td>
+                <td class="c-name">
+                    <span class="name">
+                        <b th:text="${s.prezime}">Prezime</b>
+                        <span class="father" th:text="'(' + ${s.imeOca} + ')'">(Otac)</span>
+                        <b th:text="${s.ime}">Ime</b>
+                    </span>
+                    <span class="me-tag" th:if="${mojId != null and s.idStudenta == mojId}">Vi</span>
+                </td>
+                <td class="c-pts"><b th:text="${#numbers.formatDecimal(s.bodovi, 1, 'NONE', 2, 'POINT')}">0.00</b></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ======================= STUDENTI VIŠIH GODINA ======================= -->
+    <section class="panel rang-panel" id="visegodisnji">
+        <div class="rang-head">
+            <span class="rang-dot rang-dot--blue"></span>
+            <h2>Studenti viših godina</h2>
+        </div>
+
+        <div class="empty-small" th:if="${visegodisnji == null or #lists.isEmpty(visegodisnji)}">Nema kandidata na ovoj listi.</div>
+
+        <table class="tbl rang-tbl" th:unless="${visegodisnji == null or #lists.isEmpty(visegodisnji)}">
+            <thead>
+            <tr>
+                <th class="c-rank">#</th>
+                <th>Prezime (ime oca) i ime studenta</th>
+                <th class="c-pts">Bodovi</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="s, st : ${visegodisnji}"
+                th:classappend="${mojId != null and s.idStudenta == mojId} ? 'ja'"
+                th:attr="data-group='Studenti viših godina'">
+                <td class="c-rank"><span class="rank" th:classappend="${st.count <= 3} ? 'rank--top'" th:text="${st.count}">1</span></td>
+                <td class="c-name">
+                    <span class="name">
+                        <b th:text="${s.prezime}">Prezime</b>
+                        <span class="father" th:text="'(' + ${s.imeOca} + ')'">(Otac)</span>
+                        <b th:text="${s.ime}">Ime</b>
+                    </span>
+                    <span class="me-tag" th:if="${mojId != null and s.idStudenta == mojId}">Vi</span>
+                </td>
+                <td class="c-pts"><b th:text="${#numbers.formatDecimal(s.bodovi, 1, 'NONE', 2, 'POINT')}">0.00</b></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <p class="no-results" id="noResults" hidden>Nijedan student ne odgovara pretrazi.</p>
+</main>
+
+<!-- plutajuće dugme – pojavi se kad se tvoj red ne vidi na ekranu -->
+<button type="button" class="fab" id="fab" hidden>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg>
+    Idi do mene
+</button>
+
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+
+<script>
+    (function () {
+        const me = document.querySelector('tr.ja');
+        const card = document.getElementById('meCard');
+        const fab = document.getElementById('fab');
+
+        function goToMe() {
+            if (!me) return;
+            me.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            me.classList.remove('flash');
+            void me.offsetWidth;          // restart animacije
+            me.classList.add('flash');
+        }
+
+        // ---------- "Vaša pozicija" + dugmad ----------
+        if (me) {
+            document.getElementById('meRank').textContent = me.querySelector('.rank').textContent + '.';
+            document.getElementById('meGroup').textContent = me.dataset.group;
+            document.getElementById('mePoints').textContent = me.querySelector('.c-pts b').textContent + ' bodova';
+            card.hidden = false;
+            document.getElementById('findMe').addEventListener('click', goToMe);
+            fab.addEventListener('click', goToMe);
+
+            // plutajuće dugme samo kad tvoj red nije na ekranu
+            if ('IntersectionObserver' in window) {
+                new IntersectionObserver(function (e) {
+                    fab.hidden = e[0].isIntersecting;
+                }).observe(me);
+            }
+        }
+
+        // ---------- pretraga ----------
+        const search = document.getElementById('search');
+        const rows = document.querySelectorAll('.rang-tbl tbody tr');
+        const noRes = document.getElementById('noResults');
+        const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'dj');
+
+        search.addEventListener('input', function () {
+            const q = norm(search.value.trim());
+            let shown = 0;
+            rows.forEach(function (r) {
+                const hit = !q || norm(r.querySelector('.name').textContent).includes(q);
+                r.hidden = !hit;
+                if (hit) shown++;
+            });
+            noRes.hidden = shown > 0;
+        });
+    })();
+</script>
+</body>
+</html>

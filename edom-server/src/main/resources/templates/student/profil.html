@@ -1,78 +1,136 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
     <title>E-Dom — Moj profil</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/student.css}">
 </head>
-<body>
+<body class="app">
 
-<header>
-    <h1>E-Dom</h1>
-    <nav>
-        <a th:href="@{/student/pocetna}">Moje prijave</a>
-        <a th:href="@{/rang-lista}">Rang lista</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit">Odjava</button>
-        </form>
-    </nav>
-</header>
+<header th:replace="~{fragments/layout :: navbarStudent('profil')}"></header>
 
-<main>
+<main class="content">
 
-    <h2>Moj profil</h2>
+    <div class="page-head">
+        <span class="eyebrow dark">Studentski portal</span>
+        <h1>Moj profil</h1>
+    </div>
 
-    <p class="uspjeh" th:if="${param.sacuvano}">Podaci su sačuvani.</p>
-    <p class="greska" th:if="${greska}" th:text="${greska}"></p>
+    <div class="profil-grid">
 
-    <h3>Lični podaci</h3>
-    <p style="color:var(--sivo); font-size:0.85rem;">
-        Ovi podaci se ne mogu mijenjati putem sistema. Za ispravku se obratite administraciji doma.
-    </p>
+        <!-- ======================= LIJEVO: KARTICA STUDENTA ======================= -->
+        <aside class="panel profil-card">
+            <div class="profil-top">
+                <div class="profil-avatar"
+                     th:text="${(profil.ime != null and !#strings.isEmpty(profil.ime) ? #strings.substring(profil.ime,0,1) : '')
+                              + (profil.prezime != null and !#strings.isEmpty(profil.prezime) ? #strings.substring(profil.prezime,0,1) : '')}">NI</div>
+                <h2 th:text="${profil.ime} + ' ' + ${profil.prezime}">Ime Prezime</h2>
+                <p class="muted" th:text="${profil.email}">email@primjer.ba</p>
+            </div>
 
-    <table>
-        <tbody>
-        <tr><td>Ime i prezime</td>
-            <td th:text="${profil.ime} + ' ' + ${profil.prezime}">—</td></tr>
-        <tr><td>JMBG</td><td th:text="${profil.jmbg}">—</td></tr>
-        <tr><td>Broj indeksa</td><td th:text="${profil.brojIndeksa}">—</td></tr>
-        <tr><td>Ime roditelja</td><td th:text="${profil.imeRoditelja}">—</td></tr>
-        </tbody>
-    </table>
+            <div class="lock-note">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span>Lični podaci se ne mogu mijenjati putem sistema. Za ispravku se obratite administraciji doma.</span>
+            </div>
 
-    <h3 style="margin-top:2rem;">Kontakt i studij</h3>
+            <dl class="info-list">
+                <div><dt>Ime i prezime</dt><dd th:text="${profil.ime} + ' ' + ${profil.prezime}">—</dd></div>
+                <div><dt>JMBG</dt><dd th:text="${profil.jmbg}">—</dd></div>
+                <div><dt>Broj indeksa</dt><dd th:text="${profil.brojIndeksa}">—</dd></div>
+                <div><dt>Ime roditelja</dt><dd th:text="${profil.imeRoditelja}">—</dd></div>
+            </dl>
+        </aside>
 
-    <form th:action="@{/student/profil}" th:object="${izmjena}" method="post">
+        <!-- ======================= DESNO: FORMA ======================= -->
+        <section class="panel">
+            <div class="panel-head">
+                <div>
+                    <h2>Kontakt i studij</h2>
+                    <p class="muted">Ove podatke možete sami ažurirati.</p>
+                </div>
+            </div>
 
-        <label>E-mail</label>
-        <input type="email" th:field="*{email}">
-        <span class="greska" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+            <form th:action="@{/student/profil}" th:object="${izmjena}" method="post" id="profilForm" class="form">
+                <div class="grid-2">
+                    <div class="f-field">
+                        <label for="email">E-mail</label>
+                        <input type="email" th:field="*{email}" th:errorclass="is-invalid" autocomplete="email">
+                        <span class="field-err" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                    </div>
 
-        <label>Telefon</label>
-        <input type="text" th:field="*{telefon}">
+                    <div class="f-field">
+                        <label for="telefon">Telefon <span class="opt">(opcionalno)</span></label>
+                        <input type="tel" th:field="*{telefon}" placeholder="06x xxx xxx" autocomplete="tel">
+                    </div>
 
-        <label>Adresa</label>
-        <input type="text" th:field="*{adresa}">
-        <span class="greska" th:if="${#fields.hasErrors('adresa')}" th:errors="*{adresa}"></span>
+                    <div class="f-field span-2">
+                        <label for="adresa">Adresa</label>
+                        <input type="text" th:field="*{adresa}" th:errorclass="is-invalid" placeholder="Ulica i broj, grad" autocomplete="street-address">
+                        <span class="field-err" th:if="${#fields.hasErrors('adresa')}" th:errors="*{adresa}"></span>
+                    </div>
 
-        <label>Fakultet</label>
-        <input type="text" th:field="*{fakultet}">
-        <span class="greska" th:if="${#fields.hasErrors('fakultet')}" th:errors="*{fakultet}"></span>
+                    <div class="f-field">
+                        <label for="fakultet">Fakultet</label>
+                        <input type="text" th:field="*{fakultet}" th:errorclass="is-invalid">
+                        <span class="field-err" th:if="${#fields.hasErrors('fakultet')}" th:errors="*{fakultet}"></span>
+                    </div>
 
-        <label>Godina studija</label>
-        <input type="number" th:field="*{godinaStudija}" min="1" max="6">
-        <span class="greska" th:if="${#fields.hasErrors('godinaStudija')}" th:errors="*{godinaStudija}"></span>
+                    <div class="f-field">
+                        <label for="godinaStudija">Godina studija</label>
+                        <div class="select-wrap">
+                            <select th:field="*{godinaStudija}" th:errorclass="is-invalid">
+                                <option th:each="g : ${#numbers.sequence(1, 6)}" th:value="${g}" th:text="${g} + '. godina'">1. godina</option>
+                            </select>
+                        </div>
+                        <span class="field-err" th:if="${#fields.hasErrors('godinaStudija')}" th:errors="*{godinaStudija}"></span>
+                    </div>
+                </div>
 
-        <button type="submit">Sačuvaj izmjene</button>
-    </form>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-lg" id="saveBtn">Sačuvaj izmjene</button>
+                </div>
+            </form>
 
-    <p style="margin-top:2rem; color:var(--sivo); font-size:0.85rem;">
-        Prosjek ocjena i socijalni status unose se prilikom podnošenja prijave
-        i utvrđuju se na osnovu priložene dokumentacije.
-    </p>
+            <div class="info-note">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                <span>Prosjek ocjena i socijalni status unose se prilikom podnošenja prijave i utvrđuju se na osnovu priložene dokumentacije.</span>
+            </div>
+        </section>
+    </div>
 
 </main>
 
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+
+<script>
+    (function () {
+        const form = document.getElementById('profilForm');
+        const btn = document.getElementById('saveBtn');
+
+        // skini crveni okvir čim korisnik ispravi polje
+        form.querySelectorAll('.is-invalid').forEach(function (el) {
+            el.addEventListener('input', function () {
+                el.classList.remove('is-invalid');
+                const err = el.closest('.f-field').querySelector('.field-err');
+                if (err) err.style.display = 'none';
+            }, { once: true });
+        });
+
+        // stanje učitavanja
+        form.addEventListener('submit', function (e) {
+            setTimeout(function () {
+                if (e.defaultPrevented || !form.checkValidity()) return;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Spremam…';
+            }, 0);
+        });
+        window.addEventListener('pageshow', function () {
+            btn.disabled = false;
+            btn.textContent = 'Sačuvaj izmjene';
+        });
+    })();
+</script>
 </body>
 </html>

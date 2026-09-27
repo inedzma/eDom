@@ -15,7 +15,7 @@
   Navbar će doći ovdje kad budemo radili stranice nakon prijave.
 -->
 <head>
-    <title>fragmenti</title>
+    <title>Studentski centar Zenica</title>
 </head>
 <body>
 
@@ -43,9 +43,30 @@
     </div>
 </footer>
 
+<!-- ============ NAVBAR ZA POSJETIOCE (nisu prijavljeni) ============ -->
+<header th:fragment="navbarJavni(aktivna)" class="navbar">
+    <div class="navbar-inner">
+        <a class="nav-brand" th:href="@{/}">
+            <img th:src="@{/img/studentski-centar-logo.png}" alt="Studentski centar Zenica">
+            <div class="nav-brand-text">
+                <strong>E-Dom</strong>
+                <span>Studentski centar Zenica</span>
+            </div>
+        </a>
+        <nav class="pub-links">
+            <a th:href="@{/}" th:classappend="${aktivna == 'pocetna'} ? 'active'">Početna</a>
+            <a th:href="@{/rang-lista}" th:classappend="${aktivna == 'rang'} ? 'active'">Rang lista</a>
+        </nav>
+        <div class="pub-actions">
+            <a class="btn btn-ghost btn-sm" th:href="@{/login}">Prijavi se</a>
+            <a class="btn btn-primary btn-sm" th:href="@{/registracija}">Registruj se</a>
+        </div>
+    </div>
+</header>
+
 <header th:fragment="navbarStudent(aktivna)" class="navbar" id="navbar">
     <div class="navbar-inner">
-        <a class="nav-brand" th:href="@{/student}">
+        <a class="nav-brand" th:href="@{/student/pocetna}">
             <img th:src="@{/img/studentski-centar-logo.png}" alt="Studentski centar Zenica">
             <div class="nav-brand-text">
                 <strong>E-Dom</strong>
@@ -54,7 +75,7 @@
         </a>
 
         <ul class="nav-links">
-            <li><a th:href="@{/student}" th:classappend="${aktivna == 'prijave'} ? 'active'">Moje prijave</a></li>
+            <li><a th:href="@{/student/pocetna}" th:classappend="${aktivna == 'prijave'} ? 'active'">Moje prijave</a></li>
             <li><a th:href="@{/rang-lista}" th:classappend="${aktivna == 'rang'} ? 'active'">Rang lista</a></li>
             <li><a th:href="@{/student/profil}" th:classappend="${aktivna == 'profil'} ? 'active'">Moj profil</a></li>
         </ul>
@@ -135,6 +156,9 @@
         </div>
         <div class="toast toast--uspjeh" data-tip="uspjeh" th:if="${uspjeh}">
             <div class="toast-tekst"><b>Uspješno</b><span th:text="${uspjeh}">Poruka</span></div>
+        </div>
+        <div class="toast toast--uspjeh" data-tip="uspjeh" th:if="${param.sacuvano}">
+            <div class="toast-tekst"><b>Sačuvano</b><span>Podaci su uspješno sačuvani.</span></div>
         </div>
     </div>
     <script th:src="@{/js/toast.js}"></script>

@@ -24,12 +24,16 @@ public class StudentWebController {
 
     @GetMapping("/pocetna")
     public String pocetna(@AuthenticationPrincipal KorisnikPrincipal korisnik, Model model) {
-
-        model.addAttribute("ime", korisnik.getUsername());
         model.addAttribute("prijave",
                 prijavaService.pregledZaStudenta(korisnik.getIdStudenta()));
 
         return "student/pocetna";
+    }
+
+    @ModelAttribute("ime")
+    public String ime(@AuthenticationPrincipal KorisnikPrincipal korisnik) {
+        if (korisnik == null) return null;
+        return profilService.ucitaj(korisnik.getIdStudenta()).ime();
     }
 
     @ExceptionHandler(PrijavaException.class)
