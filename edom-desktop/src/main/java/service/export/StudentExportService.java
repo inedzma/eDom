@@ -1,9 +1,9 @@
 package service.export;
 
+import ba.unze.edom.common.dto.StudentListaDTO;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import model.Student;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,9 +11,9 @@ import java.io.FileOutputStream;
 import java.util.List;
 
 
-public class StudentExportService implements ExportService<Student>{
+public class StudentExportService implements ExportService<StudentListaDTO>{
 
-    public void exportData(List<Student> studenti, File file){
+    public void exportData(List<StudentListaDTO> studenti, File file){
         Document document = new Document(PageSize.A4);
 
         try {
@@ -33,16 +33,15 @@ public class StudentExportService implements ExportService<Student>{
             for (String header : headers) {
                 table.addCell(new Phrase(header, FontFactory.getFont(FontFactory.HELVETICA_BOLD)));
             }
-            for(Student s : studenti) {
-                table.addCell(String.valueOf(s.getIdStudent()));
-                table.addCell(s.getIme() != null ? s.getIme() : "");
-                table.addCell(s.getPrezime() != null ? s.getPrezime() : "");
-                table.addCell(s.getBrojIndeksa() != null ? s.getBrojIndeksa() : "");
-                table.addCell(s.getFakultet() != null ? s.getFakultet() : "");
-                table.addCell(String.valueOf(s.getGodinaStudija()));
-                table.addCell(String.valueOf(s.getProsjek()));
-                table.addCell(s.getSocijalniStatus() != null ? s.getSocijalniStatus().getNaziv() : "");
-
+            for (StudentListaDTO s : studenti) {
+                table.addCell(String.valueOf(s.idStudent()));
+                table.addCell(s.ime() != null ? s.ime() : "");
+                table.addCell(s.prezime() != null ? s.prezime() : "");
+                table.addCell(s.brojIndeksa() != null ? s.brojIndeksa() : "");
+                table.addCell(s.fakultet() != null ? s.fakultet() : "");
+                table.addCell(s.godinaStudija() != null ? String.valueOf(s.godinaStudija()) : "");
+                table.addCell(s.prosjek() != null ? String.format("%.2f", s.prosjek()) : "-");
+                table.addCell(s.socijalniStatus() != null ? s.socijalniStatus().naziv() : "");
             }
 
             document.add(table);

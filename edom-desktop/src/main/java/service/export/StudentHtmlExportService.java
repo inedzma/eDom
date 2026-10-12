@@ -1,7 +1,7 @@
 package service.export;
 
+import ba.unze.edom.common.dto.StudentListaDTO;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-import model.Student;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -9,10 +9,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-public class StudentHtmlExportService implements ExportService<Student> {
+public class StudentHtmlExportService implements ExportService<StudentListaDTO> {
 
     @Override
-    public void exportData(List<Student> studenti, File file) {
+    public void exportData(List<StudentListaDTO> studenti, File file) {
         try {
             // 1️⃣ Kreiranje HTML-a sa ispravljenim CSS-om
             StringBuilder html = new StringBuilder();
@@ -47,16 +47,16 @@ public class StudentHtmlExportService implements ExportService<Student> {
                     .append("</tr></thead>");
 
             html.append("<tbody>");
-            for (Student s : studenti) {
+            for (StudentListaDTO s : studenti) {
                 html.append("<tr>")
-                        .append("<td>").append(s.getIdStudent()).append("</td>")
-                        .append("<td>").append(escapeHtml(s.getIme())).append("</td>")
-                        .append("<td>").append(escapeHtml(s.getPrezime())).append("</td>")
-                        .append("<td>").append(escapeHtml(s.getBrojIndeksa())).append("</td>")
-                        .append("<td>").append(escapeHtml(s.getFakultet())).append("</td>")
-                        .append("<td>").append(s.getGodinaStudija()).append("</td>")
-                        .append("<td>").append(String.format("%.2f", s.getProsjek())).append("</td>")
-                        .append("<td>").append(s.getSocijalniStatus() != null ? escapeHtml(s.getSocijalniStatus().getNaziv()) : "N/A").append("</td>")
+                        .append("<td>").append(s.idStudent()).append("</td>")
+                        .append("<td>").append(escapeHtml(s.ime())).append("</td>")
+                        .append("<td>").append(escapeHtml(s.prezime())).append("</td>")
+                        .append("<td>").append(escapeHtml(s.brojIndeksa())).append("</td>")
+                        .append("<td>").append(escapeHtml(s.fakultet())).append("</td>")
+                        .append("<td>").append(s.godinaStudija() != null ? s.godinaStudija() : "").append("</td>")
+                        .append("<td>").append(s.prosjek() != null ? String.format("%.2f", s.prosjek()) : "—").append("</td>")
+                        .append("<td>").append(s.socijalniStatus() != null ? escapeHtml(s.socijalniStatus().naziv()) : "N/A").append("</td>")
                         .append("</tr>");
             }
             html.append("</tbody></table></body></html>");

@@ -1,51 +1,47 @@
 package controllers;
 
-import dao.StudentDAO;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import api.ApiException;
+import api.StudentApi;
+import ba.unze.edom.common.dto.StudentListaDTO;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import model.Student;
+import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import service.export.StudentExportService;
 import service.export.StudentHtmlExportService;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import java.io.File;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class studentiController {
 
-    @FXML private TableView<Student> tblStudenti;
+    @FXML private TableView<StudentListaDTO> tblStudenti;
 
-    @FXML private TableColumn<Student, Integer> colId;
-    @FXML private TableColumn<Student, String> colIme;
-    @FXML private TableColumn<Student, String> colPrezime;
-    @FXML private TableColumn<Student, String> colIndeks;
-    @FXML private TableColumn<Student, String> colFakultet;
-    @FXML private TableColumn<Student, Integer> colGodina;
-    @FXML private TableColumn<Student, Double> colProsjek;
-    @FXML private TableColumn<Student, String> colStatus;
+    @FXML private TableColumn<StudentListaDTO, Integer> colId;
+    @FXML private TableColumn<StudentListaDTO, String> colIme;
+    @FXML private TableColumn<StudentListaDTO, String> colPrezime;
+    @FXML private TableColumn<StudentListaDTO, String> colIndeks;
+    @FXML private TableColumn<StudentListaDTO, String> colFakultet;
+    @FXML private TableColumn<StudentListaDTO, Integer> colGodina;
+    @FXML private TableColumn<StudentListaDTO, BigDecimal> colProsjek;
+    @FXML private TableColumn<StudentListaDTO, String> colStatus;
 
-    @FXML private javafx.scene.control.Menu menuFakulteti;
-    @FXML private javafx.scene.control.Menu menuStatus;
-    @FXML private javafx.scene.control.Menu menuGodina;
+    @FXML private Menu menuFakulteti;
+    @FXML private Menu menuStatus;
+    @FXML private Menu menuGodina;
 
     @FXML private TextField txtSearch;
 
-    private final StudentDAO studentDAO = new StudentDAO();
-
-    private ObservableList<Student> masterList;
-    private FilteredList<Student> filteredList;
+    private final ObservableList<StudentListaDTO> masterList = FXCollections.observableArrayList();
+    private FilteredList<StudentListaDTO> filteredList;
 
     private final Set<String> selectedFakulteti = new HashSet<>();
     private final Set<String> selectedStatusi = new HashSet<>();
@@ -53,198 +49,188 @@ public class studentiController {
 
     @FXML
     public void initialize() {
+        colId.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().idStudent()));
+        colIme.setCellValueFactory(c -> new SimpleStringProperty(nullSafe(c.getValue().ime())));
+        colPrezime.setCellValueFactory(c -> new SimpleStringProperty(nullSafe(c.getValue().prezime())));
+        colIndeks.setCellValueFactory(c -> new SimpleStringProperty(nullSafe(c.getValue().brojIndeksa())));
+        colFakultet.setCellValueFactory(c -> new SimpleStringProperty(nullSafe(c.getValue().fakultet())));
+        colGodina.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().godinaStudija()));
+        colProsjek.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().prosjek()));
+        colStatus.setCellValueFactory(c -> new SimpleStringProperty(nullSafe(statusNaziv(c.getValue()))));
 
-        colId.setCellValueFactory(cell -> new SimpleIntegerProperty(cell.getValue().getIdStudent()).asObject());
-        colIme.setCellValueFactory(cell -> new SimpleStringProperty(nullSafe(cell.getValue().getIme())));
-        colPrezime.setCellValueFactory(cell -> new SimpleStringProperty(nullSafe(cell.getValue().getPrezime())));
-        colIndeks.setCellValueFactory(cell -> new SimpleStringProperty(nullSafe(cell.getValue().getBrojIndeksa())));
-        colFakultet.setCellValueFactory(cell -> new SimpleStringProperty(nullSafe(cell.getValue().getFakultet())));
-        colGodina.setCellValueFactory(cell -> new SimpleIntegerProperty(cell.getValue().getGodinaStudija()).asObject());
-        colProsjek.setCellValueFactory(cell -> new SimpleDoubleProperty(cell.getValue().getProsjek()).asObject());
-        colStatus.setCellValueFactory(cell -> new SimpleStringProperty(
-                cell.getValue().getSocijalniStatus() != null
-                        ? nullSafe(cell.getValue().getSocijalniStatus().getNaziv())
-                        : ""
-        ));
-
-        masterList = FXCollections.observableArrayList(studentDAO.dohvatiSveStudente());
-
-        initFakultetiFilter();
-        initStatusFilter();
-        initGodinaFilter();
+        colProsjek.setCellFactory(c -> new TableCell<>() {
+            @Override
+            protected void updateItem(BigDecimal v, boolean empty) {
+                super.updateItem(v, empty);
+                setText(empty ? null : v == null ? "—" : String.format("%.2f", v));
+            }
+        });
 
         setupFilteringAndSorting();
+        ucitajStudente();
+    }
+
+    // ---------- učitavanje ----------
+
+    private void ucitajStudente() {
+        Task<List<StudentListaDTO>> task = new Task<>() {
+            @Override
+            protected List<StudentListaDTO> call() {
+                return StudentApi.dohvatiSve();
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            masterList.setAll(task.getValue());
+
+            selectedFakulteti.clear();
+            selectedStatusi.clear();
+            selectedGodine.clear();
+            initFakultetiFilter();
+            initStatusFilter();
+            initGodinaFilter();
+            applyAllFilters();
+        });
+
+        task.setOnFailed(e -> prikaziGresku(task.getException(), "Greška pri učitavanju studenata."));
+
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        t.start();
     }
 
     @FXML
-    private void sortImeAZ() {
-        colIme.setSortType(TableColumn.SortType.ASCENDING);
-        tblStudenti.getSortOrder().setAll(colIme);
+    private void onRefresh() {
+        ucitajStudente();
     }
 
-    @FXML
-    private void sortImeZA() {
-        colIme.setSortType(TableColumn.SortType.DESCENDING);
-        tblStudenti.getSortOrder().setAll(colIme);
+    // ---------- sortiranje ----------
+
+    @FXML private void sortImeAZ()      { sortiraj(colIme, TableColumn.SortType.ASCENDING); }
+    @FXML private void sortImeZA()      { sortiraj(colIme, TableColumn.SortType.DESCENDING); }
+    @FXML private void sortIdUzlazno()  { sortiraj(colId, TableColumn.SortType.ASCENDING); }
+    @FXML private void sortIdSilazno()  { sortiraj(colId, TableColumn.SortType.DESCENDING); }
+    @FXML private void sortProsjekDesc(){ sortiraj(colProsjek, TableColumn.SortType.DESCENDING); }
+    @FXML private void sortProsjekAsc() { sortiraj(colProsjek, TableColumn.SortType.ASCENDING); }
+
+    private void sortiraj(TableColumn<StudentListaDTO, ?> kolona, TableColumn.SortType smjer) {
+        kolona.setSortType(smjer);
+        tblStudenti.getSortOrder().setAll(kolona);
     }
 
-    @FXML
-    private void sortIdUzlazno() {
-        colId.setSortType(TableColumn.SortType.ASCENDING);
-        tblStudenti.getSortOrder().setAll(colId);
-    }
-
-    @FXML
-    private void sortIdSilazno() {
-        colId.setSortType(TableColumn.SortType.DESCENDING);
-        tblStudenti.getSortOrder().setAll(colId);
-    }
-
-    @FXML
-    private void sortProsjekDesc() {
-        colProsjek.setSortType(TableColumn.SortType.DESCENDING);
-        tblStudenti.getSortOrder().setAll(colProsjek);
-    }
-
-    @FXML
-    private void sortProsjekAsc() {
-        colProsjek.setSortType(TableColumn.SortType.ASCENDING);
-        tblStudenti.getSortOrder().setAll(colProsjek);
-    }
+    // ---------- filteri ----------
 
     private void initFakultetiFilter() {
-
         Set<String> fakulteti = masterList.stream()
-                .map(Student::getFakultet)
+                .map(StudentListaDTO::fakultet)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toCollection(TreeSet::new));
-        menuFakulteti.getItems().clear();
+        napuniMeni(menuFakulteti, fakulteti, selectedFakulteti, String::valueOf);
+    }
 
-        for (String f : fakulteti) {
-            CheckMenuItem item = new CheckMenuItem(f);
+    private void initStatusFilter() {
+        Set<String> statusi = masterList.stream()
+                .map(this::statusNaziv)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(TreeSet::new));
+        napuniMeni(menuStatus, statusi, selectedStatusi, String::valueOf);
+    }
+
+    private void initGodinaFilter() {
+        Set<Integer> godine = masterList.stream()
+                .map(StudentListaDTO::godinaStudija)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(TreeSet::new));
+        napuniMeni(menuGodina, godine, selectedGodine, String::valueOf);
+    }
+
+    private <T> void napuniMeni(Menu meni, Set<T> vrijednosti, Set<T> odabrane,
+                                java.util.function.Function<T, String> tekst) {
+        meni.getItems().clear();
+        for (T v : vrijednosti) {
+            CheckMenuItem item = new CheckMenuItem(tekst.apply(v));
             item.setOnAction(e -> {
-                if (item.isSelected()) selectedFakulteti.add(f);
-                else selectedFakulteti.remove(f);
+                if (item.isSelected()) odabrane.add(v);
+                else odabrane.remove(v);
                 applyAllFilters();
             });
-            menuFakulteti.getItems().add(item);
+            meni.getItems().add(item);
         }
     }
 
-    private void applyAllFilters(){
+    private void applyAllFilters() {
         String q = txtSearch.getText() == null ? "" : txtSearch.getText().trim().toLowerCase();
 
         filteredList.setPredicate(s -> {
+            String imePrezime = nullSafe(s.ime()) + " " + nullSafe(s.prezime());
+
             boolean searchOk = q.isEmpty()
-                    || nullSafe(s.getIme()).toLowerCase().contains(q)
-                    || nullSafe(s.getPrezime()).toLowerCase().contains(q)
-                    || (nullSafe(s.getIme()) + " " + nullSafe(s.getPrezime())).toLowerCase().contains(q)
-                    || nullSafe(s.getBrojIndeksa()).toLowerCase().contains(q)
-                    || nullSafe(s.getFakultet()).toLowerCase().contains(q)
-                    || (s.getSocijalniStatus() != null && nullSafe(s.getSocijalniStatus().getNaziv()).toLowerCase().contains(q))
-                    || String.valueOf(s.getGodinaStudija()).contains(q)
-                    || String.valueOf(s.getIdStudent()).contains(q);
+                    || imePrezime.toLowerCase().contains(q)
+                    || nullSafe(s.brojIndeksa()).toLowerCase().contains(q)
+                    || nullSafe(s.fakultet()).toLowerCase().contains(q)
+                    || nullSafe(statusNaziv(s)).toLowerCase().contains(q)
+                    || Objects.toString(s.godinaStudija(), "").contains(q)
+                    || Objects.toString(s.idStudent(), "").contains(q);
 
-            boolean fakultetOk = selectedFakulteti.isEmpty() || selectedFakulteti.contains(s.getFakultet());
-
-            boolean statusOk = selectedStatusi.isEmpty() || (s.getSocijalniStatus() != null && selectedStatusi.contains(s.getSocijalniStatus().getNaziv()));
-
-            boolean godinaOk = selectedGodine.isEmpty() || selectedGodine.contains(s.getGodinaStudija());
+            boolean fakultetOk = selectedFakulteti.isEmpty() || selectedFakulteti.contains(s.fakultet());
+            boolean statusOk   = selectedStatusi.isEmpty()   || selectedStatusi.contains(statusNaziv(s));
+            boolean godinaOk   = selectedGodine.isEmpty()    || selectedGodine.contains(s.godinaStudija());
 
             return searchOk && fakultetOk && statusOk && godinaOk;
         });
     }
 
-    private void initStatusFilter() {
-        Set<String> statusi = masterList.stream()
-                .map(Student::getSocijalniStatus)
-                .filter(Objects::nonNull)
-                .map(status -> status.getNaziv())
-                .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(TreeSet::new)); // ✅ sortirano
-
-        menuStatus.getItems().clear();
-
-        for (String s : statusi) {
-            CheckMenuItem item = new CheckMenuItem(s);
-            item.setOnAction(e -> {
-                if (item.isSelected()) selectedStatusi.add(s);
-                else selectedStatusi.remove(s);
-                applyAllFilters();
-            });
-            menuStatus.getItems().add(item);
-        }
-    }
-
-    private void initGodinaFilter() {
-        Set<Integer> godine = masterList.stream()
-                .map(Student::getGodinaStudija)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(TreeSet::new)); // ✅ sortirano
-
-        menuGodina.getItems().clear();
-
-        for (Integer g : godine) {
-            CheckMenuItem item = new CheckMenuItem(String.valueOf(g));
-            item.setOnAction(e -> {
-                if (item.isSelected()) selectedGodine.add(g);
-                else selectedGodine.remove(g);
-                applyAllFilters();
-            });
-            menuGodina.getItems().add(item);
-        }
-    }
-
-    private void setupFilteringAndSorting(){
+    private void setupFilteringAndSorting() {
         filteredList = new FilteredList<>(masterList, s -> true);
+        txtSearch.textProperty().addListener((obs, o, n) -> applyAllFilters());
 
-        txtSearch.textProperty().addListener((obs, oldVal, newVal) -> applyAllFilters());
-
-        SortedList<Student> sorted = new SortedList<>(filteredList);
+        SortedList<StudentListaDTO> sorted = new SortedList<>(filteredList);
         sorted.comparatorProperty().bind(tblStudenti.comparatorProperty());
-
         tblStudenti.setItems(sorted);
     }
 
+    // ---------- export ----------
+
     @FXML
     private void onExportPdf() {
-        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-        fileChooser.setTitle("Spremi PDF (iText)");
-        fileChooser.getExtensionFilters().add(
-                new javafx.stage.FileChooser.ExtensionFilter("PDF Files", "*.pdf")
-        );
-        java.io.File file = fileChooser.showSaveDialog(tblStudenti.getScene().getWindow());
-        if (file != null) {
-            // Koristi tvoj postojeći StudentPdfExportService
-            StudentExportService service = new StudentExportService();
-            service.exportData(filteredList.stream().toList(), file); // koristi samo filtrirane studente
+        File file = odaberiFajl("Spremi PDF");
+        if (file == null) return;
+        try {
+            new StudentExportService().exportData(List.copyOf(filteredList), file);
+        } catch (RuntimeException ex) {
+            prikaziGresku(ex, "Greška pri izvozu PDF-a.");
         }
     }
 
     @FXML
     private void onExportHtmlPdf() {
-        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-        fileChooser.setTitle("Spremi PDF (HTML)");
-        fileChooser.getExtensionFilters().add(
-                new javafx.stage.FileChooser.ExtensionFilter("PDF Files", "*.pdf")
-        );
-        java.io.File file = fileChooser.showSaveDialog(tblStudenti.getScene().getWindow());
-        if (file != null) {
-            // Koristi HTML+CSS servis
-            StudentHtmlExportService service = new StudentHtmlExportService();
-            service.exportData(filteredList.stream().toList(), file); // filtrirani studenti
+        File file = odaberiFajl("Spremi PDF (HTML)");
+        if (file == null) return;
+        try {
+            new StudentHtmlExportService().exportData(List.copyOf(filteredList), file);
+        } catch (RuntimeException ex) {
+            prikaziGresku(ex, "Greška pri izvozu PDF-a.");
         }
     }
 
-    @FXML
-    private void onRefresh() {
-        // Dohvati nove studente iz baze i zamijeni trenutni masterList
-        masterList.setAll(studentDAO.dohvatiSveStudente());
-        // Ponovno primijeni filtere da se lista odmah ažurira
-        applyAllFilters();
+    private File odaberiFajl(String naslov) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle(naslov);
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+        return fc.showSaveDialog(tblStudenti.getScene().getWindow());
     }
 
+    // ---------- pomoćne ----------
 
+    private String statusNaziv(StudentListaDTO s) {
+        return s.socijalniStatus() == null ? null : s.socijalniStatus().naziv();
+    }
+
+    private void prikaziGresku(Throwable ex, String opsta) {
+        if (!(ex instanceof ApiException)) ex.printStackTrace();
+        String poruka = ex instanceof ApiException ? ex.getMessage() : opsta;
+        new Alert(Alert.AlertType.ERROR, poruka).showAndWait();
+    }
 
     private String nullSafe(String s) {
         return s == null ? "" : s;
