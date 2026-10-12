@@ -42,4 +42,8 @@ module org.example.edom {
 
     // 🔥 KLJUČNO: OTVORI FOLDER SA FONTOVIMA 🔥
     opens fonts;
+
+    requires java.net.http;
+    requires com.fasterxml.jackson.databind;
+    opens api to com.fasterxml.jackson.databind;
 }

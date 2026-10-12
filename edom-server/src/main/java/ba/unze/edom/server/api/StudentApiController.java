@@ -1,9 +1,10 @@
 package ba.unze.edom.server.api;
 
-import ba.unze.edom.server.entity.Student;
-import ba.unze.edom.server.repository.StudentRepository;
+import ba.unze.edom.server.dto.StudentListaDTO;
+import ba.unze.edom.server.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -11,10 +12,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudentApiController {
 
-    private final StudentRepository repo;
+    private final StudentService studentService;
 
     @GetMapping
-    public List<Student> sviStudenti() {
-        return repo.findAll();
+    public List<StudentListaDTO> sviStudenti() {
+        return studentService.listaZaAdmina();
     }
 }
