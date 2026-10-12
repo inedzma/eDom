@@ -45,5 +45,6 @@ module org.example.edom {
 
     requires java.net.http;
     requires com.fasterxml.jackson.databind;
+    requires ba.unze.edom.common;
     opens api to com.fasterxml.jackson.databind;
 }

@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
+import ba.unze.edom.common.dto.LoginOdgovor;
+import ba.unze.edom.common.dto.LoginZahtjev;
+
 import java.util.Map;
 
 @RestController
@@ -17,9 +20,6 @@ import java.util.Map;
 public class AuthApiController {
 
     private final AuthService authService;
-
-    public record LoginZahtjev(@NotBlank String username, @NotBlank String lozinka) {}
-    public record LoginOdgovor(String token) {}
 
     @PostMapping("/login")
     public ResponseEntity<LoginOdgovor> login(@Valid @RequestBody LoginZahtjev zahtjev) {

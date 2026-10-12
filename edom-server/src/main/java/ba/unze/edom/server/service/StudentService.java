@@ -1,6 +1,7 @@
 package ba.unze.edom.server.service;
 
-import ba.unze.edom.server.dto.StudentListaDTO;
+import ba.unze.edom.common.dto.StudentListaDTO;
+import ba.unze.edom.server.mapper.StudentMapper;
 import ba.unze.edom.server.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class StudentService {
     @Transactional(readOnly = true)
     public List<StudentListaDTO> listaZaAdmina() {
         return studentRepository.findAllSaStatusom().stream()
-                .map(StudentListaDTO::iz)
+                .map(StudentMapper::uListu)
                 .toList();
     }
 }

@@ -1,11 +1,10 @@
 package api;
 
+import ba.unze.edom.common.dto.LoginOdgovor;
+import ba.unze.edom.common.dto.LoginZahtjev;
 import service.Session;
 
 public final class AuthApi {
-
-    public record LoginZahtjev(String username, String lozinka) {}
-    public record LoginOdgovor(String token) {}
 
     private AuthApi() {}
 
