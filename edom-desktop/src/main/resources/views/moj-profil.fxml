@@ -38,6 +38,10 @@
             <Label text="Korisničko ime:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
             <TextField fx:id="txtUsername" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
+            <Label text="Email:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtEmail" disable="true" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+
             <Label text="Uloga:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
             <TextField fx:id="txtUloga" disable="true" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
             <Label text="Zadnja prijava:"

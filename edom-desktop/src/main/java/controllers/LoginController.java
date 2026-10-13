@@ -2,11 +2,9 @@ package controllers;
 import api.ApiException;
 import api.AuthApi;
 import javafx.concurrent.Task;
-import dao.KorisnikDAO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
@@ -16,16 +14,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import model.Korisnik;
 import org.example.edom.HelloApplication;
-import service.Session;
 import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.prefs.Preferences;
 
 public class LoginController {
@@ -213,22 +208,18 @@ public class LoginController {
 
     @FXML
     private void onForgotPasswordClicked(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    HelloApplication.class.getResource("/views/izmjena-lozinke.fxml")
-            );
+        String url = api.ApiClient.bazniUrl() + "/zaboravljena-lozinka";
 
-            Parent root = loader.load();
-
-            // Ovdje sada uzimamo TRENUTNI stage (prozor), umjesto "new Stage()"
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            openScene(stage, root, "Reset lozinke");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Možeš dodati i ispis greške na labelu ako želiš
-            lblError.setText("Greška pri otvaranju prozora za reset lozinke.");
-        }
+        // AWT Desktop ne smije blokirati JavaFX nit
+        Thread t = new Thread(() -> {
+            try {
+                java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+            } catch (Exception e) {
+                Platform.runLater(() ->
+                        lblError.setText("Otvorite u browseru: " + url));
+            }
+        });
+        t.setDaemon(true);
+        t.start();
     }
 }

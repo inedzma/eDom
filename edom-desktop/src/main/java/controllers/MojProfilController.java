@@ -1,15 +1,17 @@
 package controllers;
 
-import dao.KorisnikDAO;
+import api.ApiException;
+import api.ProfilApi;
+import ba.unze.edom.common.dto.KorisnikProfilDTO;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import model.Korisnik;
-import service.Session;
-import util.TextUtil;
+
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.sql.Timestamp;
-import org.mindrot.jbcrypt.BCrypt;
 
 public class MojProfilController {
 
@@ -17,135 +19,136 @@ public class MojProfilController {
     @FXML private TextField txtPrezime;
     @FXML private TextField txtUsername;
     @FXML private TextField txtUloga;
+    @FXML private TextField txtEmail;
+    @FXML private Label lblBadgeUloga;
+    @FXML private Label lblZadnjaPrijava;
 
     @FXML private PasswordField txtStaraLozinka;
     @FXML private PasswordField txtNovaLozinka;
     @FXML private PasswordField txtPotvrdaLozinke;
 
     @FXML private Label lblPoruka;
-    @FXML private Label lblZadnjaPrijava;
 
-    private final KorisnikDAO korisnikDAO = new KorisnikDAO();
-    private Korisnik korisnik;
+    private KorisnikProfilDTO profil;
 
     @FXML
     public void initialize() {
-        korisnik = Session.getKorisnik();
-
-        if (korisnik == null) {
-            lblPoruka.setText("Greška: korisnik nije prijavljen.");
-            return;
-        }
-
-        txtIme.setText(korisnik.getIme());
-        txtPrezime.setText(korisnik.getPrezime());
-        txtUsername.setText(korisnik.getUsername());
-        txtUloga.setText(korisnik.getUloga().getNaziv());
-
         txtUsername.setDisable(true);
         txtUloga.setDisable(true);
-        lblZadnjaPrijava.setText(
-                formatZadnjaPrijava(korisnik.getZadnjaPrijava())
-        );
+
+        Task<KorisnikProfilDTO> task = new Task<>() {
+            @Override
+            protected KorisnikProfilDTO call() {
+                return ProfilApi.dohvati();
+            }
+        };
+        task.setOnSucceeded(e -> prikazi(task.getValue()));
+        task.setOnFailed(e -> greska(task.getException(), "Greška pri učitavanju profila."));
+        pokreni(task);
+    }
+
+    private void prikazi(KorisnikProfilDTO p) {
+        this.profil = p;
+        txtIme.setText(p.ime());
+        txtPrezime.setText(p.prezime());
+        txtUsername.setText(p.username());
+        txtEmail.setText(p.email() != null ? p.email() : "nije upisan");
+        txtUloga.setText(p.uloga());
+        lblBadgeUloga.setText(p.uloga() != null ? p.uloga().toUpperCase() : "");
+        lblZadnjaPrijava.setText(formatZadnjaPrijava(p.zadnjaPrijava()));
     }
 
     @FXML
     private void sacuvajPromjene() {
-        // 1. Ažuriranje osnovnih podataka
-        korisnik.setIme(TextUtil.formatirajIme(txtIme.getText().trim()));
-        korisnik.setPrezime(TextUtil.formatirajIme(txtPrezime.getText().trim()));
+        if (profil == null) return;
 
-        // Provjeri da li korisnik uopće želi mijenjati lozinku
-        boolean zeliMijenjatiLozinku = !txtStaraLozinka.getText().isEmpty()
-                || !txtNovaLozinka.getText().isEmpty()
-                || !txtPotvrdaLozinke.getText().isEmpty();
+        String ime = txtIme.getText().trim();
+        String prezime = txtPrezime.getText().trim();
+        String stara = txtStaraLozinka.getText();
+        String nova = txtNovaLozinka.getText();
+        String potvrda = txtPotvrdaLozinke.getText();
 
-        // Ako su sva polja za lozinku prazna, samo spremi ime/prezime i izađi
-        if (!zeliMijenjatiLozinku) {
-            korisnikDAO.azurirajKorisnika(korisnik); // Metoda koja update-uje samo ime/prezime
-            lblPoruka.setText("Podaci profila uspješno ažurirani.");
-            lblPoruka.setStyle("-fx-text-fill: green;"); // Da budemo sigurni da se vidi
+        boolean mijenjaImena = !ime.equals(profil.ime()) || !prezime.equals(profil.prezime());
+        boolean mijenjaLozinku = !stara.isEmpty() || !nova.isEmpty() || !potvrda.isEmpty();
+
+        if (!mijenjaImena && !mijenjaLozinku) {
+            poruka("Nema promjena za sačuvati.", true);
             return;
         }
 
-        // --- OVDJE POČINJE LOGIKA ZA LOZINKU ---
-
-        // 2. Provjera: Jesu li sva polja popunjena?
-        if (txtStaraLozinka.getText().isEmpty() || txtNovaLozinka.getText().isEmpty() || txtPotvrdaLozinke.getText().isEmpty()) {
-            lblPoruka.setText("Za promjenu lozinke morate ispuniti sva tri polja.");
-            lblPoruka.setStyle("-fx-text-fill: red;");
-            return;
+        // provjere koje pripadaju ekranu; sve ostalo provjerava server
+        if (mijenjaLozinku) {
+            if (stara.isEmpty() || nova.isEmpty() || potvrda.isEmpty()) {
+                poruka("Za promjenu lozinke morate ispuniti sva tri polja.", false);
+                return;
+            }
+            if (!nova.equals(potvrda)) {
+                poruka("Nova lozinka i potvrda se ne podudaraju.", false);
+                return;
+            }
         }
 
-        // 3. Provjera STARE lozinke (ključni ispravak!)
-        // Ne zovi bazu, usporedi unos sa trenutnim hashom u objektu
-        if (!BCrypt.checkpw(txtStaraLozinka.getText(), korisnik.getPasswordHash())) {
-            lblPoruka.setText("Pogrešna trenutna lozinka.");
-            lblPoruka.setStyle("-fx-text-fill: red;");
-            return;
-        }
+        Task<KorisnikProfilDTO> task = new Task<>() {
+            @Override
+            protected KorisnikProfilDTO call() {
+                KorisnikProfilDTO rezultat = profil;
+                if (mijenjaImena) {
+                    rezultat = ProfilApi.izmijeni(ime, prezime);
+                }
+                if (mijenjaLozinku) {
+                    ProfilApi.promijeniLozinku(stara, nova);
+                }
+                return rezultat;
+            }
+        };
 
-        // 4. Provjera podudaranja nove i potvrde
-        if (!txtNovaLozinka.getText().equals(txtPotvrdaLozinke.getText())) {
-            lblPoruka.setText("Nova lozinka i potvrda se ne podudaraju.");
-            lblPoruka.setStyle("-fx-text-fill: red;");
-            return;
-        }
-
-        // 5. Provjera da nova nije ista kao stara
-        if (txtStaraLozinka.getText().equals(txtNovaLozinka.getText())) {
-            lblPoruka.setText("Nova lozinka mora biti različita od stare.");
-            lblPoruka.setStyle("-fx-text-fill: red;");
-            return;
-        }
-
-        // 6. Validacija kompleksnosti (tvoj regex)
-        if (!txtNovaLozinka.getText().matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{4,}$")) {
-            lblPoruka.setText("Lozinka preslaba (Min 4 znaka, 1 velika, 1 broj, 1 znak).");
-            lblPoruka.setStyle("-fx-text-fill: red;");
-            return;
-        }
-
-        // 7. Hashiranje i spremanje (ključni ispravak!)
-        String hashedNewPass = BCrypt.hashpw(txtNovaLozinka.getText(), BCrypt.gensalt());
-        korisnik.setPasswordHash(hashedNewPass);
-
-        // Spremi sve u bazu
-        korisnikDAO.azurirajProfil(korisnik); // Očekujemo da ova metoda radi UPDATE passworda
-
-        // Očisti polja
-        txtStaraLozinka.clear();
-        txtNovaLozinka.clear();
-        txtPotvrdaLozinke.clear();
-
-        lblPoruka.setText("Profil i lozinka uspješno promijenjeni.");
-        lblPoruka.setStyle("-fx-text-fill: green;");
+        task.setOnSucceeded(e -> {
+            prikazi(task.getValue());
+            txtStaraLozinka.clear();
+            txtNovaLozinka.clear();
+            txtPotvrdaLozinke.clear();
+            poruka(mijenjaLozinku ? "Profil i lozinka uspješno promijenjeni."
+                    : "Podaci profila uspješno ažurirani.", true);
+        });
+        task.setOnFailed(e -> greska(task.getException(), "Greška pri spremanju promjena."));
+        pokreni(task);
     }
 
-    private String formatZadnjaPrijava(Timestamp ts) {
-        if (ts == null) {
-            return "Prva prijava";
-        }
+    // ---------- pomoćne ----------
 
-        LocalDateTime last = ts.toLocalDateTime();
+    private void poruka(String tekst, boolean uspjeh) {
+        lblPoruka.setText(tekst);
+        lblPoruka.setStyle(uspjeh ? "-fx-text-fill: green;" : "-fx-text-fill: red;");
+        lblPoruka.setVisible(true);
+        lblPoruka.setManaged(true);
+    }
+
+    private void greska(Throwable ex, String opsta) {
+        if (!(ex instanceof ApiException)) ex.printStackTrace();
+        poruka(ex instanceof ApiException ? ex.getMessage() : opsta, false);
+    }
+
+    private void pokreni(Task<?> task) {
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        t.start();
+    }
+
+    private String formatZadnjaPrijava(Instant trenutak) {
+        if (trenutak == null) return "Prva prijava";
+
+        LocalDateTime last = LocalDateTime.ofInstant(trenutak, ZoneId.systemDefault());
         LocalDateTime now = LocalDateTime.now();
 
-        long minutes = java.time.Duration.between(last, now).toMinutes();
-        long hours   = java.time.Duration.between(last, now).toHours();
-        long days    = java.time.Duration.between(last, now).toDays();
+        long minutes = Duration.between(last, now).toMinutes();
+        long hours   = Duration.between(last, now).toHours();
+        long days    = Duration.between(last, now).toDays();
 
-        if (minutes < 1) {
-            return "Upravo sada";
-        } else if (minutes < 60) {
-            return "Prije " + minutes + " min";
-        } else if (hours < 24) {
-            return "Prije " + hours + " h";
-        } else if (days == 1) {
-            return "Jučer u " + last.format(DateTimeFormatter.ofPattern("HH:mm"));
-        } else if (days < 7) {
-            return "Prije " + days + " dana";
-        } else {
-            return last.format(DateTimeFormatter.ofPattern("dd.MM.yyyy 'u' HH:mm"));
-        }
+        if (minutes < 1)  return "Upravo sada";
+        if (minutes < 60) return "Prije " + minutes + " min";
+        if (hours < 24)   return "Prije " + hours + " h";
+        if (days == 1)    return "Jučer u " + last.format(DateTimeFormatter.ofPattern("HH:mm"));
+        if (days < 7)     return "Prije " + days + " dana";
+        return last.format(DateTimeFormatter.ofPattern("dd.MM.yyyy 'u' HH:mm"));
     }
 }

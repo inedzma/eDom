@@ -1,5 +1,6 @@
 package ba.unze.edom.server.service;
 
+import ba.unze.edom.common.dto.KategorijaBodovanja;
 import ba.unze.edom.common.dto.RezultatBodovanja;
 import ba.unze.edom.common.dto.StavkaBodovanja;
 import ba.unze.edom.server.entity.Prijava;
@@ -86,7 +87,7 @@ public class BodovanjeService {
 
     // ---------------- USPJEH ----------------
 
-    private StavkaBodovanja bodoviUspjeh(Prijava p) {
+    private String bodoviUspjeh(Prijava p) {
 
         Integer godina = p.getGodinaStudija();
         BigDecimal prosjek = p.getProsjek();
@@ -101,8 +102,7 @@ public class BodovanjeService {
 
         if (godina == GodineStudija.PRVA) {
             double b = pr * 9 + 1;
-            return new StavkaBodovanja("Uspjeh (brucoš)", zaokruzi(b),
-                    "Prosjek " + pr, ver);
+            return KategorijaBodovanja.USPJEH;
         }
 
         int ispiti = p.getPolozeniIspiti() != null ? p.getPolozeniIspiti() : 0;

@@ -6,6 +6,7 @@ public record KorisnikProfilDTO(
         String ime,
         String prezime,
         String username,
+        String email,
         String uloga,
         Instant zadnjaPrijava
 ) {}

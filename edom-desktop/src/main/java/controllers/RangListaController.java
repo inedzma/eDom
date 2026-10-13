@@ -1,12 +1,15 @@
 package controllers;
 
-import dao.PrijavaDAO;
+import api.ApiException;
+import api.RangListaApi;
+import ba.unze.edom.common.dto.RangListaAdminDTO;
+import ba.unze.edom.common.dto.RangRedDTO;
 import dto.RangListaDTO;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,106 +19,84 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import model.Prijava;
 import service.export.RangListaHtmlExportService;
-import util.BodoviUtil;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class RangListaController {
 
-    @FXML private TableView<Prijava> tblRangLista;
-    @FXML private TableColumn<Prijava, Number> colRedniBroj;
-    @FXML private TableColumn<Prijava, Integer> colIdPrijave;
-    @FXML private TableColumn<Prijava, String> colImePrezime;
-    @FXML private TableColumn<Prijava, Double> colUkupniBodovi;
-    @FXML private TableColumn<Prijava, Double> colGodinaStudija;
-    @FXML private TableColumn<Prijava, Double> colProsjek;
-    @FXML private TableColumn<Prijava, Double> colOsvojeneNagrade;
-    @FXML private TableColumn<Prijava, Double> colSocijalniStatus;
-    @FXML private TableColumn<Prijava, Double> colUdaljenost;
-    @FXML private TableColumn<Prijava, Double> colDodatniBodovi;
-    @FXML private TableColumn<Prijava, Void> colDetalji;
+    @FXML private Label lblGodina;
+    @FXML private ToggleButton btnBrucosi;
+    @FXML private ToggleButton btnVisi;
     @FXML private Menu menuKolone;
 
-    private final PrijavaDAO prijavaDAO = new PrijavaDAO();
-    private ObservableList<Prijava> rangLista;
+    @FXML private TableView<RangRedDTO> tblRangLista;
+    @FXML private TableColumn<RangRedDTO, Integer> colRedniBroj;
+    @FXML private TableColumn<RangRedDTO, Integer> colIdPrijave;
+    @FXML private TableColumn<RangRedDTO, String> colImePrezime;
+    @FXML private TableColumn<RangRedDTO, Integer> colGodinaStudija;
+    @FXML private TableColumn<RangRedDTO, Double> colUspjeh;
+    @FXML private TableColumn<RangRedDTO, Double> colUdaljenost;
+    @FXML private TableColumn<RangRedDTO, Double> colPrimanja;
+    @FXML private TableColumn<RangRedDTO, Double> colBranioci;
+    @FXML private TableColumn<RangRedDTO, Double> colDodatni;
+    @FXML private TableColumn<RangRedDTO, Double> colUkupniBodovi;
+    @FXML private TableColumn<RangRedDTO, Void> colDetalji;
+
+    private RangListaAdminDTO lista;
 
     @FXML
     public void initialize() {
+        initKolone();
+        initMeniKolona();
+        initGrupe();
+        ucitaj();
+    }
 
-        Map<String, TableColumn<Prijava, ?>> koloneMap = Map.of(
-                "Redni broj", colRedniBroj,
-                "ID prijave", colIdPrijave,
-                "Ime i prezime", colImePrezime,
-                "Ukupni bodovi", colUkupniBodovi,
-                "Godina studija", colGodinaStudija,
-                "Prosjek", colProsjek,
-                "Osvojene nagrade", colOsvojeneNagrade,
-                "Socijalni status", colSocijalniStatus,
-                "Udaljenost", colUdaljenost,
-                "Dodatni bodovi", colDodatniBodovi
-        );
+    // ---------- kolone ----------
 
-        menuKolone.getItems().clear();
-        koloneMap.forEach((naziv, kolona) -> {
-            CheckMenuItem item = new CheckMenuItem(naziv);
-            item.setSelected(true); // default sve kolone vidljive
-            item.selectedProperty().addListener((obs, wasSelected, isSelected) -> kolona.setVisible(isSelected));
-            menuKolone.getItems().add(item);
+    private void initKolone() {
+        colRedniBroj.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().redniBroj()));
+        colIdPrijave.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().idPrijava()));
+        colImePrezime.setCellValueFactory(c -> new SimpleStringProperty(punoIme(c.getValue())));
+        colGodinaStudija.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().godinaStudija()));
+
+        brojKolona(colUspjeh, RangRedDTO::uspjeh);
+        brojKolona(colUdaljenost, RangRedDTO::udaljenost);
+        brojKolona(colPrimanja, RangRedDTO::primanja);
+        brojKolona(colBranioci, RangRedDTO::branioci);
+        brojKolona(colDodatni, RangRedDTO::dodatni);
+        brojKolona(colUkupniBodovi, RangRedDTO::ukupno);
+
+        // ukupno: upozorenje ako prijava ima neispravne podatke
+        colUkupniBodovi.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double v, boolean empty) {
+                super.updateItem(v, empty);
+                setTooltip(null);
+                RangRedDTO r = (empty || getTableRow() == null) ? null : getTableRow().getItem();
+                if (r == null) {
+                    setText(null);
+                } else if (r.greska() != null) {
+                    setText("⚠");
+                    setTooltip(new Tooltip(r.greska()));
+                } else {
+                    setText(String.format("%.2f", v));
+                }
+            }
         });
-
-
-        colRedniBroj.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(tblRangLista.getItems().indexOf(cd.getValue()) + 1)
-        );
-
-        colIdPrijave.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(cd.getValue().getIdPrijava())
-        );
-
-        colImePrezime.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(cd.getValue().getImeStudenta() + " " + cd.getValue().getPrezimeStudenta())
-        );
-
-        colGodinaStudija.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(cd.getValue().getBodoviMap().getOrDefault("godina", 0.0))
-        );
-
-        colProsjek.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(cd.getValue().getBodoviMap().getOrDefault("uspjeh", 0.0))
-        );
-
-        colOsvojeneNagrade.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(cd.getValue().getBodoviMap().getOrDefault("nagrade", 0.0))
-        );
-
-        colSocijalniStatus.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(cd.getValue().getBodoviMap().getOrDefault("socijalni", 0.0))
-        );
-
-        colUdaljenost.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(cd.getValue().getBodoviMap().getOrDefault("udaljenost", 0.0))
-        );
-
-        colDodatniBodovi.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(cd.getValue().getBodoviMap().getOrDefault("dodatni", 0.0))
-        );
-
-        colUkupniBodovi.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(cd.getValue().getBodoviMap().getOrDefault("ukupno", 0.0))
-        );
 
         colDetalji.setCellFactory(tc -> new TableCell<>() {
             private final Button btn = new Button("Detalji");
             {
                 btn.getStyleClass().add("det-btn");
                 btn.setOnAction(e -> {
-                    Prijava prijava = getTableView().getItems().get(getIndex());
-                    otvoriDetalje(prijava);
+                    RangRedDTO r = getTableRow() != null ? getTableRow().getItem() : null;
+                    if (r != null) otvoriDetalje(r.idPrijava());
                 });
             }
 
@@ -126,32 +107,106 @@ public class RangListaController {
             }
         });
 
-        rangLista = FXCollections.observableArrayList();
-        for (Prijava p : prijavaDAO.dohvatiSvePrijave()) {
-            if (p.getStatusPrijave() != null && "odobreno".equalsIgnoreCase(p.getStatusPrijave().getNaziv())) {
-                Map<String, Double> bodovi = BodoviUtil.izracunajBodoveZaPrijavu(p);
-                p.setBodoviMap(bodovi);
-                rangLista.add(p);
-            }
-        }
-
-        SortedList<Prijava> sorted = new SortedList<>(rangLista);
-        sorted.comparatorProperty().bind(tblRangLista.comparatorProperty());
-        tblRangLista.setItems(sorted);
-
-        colUkupniBodovi.setSortType(TableColumn.SortType.DESCENDING);
-        tblRangLista.getSortOrder().clear();
-        tblRangLista.getSortOrder().add(colUkupniBodovi);
-
         tblRangLista.getSelectionModel().setCellSelectionEnabled(false);
     }
 
-    private void otvoriDetalje(Prijava prijava) {
+    private void brojKolona(TableColumn<RangRedDTO, Double> kolona, Function<RangRedDTO, Double> polje) {
+        kolona.setCellValueFactory(c -> new SimpleObjectProperty<>(polje.apply(c.getValue())));
+        kolona.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double v, boolean empty) {
+                super.updateItem(v, empty);
+                setText(empty || v == null ? null : String.format("%.2f", v));
+            }
+        });
+    }
+
+    /** LinkedHashMap čuva redoslijed; Map.of ga je ranije miješao. */
+    private void initMeniKolona() {
+        Map<String, TableColumn<RangRedDTO, ?>> kolone = new LinkedHashMap<>();
+        kolone.put("Redni broj", colRedniBroj);
+        kolone.put("ID prijave", colIdPrijave);
+        kolone.put("Ime i prezime", colImePrezime);
+        kolone.put("Godina studija", colGodinaStudija);
+        kolone.put("Uspjeh", colUspjeh);
+        kolone.put("Udaljenost", colUdaljenost);
+        kolone.put("Primanja", colPrimanja);
+        kolone.put("Branioci", colBranioci);
+        kolone.put("Dodatni", colDodatni);
+        kolone.put("Ukupno", colUkupniBodovi);
+
+        menuKolone.getItems().clear();
+        kolone.forEach((naziv, kolona) -> {
+            CheckMenuItem item = new CheckMenuItem(naziv);
+            item.setSelected(true);
+            item.selectedProperty().addListener((obs, o, n) -> kolona.setVisible(n));
+            menuKolone.getItems().add(item);
+        });
+    }
+
+    private void initGrupe() {
+        ToggleGroup grupa = new ToggleGroup();
+        btnBrucosi.setToggleGroup(grupa);
+        btnVisi.setToggleGroup(grupa);
+        btnBrucosi.setSelected(true);
+
+        grupa.selectedToggleProperty().addListener((obs, stari, novi) -> {
+            if (novi == null) {
+                stari.setSelected(true);   // jedna grupa je uvijek odabrana
+            } else {
+                prikaziGrupu();
+            }
+        });
+    }
+
+    // ---------- učitavanje ----------
+
+    private void ucitaj() {
+        Task<RangListaAdminDTO> task = new Task<>() {
+            @Override
+            protected RangListaAdminDTO call() {
+                return RangListaApi.dohvati(null);
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            lista = task.getValue();
+            lblGodina.setText(lista.akademskaGodina() != null
+                    ? "Akademska godina " + lista.akademskaGodina()
+                    : "Nema prijava");
+            btnBrucosi.setText("Brucoši (" + lista.brucosi().size() + ")");
+            btnVisi.setText("Više godine (" + lista.visegodisnji().size() + ")");
+            prikaziGrupu();
+        });
+        task.setOnFailed(e -> prikaziGresku(task.getException(), "Greška pri učitavanju rang liste."));
+
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        t.start();
+    }
+
+    private void prikaziGrupu() {
+        if (lista == null) return;
+        List<RangRedDTO> redovi = btnBrucosi.isSelected() ? lista.brucosi() : lista.visegodisnji();
+        tblRangLista.setItems(FXCollections.observableArrayList(redovi));
+        tblRangLista.getSortOrder().clear();
+    }
+
+    @FXML
+    private void onRefresh() {
+        ucitaj();
+    }
+
+    // ---------- detalji ----------
+
+    private void otvoriDetalje(Integer idPrijave) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/detalji-prijave.fxml"));
             Scene scene = new Scene(loader.load());
-            controllers.DetaljiPrijaveController controller = loader.getController();
-            controller.ucitaj(prijava.getIdPrijava());
+
+            DetaljiPrijaveController controller = loader.getController();
+            controller.ucitaj(idPrijave);
+
             Stage stage = new Stage();
             stage.setTitle("Detalji prijave");
             stage.setScene(scene);
@@ -164,74 +219,64 @@ public class RangListaController {
     }
 
     private void maximize(Stage stage) {
-        Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
-        stage.setX(bounds.getMinX());
-        stage.setY(bounds.getMinY());
-        stage.setWidth(bounds.getWidth());
-        stage.setHeight(bounds.getHeight());
+        Rectangle2D b = Screen.getPrimary().getVisualBounds();
+        stage.setX(b.getMinX());
+        stage.setY(b.getMinY());
+        stage.setWidth(b.getWidth());
+        stage.setHeight(b.getHeight());
     }
 
+    // ---------- export ----------
 
     @FXML
     public void onExportHtmlPdf(ActionEvent actionEvent) {
+        if (lista == null) return;
+
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Sačuvaj rang listu");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF fajl", "*.pdf"));
+        fc.setInitialFileName("Rang_lista_" + lista.godina() + ".pdf");
+
+        File file = fc.showSaveDialog(tblRangLista.getScene().getWindow());
+        if (file == null) return;
+
         try {
-            // 1. Inicijalizacija dvije prazne liste
-            List<RangListaDTO> brucosiList = new ArrayList<>();
-            List<RangListaDTO> visiList = new ArrayList<>();
-
-            int rbBrucosi = 1;
-            int rbVisi = 1;
-
-
-            for (Prijava p : tblRangLista.getItems()) {
-
-                Double godDbl = p.getBodoviMap().getOrDefault("godina", 0.0);
-                int godina = godDbl.intValue();
-
-                if (godina == 1) {
-                    brucosiList.add(pripremiDto(p, rbBrucosi++));
-                } else {
-                    visiList.add(pripremiDto(p, rbVisi++));
-                }
-            }
-
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Sačuvaj konačnu rang listu");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF fajl", "*.pdf"));
-            fileChooser.setInitialFileName("Konacna_Rang_Lista.pdf");
-
-            File file = fileChooser.showSaveDialog(tblRangLista.getScene().getWindow());
-
-            if (file != null) {
-                RangListaHtmlExportService service = new RangListaHtmlExportService();
-                service.exportSplitData(brucosiList, visiList, file);
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "PDF uspješno kreiran!", ButtonType.OK);
-                alert.showAndWait();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Greška: " + e.getMessage(), ButtonType.OK);
-            alert.showAndWait();
+            new RangListaHtmlExportService().exportSplitData(
+                    zaExport(lista.brucosi()), zaExport(lista.visegodisnji()), file);
+            new Alert(Alert.AlertType.INFORMATION, "PDF uspješno kreiran!", ButtonType.OK).showAndWait();
+        } catch (RuntimeException ex) {
+            prikaziGresku(ex, "Greška pri izvozu rang liste.");
         }
     }
 
-    private RangListaDTO pripremiDto(Prijava p, int redniBroj) {
-        RangListaDTO dto = new RangListaDTO();
+    private List<RangListaDTO> zaExport(List<RangRedDTO> redovi) {
+        return redovi.stream()
+                .filter(r -> r.greska() == null)
+                .map(r -> {
+                    RangListaDTO dto = new RangListaDTO();
+                    dto.addKolona("#", String.valueOf(r.redniBroj()));
+                    dto.addKolona("Prezime (ime oca) i ime studenta", punoIme(r));
+                    dto.addKolona("Bodovi", String.format("%.2f", r.ukupno()));
+                    return dto;
+                })
+                .toList();
+    }
 
-        dto.addKolona("#", String.valueOf(redniBroj));
+    // ---------- pomoćne ----------
 
+    /** Zvanični format: Prezime (ime oca) Ime */
+    private String punoIme(RangRedDTO r) {
+        String otac = r.imeOca() != null && !r.imeOca().isBlank() ? " (" + r.imeOca() + ") " : " ";
+        return nullSafe(r.prezime()) + otac + nullSafe(r.ime());
+    }
 
-        String imeOca = (p.getImeRoditelja() != null && !p.getImeRoditelja().isEmpty()) ? " (" + p.getImeRoditelja() + ") " : " ";
-        String prezimeIme = p.getPrezimeStudenta() + imeOca + p.getImeStudenta();
+    private void prikaziGresku(Throwable ex, String opsta) {
+        if (!(ex instanceof ApiException)) ex.printStackTrace();
+        String poruka = ex instanceof ApiException ? ex.getMessage() : opsta;
+        new Alert(Alert.AlertType.ERROR, poruka).showAndWait();
+    }
 
-        dto.addKolona("Prezime (ime oca) i ime studenta", prezimeIme);
-
-        double bodovi = p.getBodoviMap().getOrDefault("ukupno", 0.0);
-        dto.addKolona("Bodovi", String.format("%.2f", bodovi));
-
-
-        return dto;
+    private String nullSafe(String s) {
+        return s == null ? "" : s;
     }
 }

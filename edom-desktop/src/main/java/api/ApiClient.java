@@ -119,4 +119,8 @@ public final class ApiClient {
             default  -> "Greška na serveru (" + status + ").";
         };
     }
+
+    public static String bazniUrl() {
+        return BAZNI_URL;
+    }
 }
