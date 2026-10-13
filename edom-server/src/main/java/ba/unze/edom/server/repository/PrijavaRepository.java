@@ -38,4 +38,24 @@ public interface PrijavaRepository extends JpaRepository<Prijava, Integer> {
 
     Optional<Prijava> findByStudent_IdStudentAndAkademskaGodina(
             Integer idStudenta, Integer akademskaGodina);
+
+    @Query("""
+           select p from Prijava p
+             join fetch p.student s
+             left join fetch p.status st
+           where p.akademskaGodina = :godina
+             and (st is null or st.naziv <> :izostavi)
+           order by s.prezime, s.ime
+           """)
+    List<Prijava> zaAdminListu(@Param("godina") Integer godina,
+                               @Param("izostavi") String izostavi);
+
+    @Query("""
+           select p from Prijava p
+             join fetch p.student
+             left join fetch p.status
+             left join fetch p.kriteriji
+           where p.idPrijava = :id
+           """)
+    Optional<Prijava> zaDetalje(@Param("id") Integer id);
 }

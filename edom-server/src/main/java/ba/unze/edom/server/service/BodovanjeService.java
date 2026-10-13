@@ -1,7 +1,7 @@
 package ba.unze.edom.server.service;
 
-import ba.unze.edom.server.dto.RezultatBodovanja;
-import ba.unze.edom.server.dto.StavkaBodovanja;
+import ba.unze.edom.common.dto.RezultatBodovanja;
+import ba.unze.edom.common.dto.StavkaBodovanja;
 import ba.unze.edom.server.entity.Prijava;
 import ba.unze.edom.server.entity.PrijavaKriterij;
 import ba.unze.edom.server.entity.VrstaKriterija;

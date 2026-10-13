@@ -359,3 +359,5 @@
     -fx-alignment: CENTER;
 }
 
+.bodovi-ceka   { -fx-text-fill: #b9770e; }
+.bodovi-greska { -fx-text-fill: #c0392b; -fx-font-weight: bold; }

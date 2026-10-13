@@ -66,7 +66,7 @@
                     <TableColumn fx:id="colPrezime" prefWidth="160" text="Prezime" />
                     <TableColumn fx:id="colDatum" prefWidth="140" text="Datum" styleClass="centered-cell" />
                     <TableColumn fx:id="colAkGod" prefWidth="140" text="Akad. godina" styleClass="centered-cell" />
-                    <TableColumn fx:id="colUkupniBodovi" prefWidth="140" text="Ukupni bodovi" styleClass="centered-cell" />
+                    <TableColumn fx:id="colUkupniBodovi" prefWidth="200" text="Bodovi (potvrđeno / moguće)" styleClass="centered-cell" />
                     <TableColumn fx:id="colStatus" prefWidth="180" text="Status" />
                     <TableColumn fx:id="colNapomena" prefWidth="320" text="Napomena" />
                 </columns>

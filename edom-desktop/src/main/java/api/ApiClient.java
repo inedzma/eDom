@@ -23,6 +23,7 @@ public final class ApiClient {
             .build();
 
     private static final ObjectMapper JSON = new ObjectMapper()
+            .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private ApiClient() {}

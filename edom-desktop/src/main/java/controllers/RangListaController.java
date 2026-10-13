@@ -151,7 +151,7 @@ public class RangListaController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/detalji-prijave.fxml"));
             Scene scene = new Scene(loader.load());
             controllers.DetaljiPrijaveController controller = loader.getController();
-            controller.setPrijava(prijava);
+            controller.ucitaj(prijava.getIdPrijava());
             Stage stage = new Stage();
             stage.setTitle("Detalji prijave");
             stage.setScene(scene);

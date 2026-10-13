@@ -1,9 +1,12 @@
 package controllers;
 
-import dao.PrijavaDAO;
-import dao.StudentDAO;
+import api.ApiException;
+import api.PrijavaApi;
+import ba.unze.edom.common.dto.PrijavaListaDTO;
+import dto.PrijavaExportDTo;
 import javafx.application.Platform;
-import javafx.beans.property.*;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -15,41 +18,40 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import model.Prijava;
-import model.Student;
 import service.export.PrijavaHtmlExportService;
-import dto.PrijavaExportDTo;
 
+import java.io.File;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class prijaveController {
 
-    @FXML private TableView<Prijava> tblPrijave;
+    private static final DateTimeFormatter DATUM = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
 
-    @FXML private TableColumn<Prijava, Integer> colId;
-    @FXML private TableColumn<Prijava, String> colIme;
-    @FXML private TableColumn<Prijava, String> colPrezime;
-    @FXML private TableColumn<Prijava, String> colDatum;
-    @FXML private TableColumn<Prijava, Integer> colAkGod;
-    @FXML private TableColumn<Prijava, Double> colUkupniBodovi;
-    @FXML private TableColumn<Prijava, String> colStatus;
-    @FXML private TableColumn<Prijava, String> colNapomena;
+    @FXML private TableView<PrijavaListaDTO> tblPrijave;
+
+    @FXML private TableColumn<PrijavaListaDTO, Integer> colId;
+    @FXML private TableColumn<PrijavaListaDTO, String> colIme;
+    @FXML private TableColumn<PrijavaListaDTO, String> colPrezime;
+    @FXML private TableColumn<PrijavaListaDTO, LocalDate> colDatum;
+    @FXML private TableColumn<PrijavaListaDTO, Integer> colAkGod;
+    @FXML private TableColumn<PrijavaListaDTO, Double> colUkupniBodovi;
+    @FXML private TableColumn<PrijavaListaDTO, String> colStatus;
+    @FXML private TableColumn<PrijavaListaDTO, String> colNapomena;
 
     @FXML private TextField txtSearch;
     @FXML private Menu menuFakulteti;
     @FXML private Menu menuStatusPrijave;
     @FXML private Menu menuGodineStudija;
 
-    private final PrijavaDAO prijavaDAO = new PrijavaDAO();
-    private final StudentDAO studentDAO = new StudentDAO();
-
-    private ObservableList<Prijava> masterList;
-    private FilteredList<Prijava> filteredList;
-
-    private Map<Integer, Student> studentMap;
+    private final ObservableList<PrijavaListaDTO> masterList = FXCollections.observableArrayList();
+    private FilteredList<PrijavaListaDTO> filteredList;
 
     private final Set<String> selectedFakulteti = new HashSet<>();
     private final Set<String> selectedStatusiPrijave = new HashSet<>();
@@ -57,319 +59,250 @@ public class prijaveController {
 
     @FXML
     public void initialize() {
-        initStudentMap();
         initTableColumns();
         initStatusBadges();
-
-        masterList = FXCollections.observableArrayList(prijavaDAO.dohvatiSvePrijave());
-
-        initFakultetiFilter();
-        initStatusPrijaveFilter();
-        initGodinaStudijaFilter();
-
         setupFilteringAndSorting();
         setupRowDoubleClick();
+        ucitajPrijave();
     }
+
+    // ---------- kolone ----------
 
     private void initTableColumns() {
-        colId.setCellValueFactory(cd ->
-                new SimpleIntegerProperty(cd.getValue().getIdPrijava()).asObject());
+        colId.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().idPrijava()));
+        colIme.setCellValueFactory(c -> new SimpleStringProperty(nullSafe(c.getValue().ime())));
+        colPrezime.setCellValueFactory(c -> new SimpleStringProperty(nullSafe(c.getValue().prezime())));
+        colAkGod.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().akademskaGodina()));
+        colStatus.setCellValueFactory(c -> new SimpleStringProperty(nullSafe(c.getValue().status())));
+        colNapomena.setCellValueFactory(c -> new SimpleStringProperty(nullSafe(c.getValue().napomena())));
 
-        colIme.setCellValueFactory(cd ->
-                new SimpleStringProperty(nullSafe(cd.getValue().getImeStudenta())));
-
-        colPrezime.setCellValueFactory(cd ->
-                new SimpleStringProperty(nullSafe(cd.getValue().getPrezimeStudenta())));
-
-        colDatum.setCellValueFactory(cd ->
-                new SimpleStringProperty(
-                        cd.getValue().getDatumPrijava() != null
-                                ? cd.getValue().getDatumPrijava().toString()
-                                : ""
-                ));
-
-        colAkGod.setCellValueFactory(cd ->
-                new SimpleIntegerProperty(cd.getValue().getAkademskaGodina()).asObject());
-
-        colUkupniBodovi.setCellValueFactory(cd ->
-                new SimpleDoubleProperty(cd.getValue().getUkupniBodovi()).asObject());
-
-        colStatus.setCellValueFactory(cd ->
-                new SimpleStringProperty(
-                        cd.getValue().getStatusPrijave() != null
-                                ? cd.getValue().getStatusPrijave().getNaziv()
-                                : ""
-                ));
-
-        colNapomena.setCellValueFactory(cd ->
-                new SimpleStringProperty(nullSafe(cd.getValue().getNapomena())));
-    }
-
-    private void initStatusBadges() {
-        colStatus.setCellFactory(column -> new TableCell<Prijava, String>() {
+        // datum: vrijednost je LocalDate (ispravno sortiranje), prikaz dd.MM.yyyy.
+        colDatum.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().datumPrijave()));
+        colDatum.setCellFactory(col -> new TableCell<>() {
             @Override
-            protected void updateItem(String status, boolean empty) {
-                super.updateItem(status, empty);
+            protected void updateItem(LocalDate d, boolean empty) {
+                super.updateItem(d, empty);
+                setText(empty || d == null ? null : d.format(DATUM));
+            }
+        });
 
-                if (empty || status == null || status.isBlank()) {
+        // bodovi: sortira po potvrđenim, prikazuje "potvrđeno / moguće"
+        colUkupniBodovi.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().potvrdjeniBodovi()));
+        colUkupniBodovi.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double v, boolean empty) {
+                super.updateItem(v, empty);
+                getStyleClass().removeAll("bodovi-greska", "bodovi-ceka");
+                setTooltip(null);
+
+                PrijavaListaDTO p = (empty || getTableRow() == null) ? null : getTableRow().getItem();
+                if (p == null) {
                     setText(null);
-                    setGraphic(null);
-                    getStyleClass().removeAll("status-approved", "status-rejected", "status-review", "status-closed");
                     return;
                 }
 
-                setText(status);
-                setGraphic(null);
+                if (p.greska() != null) {
+                    setText("⚠ neispravni podaci");
+                    setTooltip(new Tooltip(p.greska()));
+                    getStyleClass().add("bodovi-greska");
+                    return;
+                }
 
-                getStyleClass().removeAll("status-approved", "status-rejected", "status-review", "status-closed");
-
-                String s = status.toLowerCase();
-
-                if (s.contains("odob")) {
-                    getStyleClass().add("status-approved");
-                } else if (s.contains("odbi")) {
-                    getStyleClass().add("status-rejected");
-                } else if (s.contains("pregl")) {
-                    getStyleClass().add("status-review");
-                } else if (s.contains("zaklj")) {
-                    getStyleClass().add("status-closed");
+                setText(String.format("%.2f / %.2f", p.potvrdjeniBodovi(), p.potencijalniBodovi()));
+                if (p.cekaVerifikaciju()) {
+                    getStyleClass().add("bodovi-ceka");
+                    setTooltip(new Tooltip("Dio bodova čeka provjeru dokumenata."));
                 }
             }
         });
     }
 
-    @FXML
-    private void sortImeAZ() {
-        colIme.setSortType(TableColumn.SortType.ASCENDING);
-        tblPrijave.getSortOrder().setAll(colIme);
-    }
-
-    @FXML
-    private void sortImeZA() {
-        colIme.setSortType(TableColumn.SortType.DESCENDING);
-        tblPrijave.getSortOrder().setAll(colIme);
-    }
-
-    @FXML
-    private void sortIdUzlazno() {
-        colId.setSortType(TableColumn.SortType.ASCENDING);
-        tblPrijave.getSortOrder().setAll(colId);
-    }
-
-    @FXML
-    private void sortIdSilazno() {
-        colId.setSortType(TableColumn.SortType.DESCENDING);
-        tblPrijave.getSortOrder().setAll(colId);
-    }
-
-    @FXML
-    private void sortBodoviUzlazno() {
-        colUkupniBodovi.setSortType(TableColumn.SortType.ASCENDING);
-        tblPrijave.getSortOrder().setAll(colUkupniBodovi);
-    }
-
-    @FXML
-    private void sortBodoviSilazno() {
-        colUkupniBodovi.setSortType(TableColumn.SortType.DESCENDING);
-        tblPrijave.getSortOrder().setAll(colUkupniBodovi);
-    }
-
-    @FXML
-    private void onExportHtmlPdf() {
-        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-        fileChooser.setTitle("Spremi PDF (HTML)");
-        fileChooser.getExtensionFilters().add(
-                new javafx.stage.FileChooser.ExtensionFilter("PDF Files", "*.pdf")
-        );
-
-        java.io.File file = fileChooser.showSaveDialog(tblPrijave.getScene().getWindow());
-        if (file == null) return;
-
-        List<PrijavaExportDTo> dataZaExport = pripremiPrijaveZaExport();
-
-        Task<Void> exportTask = new Task<>() {
+    private void initStatusBadges() {
+        colStatus.setCellFactory(column -> new TableCell<>() {
             @Override
-            protected Void call() {
-                PrijavaHtmlExportService service = new PrijavaHtmlExportService();
-                service.exportData(dataZaExport, file);
-                return null;
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                getStyleClass().removeAll("status-approved", "status-rejected", "status-review", "status-closed");
+
+                if (empty || status == null || status.isBlank()) {
+                    setText(null);
+                    return;
+                }
+                setText(status);
+
+                String s = status.toLowerCase();
+                if (s.contains("odob"))       getStyleClass().add("status-approved");
+                else if (s.contains("odbi"))  getStyleClass().add("status-rejected");
+                else if (s.contains("pregl")) getStyleClass().add("status-review");
+                else if (s.contains("zaklj")) getStyleClass().add("status-closed");
+            }
+        });
+    }
+
+    // ---------- učitavanje ----------
+
+    private void ucitajPrijave() {
+        Task<List<PrijavaListaDTO>> task = new Task<>() {
+            @Override
+            protected List<PrijavaListaDTO> call() {
+                return PrijavaApi.lista(null);
             }
         };
-        new Thread(exportTask).start();
+
+        task.setOnSucceeded(e -> {
+            masterList.setAll(task.getValue());
+
+            selectedFakulteti.clear();
+            selectedStatusiPrijave.clear();
+            selectedGodineStudija.clear();
+
+            napuniMeni(menuFakulteti, skupi(PrijavaListaDTO::fakultet), selectedFakulteti);
+            napuniMeni(menuStatusPrijave, skupi(PrijavaListaDTO::status), selectedStatusiPrijave);
+            napuniMeni(menuGodineStudija, skupi(PrijavaListaDTO::godinaStudija), selectedGodineStudija);
+
+            applyAllFilters();
+        });
+
+        task.setOnFailed(e -> prikaziGresku(task.getException(), "Greška pri učitavanju prijava."));
+
+        pokreni(task);
     }
 
-    private List<PrijavaExportDTo> pripremiPrijaveZaExport() {
-        return tblPrijave.getItems().stream().map(p -> {
-            Student s = studentMap.get(p.getIdStudent());
+    @FXML
+    private void onRefresh() {
+        ucitajPrijave();
+    }
 
-            return new PrijavaExportDTo(
-                    p.getIdPrijava(),
-                    s != null ? nullSafe(s.getIme()) : "",
-                    s != null ? nullSafe(s.getPrezime()) : "",
-                    s != null ? nullSafe(s.getFakultet()) : "",
-                    p.getDatumPrijava() != null ? p.getDatumPrijava().toString() : "",
-                    p.getUkupniBodovi(),
-                    p.getStatusPrijave() != null ? p.getStatusPrijave().getNaziv() : ""
-            );
-        }).toList();
+    // ---------- sortiranje ----------
+
+    @FXML private void sortImeAZ()         { sortiraj(colIme, TableColumn.SortType.ASCENDING); }
+    @FXML private void sortImeZA()         { sortiraj(colIme, TableColumn.SortType.DESCENDING); }
+    @FXML private void sortIdUzlazno()     { sortiraj(colId, TableColumn.SortType.ASCENDING); }
+    @FXML private void sortIdSilazno()     { sortiraj(colId, TableColumn.SortType.DESCENDING); }
+    @FXML private void sortBodoviUzlazno() { sortiraj(colUkupniBodovi, TableColumn.SortType.ASCENDING); }
+    @FXML private void sortBodoviSilazno() { sortiraj(colUkupniBodovi, TableColumn.SortType.DESCENDING); }
+
+    private void sortiraj(TableColumn<PrijavaListaDTO, ?> kolona, TableColumn.SortType smjer) {
+        kolona.setSortType(smjer);
+        tblPrijave.getSortOrder().setAll(kolona);
+    }
+
+    // ---------- filteri ----------
+
+    private <T extends Comparable<T>> Set<T> skupi(Function<PrijavaListaDTO, T> polje) {
+        return masterList.stream()
+                .map(polje)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    private <T> void napuniMeni(Menu meni, Set<T> vrijednosti, Set<T> odabrane) {
+        meni.getItems().clear();
+        for (T v : vrijednosti) {
+            CheckMenuItem item = new CheckMenuItem(String.valueOf(v));
+            item.setOnAction(e -> {
+                if (item.isSelected()) odabrane.add(v);
+                else odabrane.remove(v);
+                applyAllFilters();
+            });
+            meni.getItems().add(item);
+        }
     }
 
     private void setupFilteringAndSorting() {
         filteredList = new FilteredList<>(masterList, p -> true);
-
         txtSearch.textProperty().addListener((obs, o, n) -> applyAllFilters());
 
-        SortedList<Prijava> sorted = new SortedList<>(filteredList);
+        SortedList<PrijavaListaDTO> sorted = new SortedList<>(filteredList);
         sorted.comparatorProperty().bind(tblPrijave.comparatorProperty());
-
         tblPrijave.setItems(sorted);
     }
 
     private void applyAllFilters() {
+        String q = txtSearch.getText() == null ? "" : txtSearch.getText().toLowerCase().trim();
+
         filteredList.setPredicate(p -> {
-
-            String q = txtSearch.getText() == null ? "" : txtSearch.getText().toLowerCase().trim();
-
-            Student s = studentMap.get(p.getIdStudent());
-            String fakultet = s != null ? nullSafe(s.getFakultet()) : "";
-            Integer godinaStudija = s != null ? s.getGodinaStudija() : null;
-
-            String status = (p.getStatusPrijave() != null) ? nullSafe(p.getStatusPrijave().getNaziv()) : "";
+            String imePrezime = nullSafe(p.ime()) + " " + nullSafe(p.prezime());
 
             boolean searchOk = q.isEmpty()
-                    || nullSafe(p.getImeStudenta()).toLowerCase().contains(q)
-                    || nullSafe(p.getPrezimeStudenta()).toLowerCase().contains(q)
-                    || status.toLowerCase().contains(q)
-                    || fakultet.toLowerCase().contains(q)
-                    || String.valueOf(p.getIdPrijava()).contains(q)
-                    || nullSafe(p.getNapomena()).toLowerCase().contains(q);
+                    || imePrezime.toLowerCase().contains(q)
+                    || nullSafe(p.brojIndeksa()).toLowerCase().contains(q)
+                    || nullSafe(p.status()).toLowerCase().contains(q)
+                    || nullSafe(p.fakultet()).toLowerCase().contains(q)
+                    || nullSafe(p.napomena()).toLowerCase().contains(q)
+                    || Objects.toString(p.idPrijava(), "").contains(q);
 
-            boolean fakultetOk = selectedFakulteti.isEmpty()
-                    || selectedFakulteti.contains(fakultet);
-
-            boolean statusOk = selectedStatusiPrijave.isEmpty()
-                    || selectedStatusiPrijave.contains(status);
-
-            boolean godinaOk = selectedGodineStudija.isEmpty()
-                    || (godinaStudija != null && selectedGodineStudija.contains(godinaStudija));
+            boolean fakultetOk = selectedFakulteti.isEmpty() || selectedFakulteti.contains(p.fakultet());
+            boolean statusOk   = selectedStatusiPrijave.isEmpty() || selectedStatusiPrijave.contains(p.status());
+            boolean godinaOk   = selectedGodineStudija.isEmpty() || selectedGodineStudija.contains(p.godinaStudija());
 
             return searchOk && fakultetOk && statusOk && godinaOk;
         });
     }
 
-    private void initFakultetiFilter() {
-        Set<String> fakulteti = studentMap.values().stream()
-                .map(Student::getFakultet)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(TreeSet::new));
+    // ---------- export ----------
 
-        menuFakulteti.getItems().clear();
+    @FXML
+    private void onExportHtmlPdf() {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Spremi PDF (HTML)");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+        File file = fc.showSaveDialog(tblPrijave.getScene().getWindow());
+        if (file == null) return;
 
-        for (String f : fakulteti) {
-            CheckMenuItem item = new CheckMenuItem(f);
-            item.setOnAction(e -> {
-                if (item.isSelected()) selectedFakulteti.add(f);
-                else selectedFakulteti.remove(f);
-                applyAllFilters();
-            });
-            menuFakulteti.getItems().add(item);
-        }
+        List<PrijavaExportDTo> podaci = tblPrijave.getItems().stream().map(this::zaExport).toList();
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                new PrijavaHtmlExportService().exportData(podaci, file);
+                return null;
+            }
+        };
+        task.setOnFailed(e -> prikaziGresku(task.getException(), "Greška pri izvozu PDF-a."));
+        pokreni(task);
     }
 
-    private void initGodinaStudijaFilter() {
-        Set<Integer> godine = studentMap.values().stream()
-                .map(Student::getGodinaStudija)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(TreeSet::new));
-
-        menuGodineStudija.getItems().clear();
-
-        for (Integer g : godine) {
-            CheckMenuItem item = new CheckMenuItem(String.valueOf(g));
-            item.setOnAction(e -> {
-                if (item.isSelected()) selectedGodineStudija.add(g);
-                else selectedGodineStudija.remove(g);
-                applyAllFilters();
-            });
-            menuGodineStudija.getItems().add(item);
-        }
+    private PrijavaExportDTo zaExport(PrijavaListaDTO p) {
+        return new PrijavaExportDTo(
+                p.idPrijava(),
+                nullSafe(p.ime()),
+                nullSafe(p.prezime()),
+                nullSafe(p.fakultet()),
+                p.datumPrijave() != null ? p.datumPrijave().format(DATUM) : "",
+                p.potvrdjeniBodovi() != null ? p.potvrdjeniBodovi() : 0.0,
+                nullSafe(p.status())
+        );
     }
 
-    private void initStatusPrijaveFilter() {
-        Set<String> statusi = masterList.stream()
-                .map(p -> p.getStatusPrijave() != null ? p.getStatusPrijave().getNaziv() : null)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(TreeSet::new));
-
-        menuStatusPrijave.getItems().clear();
-
-        for (String status : statusi) {
-            CheckMenuItem item = new CheckMenuItem(status);
-            item.setOnAction(e -> {
-                if (item.isSelected()) selectedStatusiPrijave.add(status);
-                else selectedStatusiPrijave.remove(status);
-                applyAllFilters();
-            });
-            menuStatusPrijave.getItems().add(item);
-        }
-    }
-
-    private void initStudentMap() {
-        studentMap = studentDAO.dohvatiSveStudente()
-                .stream()
-                .collect(Collectors.toMap(Student::getIdStudent, s -> s));
-    }
+    // ---------- navigacija ----------
 
     private void setupRowDoubleClick() {
         tblPrijave.setRowFactory(tv -> {
-            TableRow<Prijava> row = new TableRow<>();
+            TableRow<PrijavaListaDTO> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
                 if (!row.isEmpty() && e.getClickCount() == 2) {
-                    otvoriDetalje(row.getItem());
+                    otvoriDetalje(row.getItem().idPrijava());
                 }
             });
             return row;
         });
     }
-
-    // ✅ ISPRAVKA: više nema new Stage() ovdje
-    @FXML
-    private void onNovaPrijava() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/views/novi-student.fxml")
-            );
-            Parent root = loader.load();
-
-            NoviStudentController controller = loader.getController();
-            controller.setPreviousView("prijave"); // (nije obavezno, ali korisno)
-
-            Stage currentStage = (Stage) tblPrijave.getScene().getWindow();
-            currentStage.setScene(new Scene(root));
-            currentStage.setMaximized(true);
-            currentStage.setResizable(true);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void otvoriDetalje(Prijava prijava) {
+    private void otvoriDetalje(Integer idPrijave) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/detalji-prijave.fxml"));
             Scene scene = new Scene(loader.load());
 
             DetaljiPrijaveController controller = loader.getController();
-            controller.setPrijava(prijava);
+            controller.ucitaj(idPrijave);
 
-            Stage stage = new Stage(); // ovo može ostati (popup)
+            Stage stage = new Stage();
             stage.setTitle("Detalji prijave");
             stage.setScene(scene);
             stage.setResizable(true);
             stage.show();
 
             Platform.runLater(() -> maximize(stage));
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -383,12 +316,40 @@ public class prijaveController {
         stage.setHeight(bounds.getHeight());
     }
 
-    private String nullSafe(String s) {
-        return s == null ? "" : s;
+    /** Ručni unos ostaje na starom kodu dok ne dođemo do njega. */
+    @FXML
+    private void onNovaPrijava() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/novi-student.fxml"));
+            Parent root = loader.load();
+
+            NoviStudentController controller = loader.getController();
+            controller.setPreviousView("prijave");
+
+            Stage currentStage = (Stage) tblPrijave.getScene().getWindow();
+            currentStage.setScene(new Scene(root));
+            currentStage.setMaximized(true);
+            currentStage.setResizable(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public void onRefresh() {
-        masterList.setAll(prijavaDAO.dohvatiSvePrijave());
-        applyAllFilters();
+    // ---------- pomoćne ----------
+
+    private void pokreni(Task<?> task) {
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        t.start();
+    }
+
+    private void prikaziGresku(Throwable ex, String opsta) {
+        if (!(ex instanceof ApiException)) ex.printStackTrace();
+        String poruka = ex instanceof ApiException ? ex.getMessage() : opsta;
+        new Alert(Alert.AlertType.ERROR, poruka).showAndWait();
+    }
+
+    private String nullSafe(String s) {
+        return s == null ? "" : s;
     }
 }

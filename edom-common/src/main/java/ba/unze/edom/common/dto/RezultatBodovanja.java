@@ -1,4 +1,4 @@
-package ba.unze.edom.server.dto;
+package ba.unze.edom.common.dto;
 
 import java.util.List;
 
