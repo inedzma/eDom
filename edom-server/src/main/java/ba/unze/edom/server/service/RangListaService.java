@@ -154,7 +154,8 @@ public class RangListaService {
     // ---------- pomoćne ----------
 
     private boolean jeOdobrena(Prijava p) {
-        return p.getStatus() != null && Statusi.ODOBRENO.equalsIgnoreCase(p.getStatus().getNaziv());
+        String s = p.getStatus() != null ? p.getStatus().getNaziv() : null;
+        return Statusi.ODOBRENO.equalsIgnoreCase(s) || Statusi.ZAKLJUCENO.equalsIgnoreCase(s);
     }
 
     /** Godina iz prijave ima prednost; ako je nema, uzima se iz profila studenta. */

@@ -3,7 +3,6 @@ package controllers;
 import api.ApiException;
 import api.PrijavaApi;
 import ba.unze.edom.common.dto.PrijavaListaDTO;
-import dto.PrijavaExportDTo;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -22,6 +21,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import service.export.PrijavaHtmlExportService;
+import util.Ekrani;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -250,7 +250,8 @@ public class prijaveController {
         File file = fc.showSaveDialog(tblPrijave.getScene().getWindow());
         if (file == null) return;
 
-        List<PrijavaExportDTo> podaci = tblPrijave.getItems().stream().map(this::zaExport).toList();
+        // ono što je trenutno u tabeli: filtrirano i sortirano kako admin vidi
+        List<PrijavaListaDTO> podaci = List.copyOf(tblPrijave.getItems());
 
         Task<Void> task = new Task<>() {
             @Override
@@ -262,21 +263,6 @@ public class prijaveController {
         task.setOnFailed(e -> prikaziGresku(task.getException(), "Greška pri izvozu PDF-a."));
         pokreni(task);
     }
-
-    private PrijavaExportDTo zaExport(PrijavaListaDTO p) {
-        return new PrijavaExportDTo(
-                p.idPrijava(),
-                nullSafe(p.ime()),
-                nullSafe(p.prezime()),
-                nullSafe(p.fakultet()),
-                p.datumPrijave() != null ? p.datumPrijave().format(DATUM) : "",
-                p.potvrdjeniBodovi() != null ? p.potvrdjeniBodovi() : 0.0,
-                nullSafe(p.status())
-        );
-    }
-
-    // ---------- navigacija ----------
-
     private void setupRowDoubleClick() {
         tblPrijave.setRowFactory(tv -> {
             TableRow<PrijavaListaDTO> row = new TableRow<>();
@@ -316,23 +302,9 @@ public class prijaveController {
         stage.setHeight(bounds.getHeight());
     }
 
-    /** Ručni unos ostaje na starom kodu dok ne dođemo do njega. */
     @FXML
     private void onNovaPrijava() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/novi-student.fxml"));
-            Parent root = loader.load();
-
-            NoviStudentController controller = loader.getController();
-            controller.setPreviousView("prijave");
-
-            Stage currentStage = (Stage) tblPrijave.getScene().getWindow();
-            currentStage.setScene(new Scene(root));
-            currentStage.setMaximized(true);
-            currentStage.setResizable(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Ekrani.zamijeni(tblPrijave, "/views/novi-student.fxml", null);
     }
 
     // ---------- pomoćne ----------

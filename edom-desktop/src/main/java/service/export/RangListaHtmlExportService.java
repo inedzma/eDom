@@ -1,7 +1,7 @@
 package service.export;
 
+import ba.unze.edom.common.dto.RangRedDTO;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-import dto.RangListaDTO;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,7 +14,7 @@ import java.util.List;
 public class RangListaHtmlExportService {
 
     // Metoda prima DVIJE liste: brucosi i viseGodine
-    public void exportSplitData(List<RangListaDTO> brucosi, List<RangListaDTO> viseGodine, File file) {
+    public void exportSplitData(List<RangRedDTO> brucosi, List<RangRedDTO> viseGodine, File file) {
         try {
             DateTimeFormatter df = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
@@ -245,38 +245,33 @@ public class RangListaHtmlExportService {
         }
     }
 
+    // ---------- tabela ----------
 
-    private String generisiTabeluHtml(List<RangListaDTO> data) {
-        if (data == null || data.isEmpty()) {
+    private String generisiTabeluHtml(List<RangRedDTO> redovi) {
+        if (redovi == null || redovi.isEmpty()) {
             return "<p class='center'><i>Nema studenata u ovoj kategoriji.</i></p>";
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("<table>");
+        StringBuilder sb = new StringBuilder("<table>");
+        sb.append("<tr><th>#</th><th>Prezime (ime oca) i ime studenta</th><th>Bodovi</th></tr>");
 
-        sb.append("<tr>");
-        for (String kolona : data.get(0).getKolone().keySet()) {
-            sb.append("<th>").append(escapeHtml(kolona)).append("</th>");
+        int rb = 1;
+        for (RangRedDTO r : redovi) {
+            sb.append("<tr>")
+                    .append("<td style='text-align:center;'>").append(rb++).append("</td>")
+                    .append("<td>").append(escapeHtml(punoIme(r))).append("</td>")
+                    .append("<td style='text-align:center;'>").append(String.format("%.2f", r.ukupno())).append("</td>")
+                    .append("</tr>");
         }
-        sb.append("</tr>");
+        return sb.append("</table>").toString();
+    }
 
-        for (RangListaDTO dto : data) {
-            sb.append("<tr>");
-            for (String value : dto.getKolone().values()) {
-                boolean isNumber = value.matches("-?\\d+([.,]\\d+)?");
-                String align = isNumber ? "center" : "left";
-
-                sb.append("<td style='text-align:")
-                        .append(align)
-                        .append(";'>")
-                        .append(escapeHtml(value))
-                        .append("</td>");
-            }
-            sb.append("</tr>");
-        }
-
-        sb.append("</table>");
-        return sb.toString();
+    /** Zvanični format: Prezime (ime oca) Ime. Koristi ga i ekran rang liste. */
+    public static String punoIme(RangRedDTO r) {
+        String prezime = r.prezime() != null ? r.prezime() : "";
+        String ime = r.ime() != null ? r.ime() : "";
+        String otac = r.imeOca() != null && !r.imeOca().isBlank() ? " (" + r.imeOca() + ") " : " ";
+        return prezime + otac + ime;
     }
 
     private String escapeHtml(String text) {

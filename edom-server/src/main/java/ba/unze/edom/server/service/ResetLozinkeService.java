@@ -19,8 +19,8 @@ public class ResetLozinkeService {
 
     static final int TRAJANJE_MINUTA = 15;
     static final int MAX_POKUSAJA = 5;
-    static final int MIN_DUZINA_LOZINKE = 8;
 
+    private static final String NEISPRAVNO = "Kod nije ispravan ili je istekao.";
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private final KorisnikRepository korisnikRepository;
@@ -28,8 +28,8 @@ public class ResetLozinkeService {
     private final EmailService emailService;
 
     /**
-     * Salje kod ako nalog postoji. Ako ne postoji, ne radi nista —
-     * kontroler svejedno prikazuje istu poruku.
+     * Šalje kod ako nalog postoji. Ako ne postoji, tiho ne radi ništa,
+     * da se po odgovoru ne može zaključiti koje e-mail adrese imaju nalog.
      */
     @Transactional
     public void zatraziKod(String email) {
@@ -38,10 +38,13 @@ public class ResetLozinkeService {
             throw new RegistracijaException("Unesite e-mail adresu.");
         }
 
-        Korisnik k = korisnikRepository.findByEmail(email.trim())
-                .orElseThrow(() -> new RegistracijaException(
-                        "Ne postoji nalog sa tom e-mail adresom."));
+        // PROMJENA 1: nepostojeći nalog više ne baca grešku
+        var nalog = korisnikRepository.findByEmail(email.trim());
+        if (nalog.isEmpty()) {
+            return;
+        }
 
+        Korisnik k = nalog.get();
         String kod = generisiKod();
 
         k.setResetTokenHash(passwordEncoder.encode(kod));
@@ -51,13 +54,12 @@ public class ResetLozinkeService {
         emailService.posaljiResetKod(k.getEmail(), kod);
     }
 
+    /**
+     * noRollbackFor: brojač pokušaja i poništavanje isteklog koda
+     * moraju ostati upisani i kad metoda baci grešku.
+     */
     @Transactional(noRollbackFor = RegistracijaException.class)
-    public void promijeniLozinku(String email, String kod,
-                                 String nova, String potvrda) {
-
-        System.out.println(">>> SERVIS ulaz, email=" + email);
-
-        final String NEISPRAVNO = "Kod nije ispravan ili je istekao.";
+    public void promijeniLozinku(String email, String kod, String nova, String potvrda) {
 
         Korisnik k = korisnikRepository.findByEmail(email == null ? "" : email.trim())
                 .orElseThrow(() -> new RegistracijaException(NEISPRAVNO));
@@ -73,8 +75,7 @@ public class ResetLozinkeService {
 
         if (k.getResetPokusaji() >= MAX_POKUSAJA) {
             ponisti(k);
-            throw new RegistracijaException(
-                    "Previše neuspješnih pokušaja. Zatražite novi kod.");
+            throw new RegistracijaException("Previše neuspješnih pokušaja. Zatražite novi kod.");
         }
 
         if (kod == null || !passwordEncoder.matches(kod.trim(), k.getResetTokenHash())) {
@@ -91,16 +92,13 @@ public class ResetLozinkeService {
             throw new RegistracijaException("Lozinke se ne podudaraju.");
         }
 
+        // PROMJENA 2: nema ispisa hasha u konzolu.
+        // PROMJENA 3: nema save(); k je učitan u ovoj transakciji,
+        // pa Hibernate sam upiše izmjene na kraju metode.
         k.setPasswordHash(passwordEncoder.encode(nova));
-
-        korisnikRepository.save(k);          // dodaj i ovo
-
-        System.out.println(">>> UPISANO id=" + k.getIdKorisnik()
-                + " novi hash=" + k.getPasswordHash());
-
         ponisti(k);
-
     }
+
     private void ponisti(Korisnik k) {
         k.setResetTokenHash(null);
         k.setResetTokenIstek(null);

@@ -36,4 +36,9 @@ public class VrstaKriterija {
 
     @Column(name = "aktivan", nullable = false)
     private boolean aktivan = true;
+
+    /** Dokument kojim se kriterij dokazuje; null ako nema posebnog. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dokaz_vrsta_id")
+    private VrstaDokumenta dokaz;
 }

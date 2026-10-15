@@ -1,0 +1,489 @@
+/* =========================================================
+   E-Dom — stranica "Kako se prijaviti" i blok uputa na početnoj
+   Paleta je ista kao na login ekranu (teal + mint).
+   ========================================================= */
+
+:root {
+    --up-teal-900: #063a4a;
+    --up-teal-800: #0a4a5c;
+    --up-mint: #00bf9a;
+    --up-mint-dark: #00a886;
+    --up-mint-soft: #e6f8f3;
+    --up-heading: #0b4a5e;
+    --up-text: #3d5f69;
+    --up-muted: #7f9aa2;
+    --up-border: #d4ece6;
+    --up-warn-bg: #fff7e8;
+    --up-warn: #b9770e;
+    --up-card: #ffffff;
+    --up-alt-bg: #f3fbf9;
+}
+
+/* ---------------- HERO ---------------- */
+.up-hero {
+    background: linear-gradient(170deg, var(--up-teal-800) 0%, var(--up-teal-900) 100%);
+    color: #fff;
+    padding: 64px 0 56px;
+    position: relative;
+    overflow: hidden;
+}
+.up-hero::after {
+    content: "";
+    position: absolute;
+    width: 700px; height: 700px; border-radius: 50%;
+    right: -200px; top: -250px;
+    background: rgba(255, 255, 255, .04);
+    pointer-events: none;
+}
+.up-hero .section-inner { position: relative; z-index: 1; }
+.up-hero .eyebrow { color: #5fd6b4; }
+.up-hero h1 {
+    font-size: clamp(30px, 4.5vw, 44px);
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 10px 0 14px;
+}
+.up-hero-lead {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #d7e7eb;
+    max-width: 680px;
+    margin-bottom: 34px;
+}
+
+.up-facts {
+    list-style: none;
+    padding: 0; margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+.up-facts li {
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 16px;
+    padding: 18px 18px 16px;
+}
+.up-facts b {
+    display: block;
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+}
+.up-facts span {
+    font-size: 14px;
+    color: #c9dde2;
+    line-height: 1.4;
+}
+
+/* ---------------- OPĆE ---------------- */
+.up-section-alt { background: var(--up-alt-bg); }
+
+.up-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 22px;
+}
+
+.up-card {
+    background: var(--up-card);
+    border: 1px solid var(--up-border);
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 6px 20px rgba(10, 74, 92, .05);
+}
+.up-card h3, .up-card h4 {
+    color: var(--up-heading);
+    font-weight: 800;
+    margin: 12px 0 6px;
+}
+.up-card h3 { font-size: 18px; }
+.up-card h4 { font-size: 16px; margin-top: 0; }
+.up-card p { color: var(--up-text); line-height: 1.55; margin: 0; }
+.up-card--small { padding: 18px 20px; }
+
+.up-card-ic {
+    width: 46px; height: 46px;
+    border-radius: 14px;
+    display: grid; place-items: center;
+    background: var(--up-mint-soft);
+    color: var(--up-mint-dark);
+}
+
+/* ---------------- KORACI (timeline) ---------------- */
+.up-timeline {
+    list-style: none;
+    padding: 0;
+    margin: 28px 0 0;
+    position: relative;
+}
+.up-timeline::before {
+    content: "";
+    position: absolute;
+    left: 23px; top: 8px; bottom: 8px;
+    width: 2px;
+    background: var(--up-border);
+}
+.up-timeline > li {
+    display: flex;
+    gap: 20px;
+    position: relative;
+    padding-bottom: 26px;
+}
+.up-timeline > li:last-child { padding-bottom: 0; }
+
+.up-tl-num {
+    flex: 0 0 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--up-mint);
+    color: #fff;
+    font-weight: 800;
+    font-size: 19px;
+    display: grid; place-items: center;
+    box-shadow: 0 0 0 6px var(--up-alt-bg);
+    position: relative;
+    z-index: 1;
+}
+.up-tl-body {
+    background: var(--up-card);
+    border: 1px solid var(--up-border);
+    border-radius: 16px;
+    padding: 18px 22px;
+    flex: 1;
+}
+.up-tl-body h3 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--up-heading);
+}
+.up-tl-body p { margin: 0; color: var(--up-text); line-height: 1.55; }
+.up-tl-body a { color: var(--up-mint-dark); font-weight: 700; }
+.up-tl-link { display: inline-block; margin-top: 10px; text-decoration: none; }
+.up-tl-link:hover { text-decoration: underline; }
+
+.up-tl-vazno .up-tl-num { background: var(--up-teal-800); }
+.up-tl-vazno .up-tl-body { border-color: var(--up-mint); border-width: 2px; }
+
+.up-adresa {
+    font-style: normal;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: var(--up-mint-soft);
+    border-radius: 10px;
+    color: var(--up-heading);
+    font-weight: 700;
+    line-height: 1.5;
+    display: inline-block;
+}
+
+.up-mini-list { margin: 10px 0 0; padding-left: 20px; color: var(--up-text); line-height: 1.6; }
+
+/* ---------------- INFO PORUKE ---------------- */
+.up-info {
+    margin-top: 26px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    background: var(--up-mint-soft);
+    border-left: 4px solid var(--up-mint);
+    color: var(--up-text);
+    line-height: 1.55;
+}
+.up-info b { color: var(--up-heading); }
+.up-info--neutral { background: #eef5f7; border-left-color: var(--up-teal-800); }
+
+/* ---------------- DOKUMENTI ---------------- */
+.up-docs-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+.up-progress {
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-weight: 700;
+    color: var(--up-heading);
+}
+.up-progress-track {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--up-border);
+    overflow: hidden;
+}
+.up-progress-bar {
+    height: 100%;
+    width: 0;
+    background: var(--up-mint);
+    border-radius: 999px;
+    transition: width .25s;
+}
+.up-progress-bar.gotovo { background: var(--up-mint-dark); }
+.up-print { align-self: flex-start; }
+
+.up-group { margin-top: 34px; }
+.up-group-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--up-heading);
+    margin: 0 0 12px;
+}
+.up-group-lead { color: var(--up-text); margin: 0 0 14px; }
+
+.up-tag {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #eef5f7;
+    color: var(--up-teal-800);
+}
+.up-tag--req { background: var(--up-mint); color: #fff; }
+.up-tag--opt { background: var(--up-warn-bg); color: var(--up-warn); }
+
+.up-checklist {
+    list-style: none;
+    padding: 0; margin: 0;
+    display: grid;
+    gap: 10px;
+}
+.up-checklist--cols { grid-template-columns: repeat(2, 1fr); }
+
+.up-check label {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 18px;
+    background: var(--up-card);
+    border: 1px solid var(--up-border);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    height: 100%;
+}
+.up-check label:hover { border-color: var(--up-mint); }
+.up-check input {
+    appearance: none;
+    flex: 0 0 24px;
+    width: 24px; height: 24px;
+    margin-top: 1px;
+    border: 2px solid var(--up-border);
+    border-radius: 7px;
+    display: grid; place-items: center;
+    cursor: pointer;
+    transition: .15s;
+}
+.up-check input:checked { background: var(--up-mint); border-color: var(--up-mint); }
+.up-check input:checked::after {
+    content: "";
+    width: 6px; height: 11px;
+    border: solid #fff;
+    border-width: 0 2.5px 2.5px 0;
+    transform: rotate(45deg) translate(-1px, -1px);
+}
+.up-check input:checked + span b { color: var(--up-mint-dark); }
+.up-check span { display: flex; flex-direction: column; gap: 3px; }
+.up-check b { color: var(--up-heading); font-weight: 800; }
+.up-check small { color: var(--up-text); font-size: 14px; line-height: 1.5; }
+.up-check small a { color: var(--up-mint-dark); font-weight: 700; }
+
+.up-table-wrap { overflow-x: auto; }
+.up-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--up-card);
+    border: 1px solid var(--up-border);
+    border-radius: 14px;
+    overflow: hidden;
+}
+.up-table th, .up-table td { padding: 12px 18px; text-align: left; }
+.up-table th {
+    background: var(--up-mint-soft);
+    color: var(--up-heading);
+    font-weight: 800;
+    font-size: 14px;
+}
+.up-table td { border-top: 1px solid var(--up-border); color: var(--up-text); }
+.up-table td:first-child { font-weight: 700; color: var(--up-heading); width: 40%; }
+
+/* ---------------- UPLATNICA (slika) ---------------- */
+.upl-slika { margin: 22px 0 0; max-width: 900px; }
+.upl-slika a { display: block; }
+.upl-slika img {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #fff;
+    border: 1px solid var(--up-border);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 10px 30px rgba(10, 74, 92, .08);
+    transition: box-shadow .15s;
+}
+.upl-slika a:hover img { box-shadow: 0 12px 34px rgba(10, 74, 92, .16); }
+.upl-slika figcaption {
+    margin-top: 12px;
+    color: var(--up-text);
+    font-size: 15px;
+    line-height: 1.55;
+}
+.upl-slika figcaption a {
+    display: inline-block;
+    margin-top: 6px;
+    color: var(--up-mint-dark);
+    font-weight: 700;
+}
+
+.up-tl-gotovo {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--up-mint-dark);
+    font-weight: 800;
+}
+
+/* ---------------- VAŽNO ---------------- */
+.up-warnings {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0;
+    display: grid;
+    gap: 10px;
+}
+.up-warnings li {
+    position: relative;
+    padding: 14px 18px 14px 50px;
+    background: var(--up-warn-bg);
+    border-radius: 12px;
+    color: var(--up-text);
+    line-height: 1.5;
+}
+.up-warnings li::before {
+    content: "!";
+    position: absolute;
+    left: 16px; top: 13px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--up-warn);
+    color: #fff;
+    font-weight: 800;
+    font-size: 14px;
+    display: grid; place-items: center;
+}
+.up-warnings b { color: var(--up-heading); }
+
+/* ---------------- CTA i izvor ---------------- */
+.up-cta-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.up-izvor {
+    margin-top: 22px;
+    text-align: center;
+    color: var(--up-muted);
+    font-size: 14px;
+}
+.up-izvor a { color: var(--up-mint-dark); font-weight: 700; }
+
+.pub-links a.active { color: var(--up-mint-dark); font-weight: 800; }
+
+/* =========================================================
+   BLOK NA POČETNOJ: "Ukratko o prijavi"
+   ========================================================= */
+.up-kratko {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 28px;
+    align-items: start;
+    margin-top: 22px;
+}
+.up-kratko-list {
+    list-style: none;
+    padding: 0; margin: 0;
+    display: grid;
+    gap: 12px;
+}
+.up-kratko-list li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 18px;
+    background: var(--up-card);
+    border: 1px solid var(--up-border);
+    border-radius: 14px;
+    color: var(--up-text);
+    line-height: 1.5;
+}
+.up-kratko-list li::before {
+    content: "✓";
+    flex: 0 0 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--up-mint-soft);
+    color: var(--up-mint-dark);
+    font-weight: 800;
+    display: grid; place-items: center;
+}
+.up-kratko-list b { color: var(--up-heading); }
+.up-kratko-side {
+    background: linear-gradient(170deg, var(--up-teal-800), var(--up-teal-900));
+    color: #fff;
+    border-radius: 20px;
+    padding: 26px;
+}
+.up-kratko-side h3 { margin: 0 0 8px; font-size: 20px; font-weight: 800; }
+.up-kratko-side p { margin: 0 0 18px; color: #d7e7eb; line-height: 1.55; }
+
+/* ---------------- RESPONSIVE ---------------- */
+@media (max-width: 900px) {
+    .up-facts { grid-template-columns: repeat(2, 1fr); }
+    .up-grid-3 { grid-template-columns: 1fr; }
+
+    .up-checklist--cols { grid-template-columns: 1fr; }
+    .up-kratko { grid-template-columns: 1fr; }
+    .up-hero { padding: 44px 0 40px; }
+}
+@media (max-width: 520px) {
+    .up-facts { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .up-facts b { font-size: 22px; }
+    .up-timeline::before { left: 19px; }
+    .up-tl-num { flex-basis: 40px; height: 40px; font-size: 16px; }
+    .up-timeline > li { gap: 14px; }
+    .up-tl-body { padding: 14px 16px; }
+}
+
+/* ---------------- PRINT: samo spisak dokumenata ---------------- */
+@media print {
+    .navbar, .up-hero, #koraci, .up-print, footer,
+    .section--tight { display: none !important; }
+    body { background: #fff; }
+    .up-check label { border: 1px solid #999; break-inside: avoid; }
+    .up-check input { border-color: #333; }
+    .up-progress-track { display: none; }
+}
+
+/* "Ukratko o prijavi" na studentskoj početnoj (stranica nema pocetna.css) */
+.up-kratko-blok { margin-top: 32px; }
+.up-kratko-blok .up-eyebrow {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--up-mint-dark);
+}
+.up-kratko-blok h2 {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--up-heading);
+    margin: 6px 0 0;
+}
+.up-kratko-side .btn { text-decoration: none; }

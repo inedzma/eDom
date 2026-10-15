@@ -6,6 +6,7 @@ import ba.unze.edom.common.dto.PrijavaListaDTO;
 import ba.unze.edom.common.dto.RezultatBodovanja;
 import ba.unze.edom.server.entity.Prijava;
 import ba.unze.edom.server.entity.Student;
+import ba.unze.edom.common.dto.KriterijStanjeDTO;
 
 import java.util.List;
 
@@ -29,9 +30,19 @@ public final class PrijaveMapper {
         );
     }
 
-    public static PrijavaDetaljiDTO uDetalje(Prijava p, RezultatBodovanja r,
-                                             String greska, List<DokumentDTO> dokumenti) {
+    public static PrijavaDetaljiDTO uDetalje(Prijava p, RezultatBodovanja r, String greska,
+                                             List<DokumentDTO> dokumenti, List<String> dozvoljeniStatusi) {
         Student s = p.getStudent();
+
+        List<KriterijStanjeDTO> kriteriji = p.getKriteriji().stream()
+                .map(k -> new KriterijStanjeDTO(
+                        k.getIdPrijavaKriterij(),
+                        k.getVrsta().getNaziv(),
+                        k.getParametar(),
+                        k.getVrsta().getNazivParametra(),
+                        k.isVerifikovan()))
+                .toList();
+
         return new PrijavaDetaljiDTO(
                 p.getIdPrijava(), p.getAkademskaGodina(), p.getDatumPrijave(),
                 status(p), p.getNapomena(),
@@ -40,7 +51,12 @@ public final class PrijaveMapper {
                 p.getGodinaStudija(), p.getProsjek(), p.getPolozeniIspiti(),
                 p.getBrojClanovaDomacinstva(), p.getUkupnaPrimanja(), p.getUdaljenostKm(),
                 r, greska,
-                dokumenti
+                dokumenti,
+                p.isUspjehVerifikovan(), p.isUdaljenostVerifikovana(), p.isPrimanjaVerifikovana(),
+                kriteriji,
+                p.getNapomenaAdmina(),
+                "na pregledu".equals(status(p)),
+                dozvoljeniStatusi
         );
     }
 

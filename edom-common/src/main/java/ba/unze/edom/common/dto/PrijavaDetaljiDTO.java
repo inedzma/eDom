@@ -29,5 +29,13 @@ public record PrijavaDetaljiDTO(
         RezultatBodovanja bodovanje,   // null ako validator odbije podatke
         String greska,
 
-        List<DokumentDTO> dokumenti
+        List<DokumentDTO> dokumenti,
+
+        boolean uspjehVerifikovan,
+        boolean udaljenostVerifikovana,
+        boolean primanjaVerifikovana,
+        List<KriterijStanjeDTO> kriteriji,
+        String napomenaAdmina,
+        boolean mozeProvjeravati,
+        List<String> dozvoljeniStatusi
 ) {}

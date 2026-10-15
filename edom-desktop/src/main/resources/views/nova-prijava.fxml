@@ -89,27 +89,15 @@
                         <TextField fx:id="txtUdaljenost" promptText="43" styleClass="field"/>
                     </VBox>
 
-                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                        <Label text="Napomena (kratko)" styleClass="field-label"/>
-                        <TextField promptText="Opcionalno..." styleClass="field"/>
-                    </VBox>
 
                 </GridPane>
 
                 <Label text="Dodatni kriteriji"
                        styleClass="section-pill"/>
 
+                <VBox fx:id="vboxKriteriji" spacing="10"/>
+
                 <Separator styleClass="soft-separator"/>
-
-                <VBox spacing="10">
-                    <CheckBox fx:id="chkIzbjeglica"
-                              text="Izbjegli i raseljeni student (3 boda)"
-                              styleClass="checkbox"/>
-
-                    <CheckBox fx:id="chkBratSestra"
-                              text="Brat/sestra studiraju (2 boda)"
-                              styleClass="checkbox"/>
-                </VBox>
 
                 <VBox fx:id="vboxBranioci" spacing="10"/>
 

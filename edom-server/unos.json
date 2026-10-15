@@ -1,0 +1,21 @@
+{
+  "student": {
+    "ime": "Test", "prezime": "Testić", "jmbg": "1111111111111",
+    "brojIndeksa": "T-001", "email": "test.testic@example.com", "telefon": "061111111",
+    "fakultet": "Politehnički fakultet UNZE", "godinaStudija": 3,
+    "adresa": "Zenica", "imeRoditelja": "Haso", "idSocijalnogStatusa": null
+  },
+  "prijava": {
+    "akademskaGodina": 2026, "prosjek": 8.5, "polozeniIspiti": 20,
+    "brojClanovaDomacinstva": 4, "ukupnaPrimanja": 1200, "udaljenostKm": 95,
+    "napomena": "test ručnog unosa",
+    "uspjehVerifikovan": true, "udaljenostVerifikovana": true, "primanjaVerifikovana": false
+  },
+  "kriteriji": [
+    { "sifra": "IZBJEGLICA", "parametar": null, "verifikovan": true },
+    { "sifra": "DIJETE_OSRBIH", "parametar": 24, "verifikovan": false }
+  ],
+  "dokumenti": [
+    { "idVrste": 1, "naziv": null, "dostavljen": true, "b64": null }
+  ]
+}

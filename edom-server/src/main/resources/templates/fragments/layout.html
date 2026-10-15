@@ -55,6 +55,7 @@
         </a>
         <nav class="pub-links">
             <a th:href="@{/}" th:classappend="${aktivna == 'pocetna'} ? 'active'">Početna</a>
+            <a th:href="@{/upute}" th:classappend="${aktivna == 'upute'} ? 'active'">Kako se prijaviti</a>
             <a th:href="@{/rang-lista}" th:classappend="${aktivna == 'rang'} ? 'active'">Rang lista</a>
         </nav>
         <div class="pub-actions">
@@ -76,6 +77,7 @@
 
         <ul class="nav-links">
             <li><a th:href="@{/student/pocetna}" th:classappend="${aktivna == 'prijave'} ? 'active'">Moje prijave</a></li>
+            <li><a th:href="@{/upute}" th:classappend="${aktivna == 'upute'} ? 'active'">Kako se prijaviti</a></li>
             <li><a th:href="@{/rang-lista}" th:classappend="${aktivna == 'rang'} ? 'active'">Rang lista</a></li>
             <li><a th:href="@{/student/profil}" th:classappend="${aktivna == 'profil'} ? 'active'">Moj profil</a></li>
         </ul>

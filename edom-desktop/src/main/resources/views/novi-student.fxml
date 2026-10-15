@@ -31,6 +31,9 @@
                                styleClass="page-subtitle"/>
                     </VBox>
 
+                    <Label fx:id="lblPostojeci" visible="false" managed="false"
+                           wrapText="true" styleClass="page-subtitle"/>
+
                     <Region HBox.hgrow="ALWAYS"/>
 
 

@@ -1,183 +1,180 @@
 package controllers;
 
-import controllers.DodajDokumenteControllers.BraniociDokumentiController;
-import dao.PrijavaDAO;
-import javafx.application.Platform;
+import ba.unze.edom.common.dto.VrstaKriterijaDTO;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import model.Prijava;
-import model.StatusPrijave;
-import service.BraniociRezultat;
+import unos.NacrtPrijave;
+import util.Ekrani;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class NovaPrijavaController {
 
     @FXML private TextField txtAkGod;
-    @FXML private TextArea txtNapomena;
     @FXML private TextField txtClanovi;
     @FXML private TextField txtUdaljenost;
-    @FXML private CheckBox chkIzbjeglica;
-    @FXML private CheckBox chkBratSestra;
-    @FXML private VBox vboxBranioci;
+    @FXML private TextArea txtNapomena;
+    @FXML private VBox vboxKriteriji;
 
-    private BraniociDokumentiController braniociController;
+    private NacrtPrijave nacrt;
 
-    private int studentId;
-    private double prosjek;
-    private int godinaStudija;
+    /** Jedan kriterij na ekranu: kvačica i, ako treba, polje za parametar. */
+    private record KriterijPolje(VrstaKriterijaDTO vrsta, CheckBox chk, TextField parametar) {}
 
-    private final PrijavaDAO prijavaDAO = new PrijavaDAO();
+    private final List<KriterijPolje> polja = new ArrayList<>();
 
-    @FXML
-    public void initialize() {
-        txtAkGod.sceneProperty().addListener((obs, o, scene) -> {
-            if (scene != null) {
-                ucitajBraniociFormu();
+    public void setNacrt(NacrtPrijave n) {
+        this.nacrt = n;
+        napraviKriterije();
+        popuni();
+    }
+
+    // ---------- kriteriji iz baze ----------
+
+    private void napraviKriterije() {
+        vboxKriteriji.getChildren().clear();
+        polja.clear();
+
+        Map<String, List<VrstaKriterijaDTO>> poGrupi = nacrt.sifarnici.kriteriji().stream()
+                .collect(Collectors.groupingBy(VrstaKriterijaDTO::grupa,
+                        LinkedHashMap::new, Collectors.toList()));
+
+        poGrupi.forEach((grupa, vrste) -> {
+            Label naslov = new Label(nazivGrupe(grupa));
+            naslov.getStyleClass().add("field-label");
+            vboxKriteriji.getChildren().add(naslov);
+
+            for (VrstaKriterijaDTO v : vrste) {
+                CheckBox chk = new CheckBox(v.naziv());
+                chk.getStyleClass().add("checkbox");
+                chk.setWrapText(true);
+                chk.setMaxWidth(Double.MAX_VALUE);
+
+                VBox red = new VBox(6, chk);
+
+                TextField param = null;
+                if (v.traziParametar()) {
+                    param = new TextField();
+                    param.setPromptText(v.nazivParametra());
+                    param.getStyleClass().add("field");
+                    param.setMaxWidth(320);
+                    VBox.setMargin(param, new Insets(0, 0, 0, 34));   // uvučeno ispod kvačice
+                    param.visibleProperty().bind(chk.selectedProperty());
+                    param.managedProperty().bind(chk.selectedProperty());
+                    red.getChildren().add(param);
+                }
+
+                polja.add(new KriterijPolje(v, chk, param));
+                vboxKriteriji.getChildren().add(red);
             }
         });
     }
 
-    public void setStudentId(int id) { this.studentId = id; }
-    public void setProsjek(double prosjek) { this.prosjek = prosjek; }
-    public void setGodinaStudija(int godinaStudija) { this.godinaStudija = godinaStudija; }
+    private String nazivGrupe(String grupa) {
+        if ("BRANIOCI".equalsIgnoreCase(grupa)) return "Boračke i socijalne kategorije (boduje se samo najveća)";
+        if ("DODATNI".equalsIgnoreCase(grupa)) return "Ostali kriteriji (sabiraju se)";
+        return grupa;
+    }
+
+    private void popuni() {
+        txtAkGod.setText(String.valueOf(
+                nacrt.akademskaGodina != null ? nacrt.akademskaGodina : LocalDate.now().getYear()));
+        if (nacrt.brojClanova != null) txtClanovi.setText(String.valueOf(nacrt.brojClanova));
+        if (nacrt.udaljenostKm != null) txtUdaljenost.setText(nacrt.udaljenostKm.toPlainString());
+        if (nacrt.napomena != null) txtNapomena.setText(nacrt.napomena);
+
+        for (KriterijPolje p : polja) {
+            String sifra = p.vrsta().sifra();
+            if (nacrt.kriteriji.containsKey(sifra)) {
+                p.chk().setSelected(true);
+                BigDecimal param = nacrt.kriteriji.get(sifra);
+                if (p.parametar() != null && param != null) p.parametar().setText(param.toPlainString());
+            }
+        }
+    }
+
+    // ---------- navigacija ----------
 
     @FXML
     private void onSaveClicked() {
+        Integer akGod = cijeli(txtAkGod);
+        Integer clanovi = cijeli(txtClanovi);
+        BigDecimal udaljenost = decimalni(txtUdaljenost);
 
-        if (txtAkGod.getText().isEmpty()
-                || txtClanovi.getText().isEmpty()
-                || txtUdaljenost.getText().isEmpty()) {
-            showAlert("Greška", "Sva polja su obavezna.");
+        if (akGod == null || clanovi == null || udaljenost == null) {
+            alert("Akademska godina, broj članova i udaljenost su obavezni i moraju biti brojevi.");
             return;
         }
-
-        int akGod, clanovi;
-        double udaljenost;
-
-        try {
-            akGod = Integer.parseInt(txtAkGod.getText());
-            clanovi = Integer.parseInt(txtClanovi.getText());
-            udaljenost = Double.parseDouble(txtUdaljenost.getText());
-        } catch (Exception e) {
-            showAlert("Greška", "Neispravan unos brojeva.");
-            return;
-        }
-
         if (akGod < LocalDate.now().getYear()) {
-            showAlert("Greška", "Akademska godina ne može biti manja od tekuće.");
+            alert("Akademska godina ne može biti manja od tekuće.");
+            return;
+        }
+        if (clanovi < 1) {
+            alert("Domaćinstvo ima najmanje jednog člana (studenta).");
             return;
         }
 
-        Prijava p = new Prijava();
-        p.setIdStudent(studentId);
-        p.setDatumPrijava(LocalDate.now());
-        p.setAkademskaGodina(akGod);
-        p.setNapomena(txtNapomena.getText());
-        p.setUkupniBodovi(0);
-        p.setStatusPrijave(new StatusPrijave(1, "Na čekanju"));
+        Map<String, BigDecimal> izabrani = new LinkedHashMap<>();
+        for (KriterijPolje p : polja) {
+            if (!p.chk().isSelected()) continue;
 
-        prijavaDAO.unesiPrijavu(p);
-        int prijavaId = p.getIdPrijava();
-
-        int dodatniBodovi = 0;
-        if (chkIzbjeglica.isSelected()) dodatniBodovi += 3;
-        if (chkBratSestra.isSelected()) dodatniBodovi += 2;
-
-        if (dodatniBodovi > 0) {
-            prijavaDAO.dodajBodoveNaPrijavu(prijavaId, dodatniBodovi);
+            BigDecimal param = null;
+            if (p.parametar() != null) {
+                param = decimalni(p.parametar());
+                if (param == null) {
+                    alert("Za kriterij '" + p.vrsta().naziv() + "' unesite "
+                            + p.vrsta().nazivParametra().toLowerCase() + ".");
+                    return;
+                }
+            }
+            izabrani.put(p.vrsta().sifra(), param);
         }
 
-        BraniociRezultat rezultat = null;
-        if (braniociController != null) {
-            rezultat = braniociController.izracunajBodove();
-        }
+        nacrt.akademskaGodina = akGod;
+        nacrt.brojClanova = clanovi;
+        nacrt.udaljenostKm = udaljenost;
+        nacrt.napomena = txtNapomena.getText();
+        nacrt.kriteriji.clear();
+        nacrt.kriteriji.putAll(izabrani);
 
-
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/views/dodaj-dokumente.fxml")
-            );
-            Parent root = loader.load();
-
-            DodajDokumenteController controller = loader.getController();
-
-            controller.setPrijavaId(prijavaId);
-
-
-            controller.setIzbjeglica(chkIzbjeglica.isSelected());
-            controller.setBratSestra(chkBratSestra.isSelected());
-            controller.setBraniociRezultat(rezultat);
-
-
-            controller.setProsjek(prosjek);
-            controller.setGodinaStudija(godinaStudija);
-            controller.setUdaljenost(udaljenost);
-
-
-            controller.setClanovi(clanovi);
-
-            Stage stage = (Stage) txtAkGod.getScene().getWindow();
-            stage.setScene(new Scene(root));
-
-            // BITNO: maximize tek nakon što se scena postavi
-            Platform.runLater(() -> {
-                stage.setMaximized(true);
-                stage.centerOnScreen();
-            });
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Greška", "Ne mogu otvoriti dokumente.");
-        }
+        Ekrani.<DodajDokumenteController>zamijeni(txtAkGod, "/views/dodaj-dokumente.fxml",
+                c -> c.setNacrt(nacrt));
     }
 
     @FXML
     private void onBackClicked() {
+        Ekrani.<NoviStudentController>zamijeni(txtAkGod, "/views/novi-student.fxml",
+                c -> c.setNacrt(nacrt));
+    }
+
+    // ---------- pomoćne ----------
+
+    private Integer cijeli(TextField t) {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/views/novi-student.fxml")
-            );
-            Parent root = loader.load();
-
-            Stage stage = (Stage) txtAkGod.getScene().getWindow();
-            stage.setScene(new Scene(root));
-
-            Platform.runLater(() -> {
-                stage.setMaximized(true);
-                stage.centerOnScreen();
-            });
-
+            return Integer.parseInt(t.getText().trim());
         } catch (Exception e) {
-            showAlert("Greška", "Ne mogu se vratiti nazad.");
+            return null;
         }
     }
 
-    private void ucitajBraniociFormu() {
+    private BigDecimal decimalni(TextField t) {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/views/DodajDokumenteSections/branioci-forma.fxml")
-            );
-            Node node = loader.load();
-            braniociController = loader.getController();
-            vboxBranioci.getChildren().setAll(node);
-
+            return new BigDecimal(t.getText().trim().replace(',', '.'));
         } catch (Exception e) {
-            showAlert("Greška", "Ne mogu učitati formu za branioce.");
+            return null;
         }
     }
 
-    private void showAlert(String title, String msg) {
-        Alert a = new Alert(Alert.AlertType.INFORMATION);
-        a.setTitle(title);
+    private void alert(String poruka) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION, poruka);
         a.setHeaderText(null);
-        a.setContentText(msg);
         a.showAndWait();
     }
 }

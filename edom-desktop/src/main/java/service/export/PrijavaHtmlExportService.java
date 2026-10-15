@@ -1,28 +1,28 @@
 package service.export;
 
+import ba.unze.edom.common.dto.PrijavaListaDTO;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-import dao.StudentDAO;
-import dto.PrijavaExportDTo;
-import model.Prijava;
-import model.Student;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-public class PrijavaHtmlExportService implements ExportService<PrijavaExportDTo>{
+public class PrijavaHtmlExportService implements ExportService<PrijavaListaDTO> {
+
+    private static final DateTimeFormatter DATUM = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
+
     @Override
-    public void exportData(java.util.List<PrijavaExportDTo> data, java.io.File file) {
-        // Implementacija izvoza Prijava u HTML format
+    public void exportData(List<PrijavaListaDTO> data, File file) {
         try {
-            // 1️⃣ Kreiranje HTML-a sa ispravljenim CSS-om
             StringBuilder html = new StringBuilder();
             html.append("<!DOCTYPE html>")
                     .append("<html xmlns=\"http://www.w3.org/1999/xhtml\">")
                     .append("<head>")
                     .append("<meta charset=\"UTF-8\"/>")
                     .append("<style>")
-                    // BITNO: Font dodijeljen SVIM elementima
                     .append("body, table, td, th, h1 { font-family: 'DejaVuSans', sans-serif; }")
                     .append("body { margin: 20px; font-size: 12px; }")
                     .append("h1 { text-align: center; color: #333; }")
@@ -42,39 +42,35 @@ public class PrijavaHtmlExportService implements ExportService<PrijavaExportDTo>
                     .append("<th>Prezime</th>")
                     .append("<th>Datum prijave</th>")
                     .append("<th>Fakultet</th>")
-                    .append("<th>Ukupni bodovi</th>")
+                    .append("<th>Bodovi (potvrđeno / moguće)</th>")
                     .append("<th>Status prijave</th>")
                     .append("</tr></thead>");
 
             html.append("<tbody>");
-            for (PrijavaExportDTo p : data) {
+            for (PrijavaListaDTO p : data) {
                 html.append("<tr>")
-                        .append("<td>").append(p.getIdPrijave()).append("</td>")
-                        .append("<td>").append(escapeHtml(p.getIme())).append("</td>")
-                        .append("<td>").append(escapeHtml(p.getPrezime())).append("</td>")
-                        .append("<td>").append(escapeHtml(p.getDatumPrijave().toString())).append("</td>")
-                        .append("<td>").append(escapeHtml(p.getFakultet())).append("</td>")
-                        .append("<td>").append(p.getUkupniBodovi()).append("</td>")
-                        .append("<td>").append(p.getStatus()).append("</td>")
+                        .append("<td>").append(p.idPrijava()).append("</td>")
+                        .append("<td>").append(escapeHtml(p.ime())).append("</td>")
+                        .append("<td>").append(escapeHtml(p.prezime())).append("</td>")
+                        .append("<td>").append(p.datumPrijave() != null ? p.datumPrijave().format(DATUM) : "").append("</td>")
+                        .append("<td>").append(escapeHtml(p.fakultet())).append("</td>")
+                        .append("<td>").append(escapeHtml(bodovi(p))).append("</td>")
+                        .append("<td>").append(escapeHtml(p.status())).append("</td>")
                         .append("</tr>");
             }
             html.append("</tbody></table></body></html>");
 
-            // 2️⃣ Kreiranje PDF-a
             try (OutputStream os = new FileOutputStream(file)) {
                 PdfRendererBuilder builder = new PdfRendererBuilder();
                 builder.useFastMode();
 
-                // Učitavanje fonta iz resources - MORA ostati otvoren dok builder ne završi
-                try (InputStream fontStream = StudentHtmlExportService.class.getResourceAsStream("/fonts/DejaVuSans.ttf")) {
+                try (InputStream fontStream = getClass().getResourceAsStream("/fonts/DejaVuSans.ttf")) {
 
                     if (fontStream == null) {
-                        throw new RuntimeException("CRVENI ALARM: Font nije nađen na /fonts/DejaVuSans.ttf. Provjeri module-info i rebuildaj projekt.");
+                        throw new RuntimeException("Font nije nađen na /fonts/DejaVuSans.ttf.");
                     }
 
                     builder.useFont(() -> fontStream, "DejaVuSans");
-
-                    // Ostatak koda...
                     builder.withHtmlContent(html.toString(), "");
                     builder.toStream(os);
                     builder.run();
@@ -82,9 +78,15 @@ public class PrijavaHtmlExportService implements ExportService<PrijavaExportDTo>
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("Greška prilikom generisanja PDF dokumenta: " + e.getMessage(), e);
         }
+    }
+
+    /** Isti prikaz kao u tabeli na ekranu. */
+    private String bodovi(PrijavaListaDTO p) {
+        if (p.greska() != null) return "neispravni podaci";
+        if (p.potvrdjeniBodovi() == null) return "";
+        return String.format("%.2f / %.2f", p.potvrdjeniBodovi(), p.potencijalniBodovi());
     }
 
     private String escapeHtml(String text) {

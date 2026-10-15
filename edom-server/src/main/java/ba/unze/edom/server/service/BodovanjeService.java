@@ -68,7 +68,8 @@ public class BodovanjeService {
                         + braniociSvi.map(StavkaBodovanja::bodovi).orElse(0.0)
                         + zbir(dodatni, false);
 
-        boolean konacno = Statusi.ODOBRENO.equals(nazivStatusa(p));
+        String st = nazivStatusa(p);
+        boolean konacno = Statusi.ODOBRENO.equals(st) || Statusi.ZAKLJUCENO.equals(st);
 
         return new RezultatBodovanja(
                 zaokruzi(potvrdjeno), zaokruzi(potencijalno), konacno, stavke);
@@ -87,22 +88,25 @@ public class BodovanjeService {
 
     // ---------------- USPJEH ----------------
 
-    private String bodoviUspjeh(Prijava p) {
+    private StavkaBodovanja bodoviUspjeh(Prijava p) {
 
         Integer godina = p.getGodinaStudija();
         BigDecimal prosjek = p.getProsjek();
-        boolean ver = p.isUspjehVerifikovan();          // <-- flag iz prijave
+        boolean ver = p.isUspjehVerifikovan();
 
         if (godina == null || prosjek == null) {
             return new StavkaBodovanja("Uspjeh", 0,
-                    "Prosjek ili godina studija nisu uneseni", ver);
+                    "Prosjek ili godina studija nisu uneseni", ver,
+                    KategorijaBodovanja.USPJEH);
         }
 
         double pr = prosjek.doubleValue();
 
         if (godina == GodineStudija.PRVA) {
             double b = pr * 9 + 1;
-            return KategorijaBodovanja.USPJEH;
+            return new StavkaBodovanja("Uspjeh (brucoš)", zaokruzi(b),
+                    "Prosjek " + pr, ver,
+                    KategorijaBodovanja.USPJEH);
         }
 
         int ispiti = p.getPolozeniIspiti() != null ? p.getPolozeniIspiti() : 0;
@@ -110,7 +114,8 @@ public class BodovanjeService {
 
         return new StavkaBodovanja("Uspjeh", zaokruzi(b),
                 "Prosjek " + pr + ", položenih ispita: " + ispiti
-                        + ", " + GodineStudija.naziv(godina), ver);
+                        + ", " + GodineStudija.naziv(godina), ver,
+                KategorijaBodovanja.USPJEH);
     }
 
     private double bonusGodine(int godina) {
@@ -133,7 +138,8 @@ public class BodovanjeService {
         boolean ver = p.isUdaljenostVerifikovana();
 
         if (p.getUdaljenostKm() == null) {
-            return new StavkaBodovanja("Udaljenost", 0, "Nije uneseno", ver);
+            return new StavkaBodovanja("Udaljenost", 0, "Nije uneseno", ver,
+                    KategorijaBodovanja.UDALJENOST);
         }
 
         double km = p.getUdaljenostKm().doubleValue();
@@ -145,7 +151,8 @@ public class BodovanjeService {
                 : 15;
 
         return new StavkaBodovanja("Udaljenost", b,
-                String.format("%.1f km", km), ver);
+                String.format("%.1f km", km), ver,
+                KategorijaBodovanja.UDALJENOST);
     }
 
     // ---------------- PRIMANJA ----------------
@@ -159,7 +166,8 @@ public class BodovanjeService {
 
         if (ukupno == null || clanova == null || clanova < 1) {
             return new StavkaBodovanja("Primanja domaćinstva", 0,
-                    "Nije uneseno", ver);
+                    "Nije uneseno", ver,
+                    KategorijaBodovanja.PRIMANJA);
         }
 
         double poClanu = ukupno.doubleValue() / clanova;
@@ -173,7 +181,8 @@ public class BodovanjeService {
 
         return new StavkaBodovanja("Primanja domaćinstva", b,
                 String.format("%.2f KM po članu (%d članova)", poClanu, clanova),
-                ver);
+                ver,
+                KategorijaBodovanja.PRIMANJA);
     }
 
     // ---------------- BRANIOCI ----------------
@@ -217,7 +226,8 @@ public class BodovanjeService {
 
         if (v.getBodovi() != null) {
             return new StavkaBodovanja(v.getNaziv(),
-                    v.getBodovi().doubleValue(), null, k.isVerifikovan());
+                    v.getBodovi().doubleValue(), null, k.isVerifikovan(),
+                    v.getGrupa());
         }
 
         double param = k.getParametar() != null
@@ -235,7 +245,8 @@ public class BodovanjeService {
                 : null;
 
         return new StavkaBodovanja(v.getNaziv(), zaokruzi(b),
-                obrazlozenje, k.isVerifikovan());
+                obrazlozenje, k.isVerifikovan(),
+                v.getGrupa());
     }
 
     private double zaokruzi(double d) {

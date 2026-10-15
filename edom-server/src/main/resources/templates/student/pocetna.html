@@ -4,6 +4,7 @@
     <th:block th:replace="~{fragments/layout :: head}"></th:block>
     <title>E-Dom — Moje prijave</title>
     <link rel="stylesheet" th:href="@{/css/student.css}">
+    <link rel="stylesheet" th:href="@{/css/upute.css}">
 </head>
 <body class="app">
 
@@ -42,6 +43,7 @@
             <h3>Još nemate nijednu prijavu</h3>
             <p>Podnesite prijavu za smještaj za tekuću akademsku godinu. Traje samo nekoliko minuta.</p>
             <a class="btn btn-primary" th:href="@{/student/prijava/nova}">Podnesi prijavu</a>
+            <a class="btn-link" th:href="@{/upute}">Prvo pogledajte šta trebate pripremiti →</a>
         </div>
 
         <!-- tabela prijava -->
@@ -100,6 +102,28 @@
             <span class="quick-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
             <div><b>Moj profil</b><span>Lični podaci i promjena lozinke</span></div>
         </a>
+    </section>
+
+    <!-- ======================= UKRATKO O PRIJAVI ======================= -->
+    <section class="up-kratko-blok">
+        <span class="up-eyebrow">Konkurs 2026/2027</span>
+        <h2>Ukratko o prijavi</h2>
+
+        <div class="up-kratko">
+            <ul class="up-kratko-list">
+                <li><span><b>Ko se može prijaviti:</b> redovni studenti fakulteta Univerziteta u Zenici čije je prebivalište najmanje 20 km od Zenice.</span></li>
+                <li><span><b>Broj mjesta:</b> 220, od čega do 35% za brucoše.</span></li>
+                <li><span><b>Prijava online:</b> popunite prijavu i priložite skenirane dokumente.</span></li>
+                <li><span><b>Originali:</b> dokumenti se boduju tek kad originali ili ovjerene kopije stignu u Studentski centar (Crkvice 50, Zenica).</span></li>
+                <li><span><b>Rokovi:</b> konkurs traje 30 dana od objave; dokumenti ne smiju biti stariji od 6 mjeseci.</span></li>
+            </ul>
+
+            <div class="up-kratko-side">
+                <h3>Šta sve trebam pripremiti?</h3>
+                <p>Pogledajte postupak korak po korak, spisak dokumenata koji možete štiklirati i primjer popunjene uplatnice.</p>
+                <a class="btn btn-primary" th:href="@{/upute}">Kako se prijaviti →</a>
+            </div>
+        </div>
     </section>
 
 </main>

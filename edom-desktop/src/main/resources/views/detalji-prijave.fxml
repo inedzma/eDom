@@ -23,8 +23,8 @@
     <center>
         <GridPane styleClass="main-grid" hgap="18" vgap="18">
             <columnConstraints>
-                <ColumnConstraints percentWidth="65"/>
-                <ColumnConstraints percentWidth="35"/>
+                <ColumnConstraints percentWidth="62"/>
+                <ColumnConstraints percentWidth="38"/>
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints vgrow="ALWAYS"/>
@@ -40,7 +40,7 @@
                 </HBox>
                 <ProgressBar fx:id="pbKompletiranost" progress="0.0" maxWidth="Infinity" styleClass="progress"/>
 
-                <TableView fx:id="tblBodovanje" styleClass="table-modern" prefHeight="220">
+                <TableView fx:id="tblBodovanje" styleClass="table-modern" prefHeight="260" minHeight="200">
                     <columns>
                         <TableColumn fx:id="colStavka" text="Stavka" prefWidth="220"/>
                         <TableColumn fx:id="colObrazlozenje" text="Obrazloženje" prefWidth="300"/>
@@ -53,8 +53,8 @@
 
                 <TableView fx:id="tblDokumenti" styleClass="table-modern" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colNaziv" text="Naziv" prefWidth="220"/>
-                        <TableColumn fx:id="colVrsta" text="Vrsta" prefWidth="220"/>
+                        <TableColumn fx:id="colNaziv" text="Naziv" prefWidth="240"/>
+                        <TableColumn fx:id="colVrsta" text="Vrsta" prefWidth="200"/>
                         <TableColumn fx:id="colDatum" text="Datum" prefWidth="110"/>
                         <TableColumn fx:id="colDostavljen" text="Dostavljen" prefWidth="100"/>
                         <TableColumn fx:id="colPregled" text="" prefWidth="110"/>
@@ -65,45 +65,50 @@
                     <Label text="Nema priloženih dokumenata" styleClass="empty-title"/>
                     <Label text="Student još nije priložio nijedan dokument." styleClass="empty-subtitle"/>
                 </VBox>
-
-                <HBox alignment="CENTER_LEFT" styleClass="delete-zone">
-                    <Button fx:id="btnObrisi" text="Obriši prijavu" onAction="#onObrisiPrijavu"
-                            styleClass="btn-danger" prefWidth="120"/>
-                </HBox>
             </VBox>
 
-            <!-- DESNO: sažetak, podaci, akcije -->
-            <VBox spacing="14" styleClass="side-panel" GridPane.columnIndex="1">
+            <!-- DESNO: sažetak, provjera, status, podaci -->
+            <ScrollPane GridPane.columnIndex="1" fitToWidth="true" hbarPolicy="NEVER">
+                <VBox spacing="14" styleClass="side-panel">
 
-                <VBox styleClass="stat-card">
-                    <Label text="Bodovi (potvrđeno / moguće)" styleClass="stat-title"/>
-                    <Label fx:id="lblUkupniBodoviValue" text="—" styleClass="stat-value"/>
-                </VBox>
+                    <VBox styleClass="stat-card">
+                        <Label text="Bodovi (potvrđeno / moguće)" styleClass="stat-title"/>
+                        <Label fx:id="lblUkupniBodoviValue" text="—" styleClass="stat-value"/>
+                    </VBox>
 
-                <VBox styleClass="stat-card">
-                    <Label text="Priloženi dokumenti" styleClass="stat-title"/>
-                    <Label fx:id="lblDostavljeniCount" text="0" styleClass="stat-value"/>
-                </VBox>
+                    <VBox styleClass="stat-card">
+                        <Label text="Status obrade" styleClass="stat-title"/>
+                        <Label fx:id="lblStatusObrade" styleClass="stat-value-small"/>
+                    </VBox>
 
-                <VBox styleClass="stat-card">
-                    <Label text="Status obrade" styleClass="stat-title"/>
-                    <Label fx:id="lblStatusObrade" styleClass="stat-value-small"/>
-                </VBox>
+                    <VBox spacing="10" styleClass="stat-card">
+                        <Label text="Provjera dokumenata" styleClass="stat-title"/>
+                        <VBox fx:id="vboxProvjera" spacing="8"/>
+                        <Button fx:id="btnSacuvajProvjeru" text="Sačuvaj provjeru"
+                                onAction="#onSacuvajProvjeru" styleClass="btn-primary"/>
+                    </VBox>
 
-                <VBox spacing="6" styleClass="stat-card">
-                    <Label text="Podaci prijave" styleClass="stat-title"/>
-                    <Label fx:id="lblPodaci" wrapText="true"/>
-                </VBox>
+                    <VBox spacing="10" styleClass="stat-card">
+                        <Label text="Promijeni status" styleClass="stat-title"/>
+                        <ComboBox fx:id="cmbStatusPrijave" maxWidth="Infinity" styleClass="combo-modern"/>
+                        <Label text="Napomena za studenta (obavezna kod odbijanja)"
+                               wrapText="true" styleClass="muted"/>
+                        <TextArea fx:id="txtNapomenaAdmina" prefRowCount="3" wrapText="true"/>
+                        <Button fx:id="btnSacuvajStatus" text="Sačuvaj status"
+                                onAction="#onSacuvajStatus" styleClass="btn-primary"/>
+                    </VBox>
 
-                <VBox spacing="10" styleClass="stat-card">
-                    <Label text="Promijeni status" styleClass="stat-title"/>
-                    <ComboBox fx:id="cmbStatusPrijave" styleClass="combo-modern"/>
-                    <Button fx:id="btnSacuvajStatus" text="Sačuvaj status"
-                            onAction="#onSacuvajStatus" styleClass="btn-primary"/>
-                    <Button fx:id="btnPosaljiEmail" text="Pošalji email studentu"
-                            onAction="#onPosaljiEmail" styleClass="btn-secondary"/>
+                    <VBox spacing="6" styleClass="stat-card">
+                        <Label text="Podaci prijave" styleClass="stat-title"/>
+                        <Label fx:id="lblPodaci" wrapText="true" maxWidth="Infinity"/>
+                    </VBox>
+
+                    <VBox styleClass="stat-card">
+                        <Label text="Priloženi dokumenti" styleClass="stat-title"/>
+                        <Label fx:id="lblDostavljeniCount" text="0" styleClass="stat-value"/>
+                    </VBox>
                 </VBox>
-            </VBox>
+            </ScrollPane>
         </GridPane>
     </center>
 

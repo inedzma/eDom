@@ -1,8 +1,6 @@
 package api;
 
-import ba.unze.edom.common.dto.DokumentSadrzajDTO;
-import ba.unze.edom.common.dto.PrijavaDetaljiDTO;
-import ba.unze.edom.common.dto.PrijavaListaDTO;
+import ba.unze.edom.common.dto.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.util.List;
@@ -24,5 +22,13 @@ public final class PrijavaApi {
     public static String sadrzajDokumenta(int idPrijave, int idDokumenta) {
         return ApiClient.get("/api/prijave/" + idPrijave + "/dokumenti/" + idDokumenta + "/sadrzaj",
                 DokumentSadrzajDTO.class).b64();
+    }
+
+    public static PrijavaDetaljiDTO verifikuj(int idPrijave, VerifikacijaDTO z) {
+        return ApiClient.put("/api/prijave/" + idPrijave + "/verifikacija", z, PrijavaDetaljiDTO.class);
+    }
+
+    public static PrijavaDetaljiDTO promijeniStatus(int idPrijave, PromjenaStatusaDTO z) {
+        return ApiClient.put("/api/prijave/" + idPrijave + "/status", z, PrijavaDetaljiDTO.class);
     }
 }

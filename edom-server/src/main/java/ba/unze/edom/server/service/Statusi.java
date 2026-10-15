@@ -6,5 +6,7 @@ public final class Statusi {
     public static final String ODOBRENO   = "odobreno";
     public static final String ODBIJENO   = "odbijeno";
 
+    public static final String ZAKLJUCENO = "zaključeno";
+
     private Statusi() {}
 }

@@ -4,31 +4,12 @@
     <th:block th:replace="~{fragments/layout :: head}"></th:block>
     <title>E-Dom — Prijava za smještaj</title>
     <link rel="stylesheet" th:href="@{/css/pocetna.css}">
+    <link rel="stylesheet" th:href="@{/css/upute.css}">
 </head>
 <body class="landing">
 
 <!-- ======================= NAVBAR (javni) ======================= -->
-<header class="navbar">
-    <div class="navbar-inner">
-        <a class="nav-brand" th:href="@{/}">
-            <img th:src="@{/img/studentski-centar-logo.png}" alt="Studentski centar Zenica">
-            <div class="nav-brand-text">
-                <strong>E-Dom</strong>
-                <span>Studentski centar Zenica</span>
-            </div>
-        </a>
-
-        <nav class="pub-links">
-            <a th:href="@{/rang-lista}">Rang lista</a>
-            <a href="#postupak">Postupak</a>
-        </nav>
-
-        <div class="pub-actions">
-            <a class="btn btn-ghost btn-sm" th:href="@{/login}">Prijavi se</a>
-            <a class="btn btn-primary btn-sm" th:href="@{/registracija}">Registruj se</a>
-        </div>
-    </div>
-</header>
+<header th:replace="~{fragments/layout :: navbarJavni('pocetna')}"></header>
 
 <main>
     <!-- ======================= HERO ======================= -->
@@ -58,7 +39,31 @@
             </div>
         </div>
     </section>
+    <!-- ======================= UKRATKO O PRIJAVI =======================
+             Ubaci odmah ispod HERO sekcije u pocetna.html,
+             a u <head> dodaj: <link rel="stylesheet" th:href="@{/css/upute.css}">  -->
+    <section class="section">
+        <div class="section-inner">
+            <span class="eyebrow dark">Konkurs 2026/2027</span>
+            <h2>Ukratko o prijavi</h2>
 
+            <div class="up-kratko">
+                <ul class="up-kratko-list">
+                    <li><span><b>Ko se može prijaviti:</b> redovni studenti fakulteta Univerziteta u Zenici čije je prebivalište najmanje 20 km od Zenice.</span></li>
+                    <li><span><b>Broj mjesta:</b> 220, od čega do 35% za brucoše.</span></li>
+                    <li><span><b>Prijava online:</b> registrujte se, popunite prijavu i priložite skenirane dokumente.</span></li>
+                    <li><span><b>Originali:</b> dokumenti se boduju tek kad originali ili ovjerene kopije stignu u Studentski centar (Crkvice 50, Zenica).</span></li>
+                    <li><span><b>Rokovi:</b> konkurs traje 30 dana od objave; dokumenti ne smiju biti stariji od 6 mjeseci.</span></li>
+                </ul>
+
+                <div class="up-kratko-side">
+                    <h3>Šta sve trebam pripremiti?</h3>
+                    <p>Pogledajte postupak korak po korak i spisak dokumenata koji možete štiklirati dok ih prikupljate.</p>
+                    <a class="btn btn-primary" th:href="@{/upute}">Kako se prijaviti →</a>
+                </div>
+            </div>
+        </div>
+    </section>
     <!-- ======================= POSTUPAK ======================= -->
     <section class="section" id="postupak">
         <div class="section-inner">

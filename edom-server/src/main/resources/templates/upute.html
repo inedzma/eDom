@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="bs" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
+    <title>E-Dom — Kako se prijaviti</title>
+    <link rel="stylesheet" th:href="@{/css/pocetna.css}">
+    <link rel="stylesheet" th:href="@{/css/upute.css}">
+</head>
+<body class="landing">
+
+<!-- ======================= NAVBAR =======================
+     Prijavljeni student vidi svoj navbar, posjetilac javni. -->
+<th:block sec:authorize="isAuthenticated()">
+    <header th:replace="~{fragments/layout :: navbarStudent('upute')}"></header>
+</th:block>
+<th:block sec:authorize="!isAuthenticated()">
+    <header th:replace="~{fragments/layout :: navbarJavni('upute')}"></header>
+</th:block>
+
+<main>
+
+    <!-- ======================= HERO ======================= -->
+    <section class="up-hero">
+        <div class="section-inner">
+            <span class="eyebrow">Konkurs za akademsku 2026/2027. godinu</span>
+            <h1>Kako se prijaviti za smještaj</h1>
+            <p class="up-hero-lead">
+                Prijavu podnosite online kroz E-Dom, a originale ili ovjerene kopije dokumenata
+                donosite u Studentski centar. Ovdje je sve što trebate znati, korak po korak.
+            </p>
+
+            <ul class="up-facts">
+                <li>
+                    <b>220</b>
+                    <span>mjesta za smještaj i ishranu</span>
+                </li>
+                <li>
+                    <b>do 35%</b>
+                    <span>mjesta za brucoše</span>
+                </li>
+                <li>
+                    <b>20 km</b>
+                    <span>najmanja udaljenost prebivališta od Zenice</span>
+                </li>
+                <li>
+                    <b>30 dana</b>
+                    <span>od objave konkursa traje prijava</span>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ======================= USLOVI ======================= -->
+    <section class="section">
+        <div class="section-inner">
+            <span class="eyebrow dark">Ko se može prijaviti</span>
+            <h2>Uslovi</h2>
+
+            <div class="up-grid-3">
+                <div class="up-card">
+                    <span class="up-card-ic">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg>
+                    </span>
+                    <h3>Redovni student UNZE</h3>
+                    <p>Prijaviti se mogu redovni studenti fakulteta Univerziteta u Zenici, uključujući i buduće brucoše.</p>
+                </div>
+                <div class="up-card">
+                    <span class="up-card-ic">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </span>
+                    <h3>Najmanje 20 km od Zenice</h3>
+                    <p>Mjesto prebivališta, odnosno boravišta, mora biti udaljeno od Zenice najmanje 20 km.</p>
+                </div>
+                <div class="up-card">
+                    <span class="up-card-ic">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+                    </span>
+                    <h3>Državljani BiH i strani državljani</h3>
+                    <p>Konkurs je otvoren za državljane BiH i strane državljane koji ispunjavaju ostale uslove.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= KORACI ======================= -->
+    <section class="section up-section-alt" id="koraci">
+        <div class="section-inner">
+            <span class="eyebrow dark">Postupak</span>
+            <h2>Korak po korak</h2>
+            <p class="section-lead">Od registracije do useljenja u Studentski centar.</p>
+
+            <ol class="up-timeline">
+                <li>
+                    <span class="up-tl-num">1</span>
+                    <div class="up-tl-body">
+                        <h3>Registrujte se na E-Dom</h3>
+                        <p>Napravite nalog sa svojim JMBG-om, brojem indeksa i e-mail adresom. E-mail je ujedno i vaše korisničko ime.</p>
+                        <a class="up-tl-link" th:href="@{/registracija}" sec:authorize="!isAuthenticated()">Registracija →</a>
+                        <span class="up-tl-gotovo" sec:authorize="isAuthenticated()">✓ Već imate nalog</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="up-tl-num">2</span>
+                    <div class="up-tl-body">
+                        <h3>Prikupite dokumente</h3>
+                        <p>Pogledajte <a href="#dokumenti">spisak dokumenata</a> ispod i označite šta već imate. Dokumenti ne smiju biti stariji od 6 mjeseci.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="up-tl-num">3</span>
+                    <div class="up-tl-body">
+                        <h3>Popunite prijavu online</h3>
+                        <p>Unesite podatke o studiju, domaćinstvu i dodatnim kriterijima. Sistem vam odmah prikazuje koliko bodova možete ostvariti.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="up-tl-num">4</span>
+                    <div class="up-tl-body">
+                        <h3>Priložite skenirane dokumente</h3>
+                        <p>Uz prijavu priložite skenove ili fotografije dokumenata (JPG, PNG ili PDF). Tako komisija može ranije pregledati vašu prijavu.</p>
+                    </div>
+                </li>
+                <li class="up-tl-vazno">
+                    <span class="up-tl-num">5</span>
+                    <div class="up-tl-body">
+                        <h3>Dostavite originale ili ovjerene kopije</h3>
+                        <p>
+                            Dokumenti se boduju tek kada originali ili ovjerene kopije stignu u Studentski centar.
+                            Možete ih donijeti lično ili poslati poštom na adresu:
+                        </p>
+                        <address class="up-adresa">
+                            JU Univerzitet u Zenici<br>
+                            OJ Studentski centar<br>
+                            Ul. Crkvice br. 50, Zenica
+                        </address>
+                    </div>
+                </li>
+                <li>
+                    <span class="up-tl-num">6</span>
+                    <div class="up-tl-body">
+                        <h3>Pratite status i rang listu</h3>
+                        <p>Nakon provjere dobijate e-mail sa odlukom i spiskom bodovanih stavki. Rang lista se objavljuje na oglasnoj ploči i web stranici Studentskog centra, kao i u E-Domu.</p>
+                        <a class="up-tl-link" th:href="@{/rang-lista}">Rang lista →</a>
+                    </div>
+                </li>
+                <li>
+                    <span class="up-tl-num">7</span>
+                    <div class="up-tl-body">
+                        <h3>Useljenje</h3>
+                        <p>Pri potpisivanju ugovora donosite ljekarsko uvjerenje o podobnosti za kolektivno stanovanje i besplatno se slikate u upravi Centra.</p>
+                        <ul class="up-mini-list">
+                            <li><b>Brucoši</b> donose potvrdu o upisu na fakultet.</li>
+                            <li><b>Starije godine</b> dostavljaju potvrdu o upisu u 2026/2027. najkasnije do <b>01.11.2026.</b>, inače gube pravo na smještaj.</li>
+                        </ul>
+                    </div>
+                </li>
+            </ol>
+
+            <div class="up-info">
+                <b>Ne možete se prijaviti online?</b>
+                Prijavu možete predati i lično u Studentskom centru. Uposlenik je unosi u sistem,
+                a vi na e-mail dobijate nalog i upute kako da pratite status prijave.
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= DOKUMENTI ======================= -->
+    <section class="section" id="dokumenti">
+        <div class="section-inner">
+            <div class="up-docs-head">
+                <div>
+                    <span class="eyebrow dark">Šta pripremiti</span>
+                    <h2>Potrebni dokumenti</h2>
+                    <p class="section-lead">Označite dokumente koje ste prikupili. Oznake se pamte u vašem pregledniku.</p>
+                </div>
+                <div class="up-progress" aria-live="polite">
+                    <span id="up-progress-text">0 / 6 obaveznih dokumenata</span>
+                    <div class="up-progress-track"><div class="up-progress-bar" id="up-progress-bar"></div></div>
+                    <button type="button" class="btn btn-outline btn-sm up-print" onclick="window.print()">Isprintaj spisak</button>
+                </div>
+            </div>
+
+            <!-- A: obavezni -->
+            <div class="up-group">
+                <h3 class="up-group-title"><span class="up-tag up-tag--req">Obavezno</span> Za sve kandidate</h3>
+                <ul class="up-checklist">
+                    <li class="up-check">
+                        <label>
+                            <input type="checkbox" data-key="obrazac" data-obavezno>
+                            <span>
+                                <b>Prijava za prijem u Studentski centar</b>
+                                <small>Obrazac se preuzima u Studentskom centru ili na web stranici Centra.</small>
+                            </span>
+                        </label>
+                    </li>
+                    <li class="up-check">
+                        <label>
+                            <input type="checkbox" data-key="uspjeh" data-obavezno>
+                            <span>
+                                <b>Dokaz o uspjehu</b>
+                                <small><b>Studenti:</b> uvjerenje fakulteta da ste redovan student s položenim ispitima iz prethodnih godina, ili ovjerena kopija indeksa s ocjenama.<br>
+                                    <b>Brucoši:</b> ovjerena kopija svjedočanstva iz IV razreda srednje škole.</small>
+                            </span>
+                        </label>
+                    </li>
+                    <li class="up-check">
+                        <label>
+                            <input type="checkbox" data-key="kucna" data-obavezno>
+                            <span>
+                                <b>Uvjerenje o zajedničkom domaćinstvu (kućna lista)</b>
+                                <small>Uz to, za svakog člana domaćinstva po jedan dokument o primanjima — pogledajte tabelu ispod.</small>
+                            </span>
+                        </label>
+                    </li>
+                    <li class="up-check">
+                        <label>
+                            <input type="checkbox" data-key="cips" data-obavezno>
+                            <span>
+                                <b>Potvrda o mjestu stalnog boravka (CIPS)</b>
+                                <small>Strani državljani prilažu kopiju pasoša.</small>
+                            </span>
+                        </label>
+                    </li>
+                    <li class="up-check">
+                        <label>
+                            <input type="checkbox" data-key="uplatnica" data-obavezno>
+                            <span>
+                                <b>Uplatnica na 10,00 KM</b>
+                                <small>Troškovi obrade podataka. Podaci za uplatu su <a href="#uplatnica">ispod</a>.</small>
+                            </span>
+                        </label>
+                    </li>
+                    <li class="up-check">
+                        <label>
+                            <input type="checkbox" data-key="garancija" data-obavezno>
+                            <span>
+                                <b>Ovjerena garancija</b>
+                                <small>Garancija o preuzimanju obaveza, ovjerena u općini ili kod notara. Obrazac se preuzima u Centru ili na web stranici. Garant prilaže svoje dokumente — pogledajte ispod.</small>
+                            </span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- B: članovi domaćinstva -->
+            <div class="up-group">
+                <h3 class="up-group-title"><span class="up-tag">Za svakog člana</span> Primanja po članu domaćinstva</h3>
+                <p class="up-group-lead">Za svakog člana domaćinstva prilaže se <b>jedan</b> dokument, zavisno od njegovog statusa:</p>
+                <div class="up-table-wrap">
+                    <table class="up-table">
+                        <thead>
+                        <tr><th>Član domaćinstva je…</th><th>Prilaže se</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr><td>zaposlen</td><td>tri zadnje platne liste</td></tr>
+                        <tr><td>penzioner</td><td>tri zadnja čeka od penzije</td></tr>
+                        <tr><td>na birou rada</td><td>potvrda sa biroa</td></tr>
+                        <tr><td>nezaposlen i nije na birou</td><td>ovjerena kopija zdravstvene knjižice</td></tr>
+                        <tr><td>učenik ili student</td><td>potvrda iz škole ili fakulteta</td></tr>
+                        <tr><td>dijete do polaska u školu</td><td>ovjerena kopija zdravstvene knjižice</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- C: garant -->
+            <div class="up-group">
+                <h3 class="up-group-title"><span class="up-tag">Uz garanciju</span> Dokumenti garanta</h3>
+                <div class="up-grid-3">
+                    <div class="up-card up-card--small">
+                        <h4>Garant je zaposlen</h4>
+                        <p>Potvrda o stalnom radnom odnosu i tri posljednje platne liste.</p>
+                    </div>
+                    <div class="up-card up-card--small">
+                        <h4>Garant je penzioner</h4>
+                        <p>Tri posljednja čeka od penzije i ovjerena kopija rješenja o penzionisanju.</p>
+                    </div>
+                    <div class="up-card up-card--small">
+                        <h4>Garant je vlasnik firme</h4>
+                        <p>Garancija ovjerena pečatom i potpisom ovlaštenog lica, uz ovjerenu kopiju ID i PDV broja firme.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- D: dodatni bodovi -->
+            <div class="up-group">
+                <h3 class="up-group-title"><span class="up-tag up-tag--opt">Ako se odnosi na vas</span> Dodatni bodovi</h3>
+                <p class="up-group-lead">Ako ostvarujete dodatne bodove po nekom osnovu, dokazujete ga jednim od sljedećih dokumenata:</p>
+                <ul class="up-checklist up-checklist--cols">
+                    <li class="up-check"><label><input type="checkbox" data-key="nagrade"><span><b>Nagrade</b><small>Potvrda o osvojenim nagradama na kantonalnim, federalnim, državnim ili međunarodnim takmičenjima (nastavnim i sportskim).</small></span></label></li>
+                    <li class="up-check"><label><input type="checkbox" data-key="invalidnost"><span><b>Invalidnost</b><small>Potvrda o stepenu invalidnosti — lične, roditelja ili staratelja.</small></span></label></li>
+                    <li class="up-check"><label><input type="checkbox" data-key="poginuli"><span><b>Poginuli, nestali ili umrli članovi porodice</b><small>Potvrda o poginulim, nestalim i umrlim članovima uže porodice.</small></span></label></li>
+                    <li class="up-check"><label><input type="checkbox" data-key="logoras"><span><b>Logoraški status</b><small>Lični ili roditelja/staratelja, izdat od Međunarodnog Crvenog krsta.</small></span></label></li>
+                    <li class="up-check"><label><input type="checkbox" data-key="osrbih"><span><b>Učešće roditelja u OS RBiH</b><small>Potvrda s provedenim vremenom.</small></span></label></li>
+                    <li class="up-check"><label><input type="checkbox" data-key="izbjeglica"><span><b>Izbjeglički / raseljenički status</b><small>Potvrda nadležne institucije.</small></span></label></li>
+                </ul>
+            </div>
+
+            <div class="up-info up-info--neutral">
+                <b>Strani državljani</b> dostavljaju: prijavu, dokaz o uspjehu, kopiju pasoša, uplatnicu i ovjerenu garanciju.
+                Kućna lista i dokumenti o primanjima se ne traže.
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= UPLATNICA ======================= -->
+    <section class="section up-section-alt" id="uplatnica">
+        <div class="section-inner">
+            <span class="eyebrow dark">Uplata</span>
+            <h2>Podaci za uplatnicu</h2>
+            <p class="section-lead">Uplatnica za javne prihode na iznos od <b>10,00 KM</b> za troškove obrade podataka. Ovako izgleda popunjena:</p>
+
+            <figure class="upl-slika">
+                <a th:href="@{/img/uplatnica-primjer.png}" target="_blank" rel="noopener" title="Otvori u punoj veličini">
+                    <img th:src="@{/img/uplatnica-primjer.png}"
+                         alt="Primjer popunjene uplatnice: svrha doznake Troškovi obrade podataka, primalac Javni prihodi ZE-DO kantona, račun primaoca 1340100000001672, iznos 10,00 KM, vrsta prihoda 722659, općina 103, budžetska organizacija 2204010, poziv na broj 4810011448.">
+                </a>
+                <figcaption>
+                    Umjesto teksta velikim slovima upišite svoje ime i prezime, adresu, broj telefona i JMBG.
+                    <a href="https://sc.unze.ba/wp-content/uploads/2024/07/Uputa-za-uplatu-troskovi-obrade.pdf"
+                       target="_blank" rel="noopener">Zvanična uputa za uplatu (PDF) →</a>
+                </figcaption>
+            </figure>
+        </div>
+    </section>
+
+    <!-- ======================= VAŽNO ======================= -->
+    <section class="section">
+        <div class="section-inner">
+            <span class="eyebrow dark">Prije predaje</span>
+            <h2>Važno</h2>
+            <ul class="up-warnings">
+                <li>Svi dokumenti moraju biti <b>original ili ovjerena kopija</b>, izdati od nadležnih institucija.</li>
+                <li>Dokumenti <b>ne smiju biti stariji od 6 mjeseci</b>.</li>
+                <li><b>Nepotpuna i neblagovremeno dostavljena</b> dokumentacija se ne razmatra.</li>
+                <li>Skenirani dokumenti u E-Domu služe za pregled — <b>boduje se tek kad stigne original</b> ili ovjerena kopija.</li>
+                <li>Ako bude nedovoljno primljenih kandidata, početkom oktobra raspisuje se <b>naknadni konkurs</b>.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ======================= CTA ======================= -->
+    <section class="section section--tight">
+        <div class="section-inner">
+            <!-- posjetilac -->
+            <div class="cta-card" sec:authorize="!isAuthenticated()">
+                <div>
+                    <h2>Spremni ste?</h2>
+                    <p>Registrujte se i podnesite prijavu — dokumente možete priložiti i kasnije, dok je konkurs otvoren.</p>
+                </div>
+                <div class="up-cta-actions">
+                    <a class="btn btn-primary btn-lg" th:href="@{/registracija}">Registruj se</a>
+                    <a class="btn btn-outline btn-lg" th:href="@{/login}">Već imam nalog</a>
+                </div>
+            </div>
+
+            <!-- prijavljeni student -->
+            <div class="cta-card" sec:authorize="isAuthenticated()">
+                <div>
+                    <h2>Spremni ste?</h2>
+                    <p>Podnesite prijavu za tekuću akademsku godinu — dokumente možete priložiti i kasnije, dok je konkurs otvoren.</p>
+                </div>
+                <div class="up-cta-actions">
+                    <a class="btn btn-primary btn-lg" th:href="@{/student/prijava/nova}">Podnesi prijavu</a>
+                    <a class="btn btn-outline btn-lg" th:href="@{/student/pocetna}">Moje prijave</a>
+                </div>
+            </div>
+
+            <p class="up-izvor">
+                Upute su napravljene na osnovu zvaničnog
+                <a href="https://sc.unze.ba/wp-content/uploads/2026/08/SC-Konkurs-2026-2027.pdf" target="_blank" rel="noopener">Konkursa za akademsku 2026/2027. godinu (PDF)</a>.
+                U slučaju razlike, važi tekst konkursa.
+            </p>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+
+<script>
+    (function () {
+        var KLJUC = 'edom-upute-dokumenti';
+        var stanje = {};
+        try { stanje = JSON.parse(localStorage.getItem(KLJUC)) || {}; } catch (e) { stanje = {}; }
+
+        var sve = document.querySelectorAll('.up-check input[type=checkbox]');
+        var obavezni = document.querySelectorAll('.up-check input[data-obavezno]');
+        var tekst = document.getElementById('up-progress-text');
+        var traka = document.getElementById('up-progress-bar');
+
+        function osvjezi() {
+            var ok = 0;
+            obavezni.forEach(function (b) { if (b.checked) ok++; });
+            tekst.textContent = ok + ' / ' + obavezni.length + ' obaveznih dokumenata';
+            traka.style.width = (obavezni.length ? ok / obavezni.length * 100 : 0) + '%';
+            traka.classList.toggle('gotovo', ok === obavezni.length);
+        }
+
+        sve.forEach(function (b) {
+            b.checked = !!stanje[b.dataset.key];
+            b.addEventListener('change', function () {
+                stanje[b.dataset.key] = b.checked;
+                try { localStorage.setItem(KLJUC, JSON.stringify(stanje)); } catch (e) { /* bez pamćenja */ }
+                osvjezi();
+            });
+        });
+        osvjezi();
+
+    })();
+</script>
+</body>
+</html>

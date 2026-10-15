@@ -76,7 +76,11 @@
                            styleClass="modern-accordion"/>
 
                 <HBox alignment="CENTER" spacing="16" styleClass="footer-box">
-                    <Button text="Podnesi prijavu"
+                    <Button text="← Nazad"
+                            onAction="#onNazad"
+                            styleClass="btn-back"/>
+                    <Button fx:id="btnPodnesi"
+                            text="Podnesi prijavu"
                             onAction="#onPodnesiPrijavu"
                             prefWidth="240"
                             styleClass="btn-next"/>

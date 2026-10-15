@@ -1,9 +1,9 @@
 package ba.unze.edom.server.api;
 
-import ba.unze.edom.common.dto.DokumentSadrzajDTO;
-import ba.unze.edom.common.dto.PrijavaDetaljiDTO;
-import ba.unze.edom.common.dto.PrijavaListaDTO;
+import ba.unze.edom.common.dto.*;
 import ba.unze.edom.server.service.PrijavaAdminService;
+import ba.unze.edom.server.service.RucniUnosService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,5 +33,23 @@ public class PrijavaApiController {
                                       @PathVariable Integer idDokumenta) {
         return new DokumentSadrzajDTO(
                 prijavaAdminService.sadrzajDokumenta(idPrijave, idDokumenta));
+    }
+
+    private final RucniUnosService rucniUnosService;
+
+    @PostMapping("/rucni-unos")
+    public RucniUnosRezultatDTO rucniUnos(@Valid @RequestBody RucniUnosDTO zahtjev) {
+        return rucniUnosService.unesi(zahtjev);
+    }
+
+    @PutMapping("/{id}/verifikacija")
+    public PrijavaDetaljiDTO verifikuj(@PathVariable Integer id, @RequestBody VerifikacijaDTO z) {
+        return prijavaAdminService.verifikuj(id, z);
+    }
+
+    @PutMapping("/{id}/status")
+    public PrijavaDetaljiDTO promijeniStatus(@PathVariable Integer id,
+                                             @Valid @RequestBody PromjenaStatusaDTO z) {
+        return prijavaAdminService.promijeniStatus(id, z);
     }
 }

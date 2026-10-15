@@ -76,6 +76,9 @@ public class Prijava {
     @Column(name = "udaljenost_verifikovana", nullable = false)
     private boolean udaljenostVerifikovana = false;
 
+    @Column(name = "napomena_administratora", length = 500)
+    private String napomenaAdmina;
+
     public void dodajKriterij(PrijavaKriterij k) {
         kriteriji.add(k);
         k.setPrijava(this);

@@ -1,5 +1,6 @@
 package ba.unze.edom.server.service;
 
+import ba.unze.edom.common.dto.StudentUnosDTO;
 import ba.unze.edom.server.dto.RegistracijaZahtjev;
 import ba.unze.edom.server.entity.Korisnik;
 import ba.unze.edom.server.entity.Student;
@@ -16,72 +17,43 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RegistracijaService {
 
-    private final StudentRepository studentRepository;
+    private final StudentEvidencijaService studentEvidencija;
     private final KorisnikRepository korisnikRepository;
     private final UlogaRepository ulogaRepository;
     private final PasswordEncoder passwordEncoder;
 
+
     @Transactional
     public Korisnik registruj(RegistracijaZahtjev z) {
+        Student student = studentEvidencija.nadjiIliKreiraj(new StudentUnosDTO(
+                z.ime(), z.prezime(), z.jmbg(), z.brojIndeksa(), z.email(), z.telefon(),
+                z.fakultet(), z.godinaStudija(), z.adresa(), z.imeRoditelja(), null));
 
-        // 1. Provjera po JMBG-u - jaci identifikator
-        var poJmbg = studentRepository.findByJmbg(z.jmbg());
-
-        if (poJmbg.isPresent()) {
-            Student postojeci = poJmbg.get();
-
-            if (korisnikRepository.findByStudent_IdStudent(postojeci.getIdStudent()).isPresent()) {
-                throw new RegistracijaException(
-                        "Za ovog studenta vec postoji nalog. Prijavite se ili resetujte lozinku.");
-            }
-
-            // isti covjek, mozda novi indeks ili nova adresa
-            postojeci.setBrojIndeksa(z.brojIndeksa());
-            postojeci.setEmail(z.email());
-            postojeci.setTelefon(z.telefon());
-
-            return napraviNalog(postojeci, z);
-        }
-
-        // 2. JMBG ne postoji, ali indeks postoji - sumnjivo, odbij
-        if (studentRepository.findByBrojIndeksa(z.brojIndeksa()).isPresent()) {
+        if (korisnikRepository.findByStudent_IdStudent(student.getIdStudent()).isPresent()) {
             throw new RegistracijaException(
-                    "Podaci se ne podudaraju sa evidencijom. Obratite se administraciji doma.");
+                    "Za ovog studenta već postoji nalog. Prijavite se ili resetujte lozinku.");
         }
 
-        // 3. Potpuno nov student
-        Student novi = new Student();
-        novi.setIme(z.ime());
-        novi.setPrezime(z.prezime());
-        novi.setJmbg(z.jmbg());
-        novi.setBrojIndeksa(z.brojIndeksa());
-        novi.setEmail(z.email());
-        novi.setTelefon(z.telefon());
-        novi.setFakultet(z.fakultet());
-        novi.setGodinaStudija(z.godinaStudija());
-        novi.setAdresa(z.adresa());
-        novi.setImeRoditelja(z.imeRoditelja());
-        studentRepository.save(novi);
-
-        return napraviNalog(novi, z);
+        return napraviNalog(student, z.email(), passwordEncoder.encode(z.lozinka()));
     }
 
-    private Korisnik napraviNalog(Student student, RegistracijaZahtjev z) {
 
-        if (korisnikRepository.findByEmail(z.email()).isPresent()) {
-            throw new RegistracijaException("Ta e-mail adresa je vec u upotrebi.");
+    @Transactional
+    public Korisnik napraviNalog(Student student, String email, String hashLozinke) {
+
+        if (korisnikRepository.findByEmail(email).isPresent()) {
+            throw new RegistracijaException("Ta e-mail adresa je već u upotrebi.");
         }
 
         var ulogaStudent = ulogaRepository.findByNaziv("Student")
-                .orElseThrow(() -> new IllegalStateException(
-                        "Uloga 'Student' ne postoji u bazi."));
+                .orElseThrow(() -> new IllegalStateException("Uloga 'Student' ne postoji u bazi."));
 
         Korisnik nalog = new Korisnik();
         nalog.setIme(student.getIme());
         nalog.setPrezime(student.getPrezime());
-        nalog.setEmail(z.email());
-        nalog.setUsername(z.email());          // e-mail sluzi i kao username
-        nalog.setPasswordHash(passwordEncoder.encode(z.lozinka()));
+        nalog.setEmail(email);
+        nalog.setUsername(email);
+        nalog.setPasswordHash(hashLozinke);
         nalog.setUloga(ulogaStudent);
         nalog.setStudent(student);
 

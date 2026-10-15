@@ -1,8 +1,11 @@
 package ba.unze.edom.server.api;
 
 import ba.unze.edom.common.dto.StudentListaDTO;
+import ba.unze.edom.common.dto.StudentPronadjenDTO;
+import ba.unze.edom.server.service.RucniUnosService;
 import ba.unze.edom.server.service.StudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,5 +20,14 @@ public class StudentApiController {
     @GetMapping
     public List<StudentListaDTO> sviStudenti() {
         return studentService.listaZaAdmina();
+    }
+
+    private final RucniUnosService rucniUnosService;
+
+    @GetMapping("/jmbg/{jmbg}")
+    public ResponseEntity<StudentPronadjenDTO> poJmbg(@PathVariable String jmbg) {
+        return rucniUnosService.nadjiPoJmbg(jmbg)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

@@ -3,6 +3,7 @@ package ba.unze.edom.server.api;
 import ba.unze.edom.server.exception.KorisnikException;
 import ba.unze.edom.server.exception.NevalidnaPrijavaException;
 import ba.unze.edom.server.exception.PrijavaException;
+import ba.unze.edom.server.exception.RegistracijaException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,7 +14,8 @@ import java.util.Map;
 @RestControllerAdvice(basePackages = "ba.unze.edom.server.api")
 public class ApiGreskeHandler {
 
-    @ExceptionHandler({PrijavaException.class, NevalidnaPrijavaException.class, KorisnikException.class})
+    @ExceptionHandler({PrijavaException.class, NevalidnaPrijavaException.class,
+            KorisnikException.class, RegistracijaException.class})
     public ResponseEntity<Map<String, String>> poslovnaGreska(RuntimeException e) {
         return ResponseEntity.badRequest().body(Map.of("poruka", e.getMessage()));
     }

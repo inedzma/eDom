@@ -4,7 +4,6 @@ import api.ApiException;
 import api.RangListaApi;
 import ba.unze.edom.common.dto.RangListaAdminDTO;
 import ba.unze.edom.common.dto.RangRedDTO;
-import dto.RangListaDTO;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -242,41 +241,28 @@ public class RangListaController {
 
         try {
             new RangListaHtmlExportService().exportSplitData(
-                    zaExport(lista.brucosi()), zaExport(lista.visegodisnji()), file);
+                    bezGresaka(lista.brucosi()), bezGresaka(lista.visegodisnji()), file);
             new Alert(Alert.AlertType.INFORMATION, "PDF uspješno kreiran!", ButtonType.OK).showAndWait();
         } catch (RuntimeException ex) {
             prikaziGresku(ex, "Greška pri izvozu rang liste.");
         }
     }
 
-    private List<RangListaDTO> zaExport(List<RangRedDTO> redovi) {
-        return redovi.stream()
-                .filter(r -> r.greska() == null)
-                .map(r -> {
-                    RangListaDTO dto = new RangListaDTO();
-                    dto.addKolona("#", String.valueOf(r.redniBroj()));
-                    dto.addKolona("Prezime (ime oca) i ime studenta", punoIme(r));
-                    dto.addKolona("Bodovi", String.format("%.2f", r.ukupno()));
-                    return dto;
-                })
-                .toList();
+    /** U zvanični dokument ne idu prijave s neispravnim podacima. */
+    private List<RangRedDTO> bezGresaka(List<RangRedDTO> redovi) {
+        return redovi.stream().filter(r -> r.greska() == null).toList();
     }
 
     // ---------- pomoćne ----------
 
-    /** Zvanični format: Prezime (ime oca) Ime */
+    /** Isti format imena kao u PDF-u — definisan na jednom mjestu, u export servisu. */
     private String punoIme(RangRedDTO r) {
-        String otac = r.imeOca() != null && !r.imeOca().isBlank() ? " (" + r.imeOca() + ") " : " ";
-        return nullSafe(r.prezime()) + otac + nullSafe(r.ime());
+        return RangListaHtmlExportService.punoIme(r);
     }
 
     private void prikaziGresku(Throwable ex, String opsta) {
         if (!(ex instanceof ApiException)) ex.printStackTrace();
         String poruka = ex instanceof ApiException ? ex.getMessage() : opsta;
         new Alert(Alert.AlertType.ERROR, poruka).showAndWait();
-    }
-
-    private String nullSafe(String s) {
-        return s == null ? "" : s;
     }
 }
