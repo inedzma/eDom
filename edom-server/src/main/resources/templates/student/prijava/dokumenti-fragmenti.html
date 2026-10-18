@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- ===================================================================
+     Fragmenti za student/prijava/dokumenti.html
+     =================================================================== -->
+
+<!-- Jedan red spiska: naziv, status, priloženi fajlovi i forma za upload -->
+<li th:fragment="zahtjev(z)" class="pd-red" th:id="${z.kljuc}"
+    th:classappend="${z.ispunjen()} ? 'pd-red--ok'">
+
+    <div class="pd-red-glava">
+        <span class="pd-status" th:classappend="${z.ispunjen()} ? 'pd-status--ok'" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </span>
+        <div class="pd-red-tekst">
+            <b th:text="${z.naziv}">Naziv dokumenta</b>
+            <small th:if="${z.opis != null}" class="pd-napomena-tekst"><th:block th:each="d : ${z.opisDijelovi()}"><a th:if="${d.jeLink()}" th:href="@{${d.link}}" th:text="${d.tekst}" target="_blank" rel="noopener">link</a><th:block th:unless="${d.jeLink()}" th:text="${d.tekst}">tekst</th:block></th:block></small>
+        </div>
+        <span class="pd-oznaka" th:if="${z.poClanu}"
+              th:classappend="${z.ispunjen()} ? 'pd-oznaka--ok'"
+              th:text="${z.prilozeno()} + ' od ' + ${z.potrebno} + ' članova'">1 od 3 članova</span>
+        <span class="pd-oznaka" th:unless="${z.poClanu}"
+              th:classappend="${z.ispunjen()} ? 'pd-oznaka--ok'"
+              th:text="${z.ispunjen()} ? 'Priloženo' : 'Nedostaje'">Nedostaje</span>
+    </div>
+
+    <!-- već priloženo -->
+    <ul class="pd-fajlovi" th:unless="${#lists.isEmpty(z.prilozeni)}">
+        <th:block th:each="d : ${z.prilozeni}">
+            <li th:insert="~{student/prijava/dokumenti-fragmenti :: fajl(${d})}"></li>
+        </th:block>
+    </ul>
+
+    <!-- upload -->
+    <form class="pd-upload" th:if="${mozeMijenjati and !z.bezVrste()}"
+          th:action="@{/student/prijava/{id}/dokumenti(id=${idPrijave})}"
+          method="post" enctype="multipart/form-data">
+
+        <input th:if="${z.jednaVrsta()}" type="hidden" name="idVrste" th:value="${z.vrste[0].idVrsta}">
+
+        <label class="pd-polje" th:unless="${z.jednaVrsta()}">
+            <span>Vrsta dokumenta</span>
+            <select name="idVrste" required>
+                <option value="" disabled selected>Odaberite…</option>
+                <option th:each="v : ${z.vrste}" th:value="${v.idVrsta}" th:text="${v.naziv}">Vrsta</option>
+            </select>
+        </label>
+
+        <label class="pd-polje" th:if="${z.poClanu}">
+            <span>Za kojeg člana</span>
+            <input type="text" name="naziv" maxlength="60" placeholder="npr. otac, majka, brat" required
+                   th:attr="list=${'clanovi-' + z.kljuc}" autocomplete="off">
+            <datalist th:id="${'clanovi-' + z.kljuc}">
+                <option th:each="c : ${z.clanovi()}" th:value="${c}"></option>
+            </datalist>
+        </label>
+
+        <label class="pd-fajl-izbor">
+            <input type="file" name="fajl" required
+                   accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 11.1l-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/></svg>
+            <span class="pd-fajl-ime">Odaberi fajl</span>
+        </label>
+
+        <button type="submit" class="btn btn-primary pd-prilozi"
+                th:text="${#lists.isEmpty(z.prilozeni)} ? 'Priloži' : 'Priloži još'">Priloži</button>
+
+        <p class="pd-poruka" role="status"></p>
+    </form>
+
+    <p class="pd-greska" th:if="${z.bezVrste()}">
+        Ova vrsta dokumenta još nije podešena u sistemu. Obratite se administraciji.
+    </p>
+</li>
+
+<!-- Jedan priloženi fajl -->
+<th:block th:fragment="fajl(d)">
+    <span class="pd-fajl-ikona">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    </span>
+    <span class="pd-fajl-naziv">
+        <span th:text="${d.nazivVrste}">Vrsta</span>
+        <em th:if="${d.opis() != null}" th:text="'· ' + ${d.opis()}">· otac</em>
+    </span>
+    <span class="pd-fajl-datum"
+          th:text="${d.datumUpload != null} ? ${#temporals.format(d.datumUpload, 'dd.MM.yyyy.')} : ''">16.10.2026.</span>
+    <a class="pd-fajl-akcija" th:if="${d.imaSadrzaj}" target="_blank"
+       th:href="@{/student/prijava/{id}/dokumenti/{dok}/preuzmi(id=${idPrijave}, dok=${d.idDokument})}">Otvori</a>
+    <form th:if="${mozeMijenjati}" class="pd-obrisi" method="post"
+          th:action="@{/student/prijava/{id}/dokumenti/{dok}/obrisi(id=${idPrijave}, dok=${d.idDokument})}">
+        <button type="submit" class="pd-fajl-akcija pd-fajl-akcija--obrisi" aria-label="Obriši dokument">Obriši</button>
+    </form>
+</th:block>
+
+</body>
+</html>

@@ -41,4 +41,8 @@ public class VrstaKriterija {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dokaz_vrsta_id")
     private VrstaDokumenta dokaz;
+
+    /** Kriterij se unosi kao period od–do; bodovi se računaju iz punih mjeseci. */
+    @Column(name = "trazi_period", nullable = false)
+    private boolean traziPeriod = false;
 }

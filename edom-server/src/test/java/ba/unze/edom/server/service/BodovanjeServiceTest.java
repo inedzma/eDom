@@ -1,452 +1,430 @@
 package ba.unze.edom.server.service;
 
-import ba.unze.edom.server.entity.*;
-import org.junit.jupiter.api.*;
+import ba.unze.edom.common.dto.RezultatBodovanja;
+import ba.unze.edom.common.dto.StavkaBodovanja;
+import ba.unze.edom.server.entity.Prijava;
+import ba.unze.edom.server.entity.PrijavaKriterij;
+import ba.unze.edom.server.entity.VrstaKriterija;
+import ba.unze.edom.server.exception.NevalidnaPrijavaException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Bodovanje prema Pravilniku Studentskog centra Zenica, akademska 2026/2027.
+ * Svaki očekivani rezultat je izračunat ručno iz Pravilnika.
+ *
+ * Unit test bez Springa i baze: pokreće se za par milisekundi.
+ */
 class BodovanjeServiceTest {
 
-    private final BodovanjeService service = new BodovanjeService(new PrijavaValidator());
+    private static final double D = 0.001;
 
-    // ---------- pomocne ----------
+    private BodovanjeService servis;
 
-    private Prijava prazna() {
-        Prijava p = new Prijava();
-        p.setBrojClanovaDomacinstva(1);
-        // ovi testovi provjeravaju racun, pa se osnovni kriteriji
-        // tretiraju kao vec provjereni
+    @BeforeEach
+    void setUp() {
+        servis = new BodovanjeService(new PrijavaValidator());
+    }
+
+    // =====================================================================
+    // USPJEH
+    // =====================================================================
+
+    @Nested
+    @DisplayName("Uspjeh")
+    class Uspjeh {
+
+        @Test
+        @DisplayName("Brucoš: prosjek × 9 + 1")
+        void brucos() {
+            Prijava p = prijava(1, "4.50", null);
+            assertEquals(41.50, bodovi(p, "Uspjeh (brucoš)"), D);
+        }
+
+        @Test
+        @DisplayName("3. godina: prosjek × 3,5 + ispiti × 1,8 + 5")
+        void trecaGodina() {
+            Prijava p = prijava(3, "8.50", 20);
+            // 8,5 × 3,5 = 29,75   20 × 1,8 = 36   bonus 5
+            assertEquals(70.75, bodovi(p, "Uspjeh"), D);
+        }
+
+        @Test
+        @DisplayName("Apsolvent nema bonus za godinu")
+        void apsolventBezBonusa() {
+            Prijava p = prijava(GodineStudija.APSOLVENT, "8.00", 40);
+            // 8 × 3,5 = 28   40 × 1,8 = 72   bonus 0
+            assertEquals(100.00, bodovi(p, "Uspjeh"), D);
+        }
+
+        @Test
+        @DisplayName("Postdiplomac ima bonus 10")
+        void postdiplomac() {
+            Prijava p = prijava(GodineStudija.POSTDIPLOMAC, "9.00", 10);
+            // 9 × 3,5 = 31,5   10 × 1,8 = 18   bonus 10
+            assertEquals(59.50, bodovi(p, "Uspjeh"), D);
+        }
+
+        @ParameterizedTest(name = "{0}. godina → bonus {1}")
+        @CsvSource({"2,3", "3,5", "4,7", "5,9", "6,10", "7,0", "8,10"})
+        @DisplayName("Bonus za godinu studija")
+        void bonusi(int godina, double bonus) {
+            assertEquals(bonus, servis.bonusGodine(godina), D);
+        }
+
+        @Test
+        @DisplayName("Broj ispita nema gornju granicu: stariji studenti imaju prednost")
+        void ispitiBezGranice() {
+            Prijava p = prijava(5, "7.00", 60);
+            // 7 × 3,5 = 24,5   60 × 1,8 = 108   bonus 9
+            assertEquals(141.50, bodovi(p, "Uspjeh"), D);
+        }
+    }
+
+    // =====================================================================
+    // PONOVNI UPIS GODINE (pitanje 1)
+    // =====================================================================
+
+    @Nested
+    @DisplayName("Ponovni upis godine")
+    class PonovniUpis {
+
+        @Test
+        @DisplayName("Prvi put: bez kazne i bez upozorenja")
+        void prviPut() {
+            Prijava p = prijava(3, "8.50", 20);
+            p.setUpisGodinePut(1);
+            p.setUspjehVerifikovan(true);
+
+            RezultatBodovanja r = servis.izracunaj(p);
+            assertNull(stavka(r, "Ponovni upis godine"));
+            assertFalse(r.imaUpozorenja());
+            assertEquals(70.75, r.potvrdjeno(), D);
+        }
+
+        @Test
+        @DisplayName("Drugi put: −3 boda")
+        void drugiPut() {
+            Prijava p = prijava(3, "8.50", 20);
+            p.setUpisGodinePut(2);
+            p.setUspjehVerifikovan(true);
+
+            RezultatBodovanja r = servis.izracunaj(p);
+            assertEquals(-3, stavka(r, "Ponovni upis godine").bodovi(), D);
+            assertEquals(67.75, r.potvrdjeno(), D);
+            assertFalse(r.imaUpozorenja());
+        }
+
+        @Test
+        @DisplayName("Treći put: −3 boda, prijava se boduje, ali admin dobija upozorenje")
+        void treciPut() {
+            Prijava p = prijava(3, "8.50", 20);
+            p.setUpisGodinePut(3);
+            p.setUspjehVerifikovan(true);
+
+            RezultatBodovanja r = servis.izracunaj(p);
+            assertEquals(67.75, r.potvrdjeno(), D);
+            assertTrue(r.imaUpozorenja());
+            assertTrue(r.upozorenja().get(0).contains("3. put"));
+        }
+
+        @Test
+        @DisplayName("Kazna se potvrđuje zajedno s uspjehom")
+        void kaznaPratiVerifikacijuUspjeha() {
+            Prijava p = prijava(3, "8.50", 20);
+            p.setUpisGodinePut(2);
+            p.setUspjehVerifikovan(false);
+
+            RezultatBodovanja r = servis.izracunaj(p);
+            assertEquals(0, r.potvrdjeno(), D);
+            assertEquals(67.75, r.potencijalno(), D);
+        }
+    }
+
+    // =====================================================================
+    // UDALJENOST
+    // =====================================================================
+
+    @ParameterizedTest(name = "{0} km → {1} bodova")
+    @CsvSource({
+            "20,     0",
+            "49.99,  0",
+            "50,     4",
+            "79.99,  4",
+            "80,     8",
+            "119.99, 8",
+            "120,   12",
+            "159.99,12",
+            "160,   15",
+            "400,   15"
+    })
+    @DisplayName("Udaljenost: granice razreda")
+    void udaljenost(String km, double ocekivano) {
+        Prijava p = prijava(3, "8.00", 10);
+        p.setUdaljenostKm(new BigDecimal(km));
+        assertEquals(ocekivano, bodovi(p, "Udaljenost"), D);
+    }
+
+    // =====================================================================
+    // PRIMANJA PO ČLANU (student se broji u članove)
+    // =====================================================================
+
+    @ParameterizedTest(name = "{0} KM / {1} članova → {2} bodova")
+    @CsvSource({
+            "0,       4, 20",
+            "436,     4, 20",   // 109 po članu
+            "440,     4, 15",   // 110
+            "600,     4, 15",   // 150
+            "600.04,  4,  8",   // 150,01
+            "800,     4,  8",   // 200
+            "1200,    4,  4",   // 300
+            "1600,    4,  2",   // 400
+            "1600.04, 4,  0"    // 400,01
+    })
+    @DisplayName("Primanja po članu domaćinstva: granice razreda")
+    void primanja(String ukupno, int clanova, double ocekivano) {
+        Prijava p = prijava(3, "8.00", 10);
+        p.setUkupnaPrimanja(new BigDecimal(ukupno));
+        p.setBrojClanovaDomacinstva(clanova);
+        assertEquals(ocekivano, bodovi(p, "Primanja domaćinstva"), D);
+    }
+
+    // =====================================================================
+    // BORAČKE I SOCIJALNE KATEGORIJE
+    // =====================================================================
+
+    @Nested
+    @DisplayName("Boračke i socijalne kategorije")
+    class Branioci {
+
+        @Test
+        @DisplayName("Boduje se samo najviša kategorija")
+        void samoNajvisa() {
+            Prijava p = prijava(3, "8.00", 10);
+            dodaj(p, fiksni("POGINULI_BRANILAC", 50, "BRANIOCI"), true);
+            dodaj(p, fiksni("BEZ_JEDNOG_RODIT", 15, "BRANIOCI"), true);
+            dodaj(p, fiksni("SOCIJALNA_POMOC", 10, "BRANIOCI"), true);
+
+            RezultatBodovanja r = servis.izracunaj(p);
+            long braniocaUStavkama = r.stavke().stream()
+                    .filter(s -> "BRANIOCI".equals(s.kategorija())).count();
+            assertEquals(1, braniocaUStavkama);
+            assertEquals(50, stavka(r, "POGINULI_BRANILAC").bodovi(), D);
+        }
+
+        @Test
+        @DisplayName("Potvrđeno uzima najvišu PROVJERENU kategoriju")
+        void najvisaProvjerena() {
+            Prijava p = prijava(3, "8.00", 10);
+            p.setUspjehVerifikovan(true);                                  // 28 + 18 + 5 = 51
+            dodaj(p, fiksni("POGINULI_BRANILAC", 50, "BRANIOCI"), false);  // nije provjereno
+            dodaj(p, fiksni("BEZ_JEDNOG_RODIT", 15, "BRANIOCI"), true);
+
+            RezultatBodovanja r = servis.izracunaj(p);
+            assertEquals(51 + 15, r.potvrdjeno(), D);
+            assertEquals(51 + 50, r.potencijalno(), D);
+        }
+
+        @ParameterizedTest(name = "RVI {0}% → {1} bodova")
+        @CsvSource({"0,0", "30,15", "59,15", "60,20", "100,20"})
+        @DisplayName("Student RVI")
+        void rvi(String postotak, double ocekivano) {
+            Prijava p = prijava(3, "8.00", 10);
+            dodajSParametrom(p, parametarski("STUDENT_RVI"), postotak);
+            assertEquals(ocekivano, bodovi(p, "STUDENT_RVI"), D);
+        }
+
+        @Test
+        @DisplayName("Invalidnost roditelja: postotak × 0,1")
+        void invalidnostRoditelja() {
+            Prijava p = prijava(3, "8.00", 10);
+            dodajSParametrom(p, parametarski("INVALID_RODITELJA"), "80");
+            assertEquals(8, bodovi(p, "INVALID_RODITELJA"), D);
+        }
+
+        @Test
+        @DisplayName("Nosilac ratnih priznanja: 10 bodova bez obzira na broj priznanja")
+        void ratnaPriznanja() {
+            Prijava p = prijava(3, "8.00", 10);
+            VrstaKriterija v = fiksni("NOSILAC_PRIZNANJA", 10, "BRANIOCI");
+            v.setTraziParametar(true);
+            v.setNazivParametra("Broj ratnih priznanja");
+            dodajSParametrom(p, v, "3");
+            assertEquals(10, bodovi(p, "NOSILAC_PRIZNANJA"), D);
+        }
+    }
+
+    // =====================================================================
+    // OS RBiH: PERIOD, PUNI MJESECI × 0,3
+    // =====================================================================
+
+    @Nested
+    @DisplayName("Učešće roditelja u OS RBiH")
+    class OsRbih {
+
+        @ParameterizedTest(name = "{0} – {1} → {2} punih mjeseci")
+        @CsvSource({
+                "1993-01-01, 1993-07-11,  6",   // 6 mjeseci i 10 dana
+                "1993-01-01, 1993-09-30,  8",   // 8 mjeseci i 29 dana
+                "1993-01-01, 1993-01-31,  0",   // manje od mjeseca
+                "1992-04-15, 1995-12-23, 44"
+        })
+        @DisplayName("Broje se samo puni mjeseci")
+        void puniMjeseci(String od, String doDatuma, long mjeseci) {
+            assertEquals(mjeseci,
+                    BodovanjeService.punihMjeseci(LocalDate.parse(od), LocalDate.parse(doDatuma)));
+        }
+
+        @Test
+        @DisplayName("44 puna mjeseca → 13,2 boda (bez gornje granice)")
+        void bodovi44() {
+            Prijava p = prijava(3, "8.00", 10);
+            dodajPeriod(p, "1992-04-15", "1995-12-23");
+            assertEquals(13.2, bodovi(p, "DIJETE_OSRBIH"), D);
+        }
+
+        @Test
+        @DisplayName("6 mjeseci i 10 dana → 1,8 bodova")
+        void bodovi6() {
+            Prijava p = prijava(3, "8.00", 10);
+            dodajPeriod(p, "1993-01-01", "1993-07-11");
+            assertEquals(1.8, bodovi(p, "DIJETE_OSRBIH"), D);
+        }
+
+        @Test
+        @DisplayName("Datum kraja prije početka je greška")
+        void obrnutiDatumi() {
+            Prijava p = prijava(3, "8.00", 10);
+            dodajPeriod(p, "1995-01-01", "1993-01-01");
+            assertThrows(NevalidnaPrijavaException.class, () -> servis.izracunaj(p));
+        }
+    }
+
+    // =====================================================================
+    // DODATNI KRITERIJI (sabiraju se)
+    // =====================================================================
+
+    @Test
+    @DisplayName("Dodatni kriteriji se sabiraju: izbjeglica 3 + brat/sestra 2 + nagrade 3")
+    void dodatniSeSabiraju() {
+        Prijava p = prijava(3, "8.00", 10);
+        p.setUspjehVerifikovan(true);                              // 51
+        dodaj(p, fiksni("IZBJEGLICA", 3, "DODATNI"), true);
+        dodaj(p, fiksni("BRAT_SESTRA", 2, "DODATNI"), true);
+        dodaj(p, fiksni("NAGRADE", 3, "DODATNI"), true);
+
+        assertEquals(51 + 8, servis.izracunaj(p).potvrdjeno(), D);
+    }
+
+    // =====================================================================
+    // CIJELA PRIJAVA
+    // =====================================================================
+
+    @Test
+    @DisplayName("Cijela prijava, sve provjereno")
+    void cijelaPrijava() {
+        Prijava p = prijava(3, "8.50", 20);                         // uspjeh 70,75
+        p.setUdaljenostKm(new BigDecimal("95"));                    // 8
+        p.setUkupnaPrimanja(new BigDecimal("1200"));                // 1200 / 4 = 300 → 4
+        p.setBrojClanovaDomacinstva(4);
         p.setUspjehVerifikovan(true);
-        p.setPrimanjaVerifikovana(true);
         p.setUdaljenostVerifikovana(true);
+        p.setPrimanjaVerifikovana(true);
+        dodaj(p, fiksni("BEZ_JEDNOG_RODIT", 15, "BRANIOCI"), true); // 15
+        dodaj(p, fiksni("IZBJEGLICA", 3, "DODATNI"), true);          // 3
+
+        RezultatBodovanja r = servis.izracunaj(p);
+        assertEquals(70.75 + 8 + 4 + 15 + 3, r.potvrdjeno(), D);
+        assertEquals(r.potvrdjeno(), r.potencijalno(), D);
+        assertFalse(r.cekaVerifikaciju());
+    }
+
+    @Test
+    @DisplayName("Ništa provjereno: potvrđeno 0, potencijalno puno")
+    void nistaProvjereno() {
+        Prijava p = prijava(3, "8.50", 20);
+        p.setUdaljenostKm(new BigDecimal("95"));
+
+        RezultatBodovanja r = servis.izracunaj(p);
+        assertEquals(0, r.potvrdjeno(), D);
+        assertEquals(78.75, r.potencijalno(), D);
+        assertTrue(r.cekaVerifikaciju());
+    }
+
+    // =====================================================================
+    // pomoćne
+    // =====================================================================
+
+    private Prijava prijava(int godina, String prosjek, Integer ispiti) {
+        Prijava p = new Prijava();
+        p.setGodinaStudija(godina);
+        p.setProsjek(new BigDecimal(prosjek));
+        p.setPolozeniIspiti(ispiti);
         return p;
     }
 
-    private VrstaKriterija fiksni(String sifra, String naziv,
-                                  double bodovi, String grupa) {
+    private VrstaKriterija fiksni(String sifra, double bodovi, String grupa) {
         VrstaKriterija v = new VrstaKriterija();
         v.setSifra(sifra);
-        v.setNaziv(naziv);
+        v.setNaziv(sifra);   // u testu naziv = šifra, da se stavka lako nađe
         v.setBodovi(BigDecimal.valueOf(bodovi));
         v.setGrupa(grupa);
-        v.setAktivan(true);
         return v;
     }
 
-    private VrstaKriterija parametarski(String sifra, String naziv, String grupa) {
+    private VrstaKriterija parametarski(String sifra) {
         VrstaKriterija v = new VrstaKriterija();
         v.setSifra(sifra);
-        v.setNaziv(naziv);
+        v.setNaziv(sifra);
+        v.setGrupa("BRANIOCI");
         v.setTraziParametar(true);
-        v.setNazivParametra("Parametar");
-        v.setGrupa(grupa);
-        v.setAktivan(true);
+        v.setNazivParametra("Postotak");
         return v;
     }
 
-    private void dodaj(Prijava p, VrstaKriterija v,
-                       Double parametar, boolean verifikovan) {
+    private void dodaj(Prijava p, VrstaKriterija v, boolean verifikovan) {
         PrijavaKriterij k = new PrijavaKriterij();
         k.setVrsta(v);
-        if (parametar != null) k.setParametar(BigDecimal.valueOf(parametar));
         k.setVerifikovan(verifikovan);
         p.dodajKriterij(k);
     }
 
-    // ================= PRAZNA PRIJAVA =================
-
-    @Test
-    @DisplayName("Prazna prijava ima 0 bodova i ne baca izuzetak")
-    void praznaPrijava() {
-        var r = service.izracunaj(prazna());
-        assertEquals(0.0, r.potvrdjeno());
-        assertEquals(0.0, r.potencijalno());
+    private void dodajSParametrom(Prijava p, VrstaKriterija v, String parametar) {
+        PrijavaKriterij k = new PrijavaKriterij();
+        k.setVrsta(v);
+        k.setParametar(new BigDecimal(parametar));
+        p.dodajKriterij(k);
     }
 
-    @Test
-    @DisplayName("null prijava vraca nulu")
-    void nullPrijava() {
-        var r = service.izracunaj(null);
-        assertEquals(0.0, r.potvrdjeno());
+    private void dodajPeriod(Prijava p, String od, String doDatuma) {
+        VrstaKriterija v = new VrstaKriterija();
+        v.setSifra("DIJETE_OSRBIH");
+        v.setNaziv("DIJETE_OSRBIH");
+        v.setGrupa("BRANIOCI");
+        v.setTraziPeriod(true);
+        PrijavaKriterij k = new PrijavaKriterij();
+        k.setVrsta(v);
+        k.setDatumOd(LocalDate.parse(od));
+        k.setDatumDo(LocalDate.parse(doDatuma));
+        p.dodajKriterij(k);
     }
 
-    // ================= USPJEH =================
-
-    @Test
-    @DisplayName("Brucos: prosjek 4.5 daje 41.5 bodova")
-    void brucos() {
-        Prijava p = prazna();
-        p.setGodinaStudija(1);
-        p.setProsjek(new BigDecimal("4.50"));
-
-        // 4.5 * 9 + 1 = 41.5
-        assertEquals(41.5, service.izracunaj(p).potvrdjeno(), 0.001);
+    private StavkaBodovanja stavka(RezultatBodovanja r, String naziv) {
+        return r.stavke().stream().filter(s -> s.naziv().equals(naziv)).findFirst().orElse(null);
     }
 
-    @Test
-    @DisplayName("Brucosu se ne racunaju polozeni ispiti")
-    void brucosBezIspita() {
-        Prijava p = prazna();
-        p.setGodinaStudija(1);
-        p.setProsjek(new BigDecimal("4.00"));
-        p.setPolozeniIspiti(30);          // ignorise se
-
-        assertEquals(37.0, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Treca godina: prosjek 8.0, 12 ispita")
-    void trecaGodina() {
-        Prijava p = prazna();
-        p.setGodinaStudija(3);
-        p.setProsjek(new BigDecimal("8.00"));
-        p.setPolozeniIspiti(12);
-
-        // 8.0*3.5 + 12*1.8 + 5 = 28 + 21.6 + 5 = 54.6
-        assertEquals(54.6, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Apsolvent dobija bonus 12")
-    void apsolvent() {
-        Prijava p = prazna();
-        p.setGodinaStudija(GodineStudija.APSOLVENT);
-        p.setProsjek(new BigDecimal("7.00"));
-        p.setPolozeniIspiti(0);
-
-        // 7.0*3.5 + 0 + 12 = 36.5
-        assertEquals(36.5, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Postdiplomac dobija bonus 10")
-    void postdiplomac() {
-        Prijava p = prazna();
-        p.setGodinaStudija(GodineStudija.POSTDIPLOMAC);
-        p.setProsjek(new BigDecimal("9.00"));
-        p.setPolozeniIspiti(0);
-
-        // 9.0*3.5 + 10 = 41.5
-        assertEquals(41.5, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Bez unesenog prosjeka nema bodova za uspjeh")
-    void bezProsjeka() {
-        Prijava p = prazna();
-        p.setGodinaStudija(3);
-        p.setPolozeniIspiti(10);
-
-        assertEquals(0.0, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Bodovi za uspjeh nisu ograniceni odozgo")
-    void uspjehNijeOgranicen() {
-        Prijava p = prazna();
-        p.setGodinaStudija(5);
-        p.setProsjek(new BigDecimal("10.00"));
-        p.setPolozeniIspiti(45);
-
-        // 35 + 81 + 9 = 125 - starije godine namjerno imaju prednost
-        assertEquals(125.0, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    // ================= UDALJENOST =================
-
-    @Test
-    @DisplayName("Granice udaljenosti")
-    void udaljenost() {
-        assertEquals(0.0,  bodoviZaUdaljenost(49.9), 0.001);
-        assertEquals(4.0,  bodoviZaUdaljenost(50), 0.001);
-        assertEquals(4.0,  bodoviZaUdaljenost(79.9), 0.001);
-        assertEquals(8.0,  bodoviZaUdaljenost(80), 0.001);
-        assertEquals(12.0, bodoviZaUdaljenost(120), 0.001);
-        assertEquals(15.0, bodoviZaUdaljenost(160), 0.001);
-        assertEquals(15.0, bodoviZaUdaljenost(500), 0.001);
-    }
-
-    private double bodoviZaUdaljenost(double km) {
-        Prijava p = prazna();
-        p.setUdaljenostKm(BigDecimal.valueOf(km));
-        return service.izracunaj(p).potvrdjeno();
-    }
-
-    // ================= PRIMANJA =================
-
-    @Test
-    @DisplayName("Granice primanja po clanu domacinstva")
-    void primanja() {
-        assertEquals(20.0, bodoviZaPrimanja(400, 4), 0.001);   // 100 po clanu
-        assertEquals(15.0, bodoviZaPrimanja(600, 4), 0.001);   // 150
-        assertEquals(8.0,  bodoviZaPrimanja(800, 4), 0.001);   // 200
-        assertEquals(4.0,  bodoviZaPrimanja(1200, 4), 0.001);  // 300
-        assertEquals(2.0,  bodoviZaPrimanja(1600, 4), 0.001);  // 400
-        assertEquals(0.0,  bodoviZaPrimanja(2000, 4), 0.001);  // 500
-    }
-
-    @Test
-    @DisplayName("Domacinstvo od jednog clana - sam student")
-    void jedanClan() {
-        assertEquals(20.0, bodoviZaPrimanja(100, 1), 0.001);
-    }
-
-    @Test
-    @DisplayName("Nula clanova je nemoguca - servis ne smije puci")
-    void nulaClanova() {
-        Prijava p = new Prijava();
-        p.setBrojClanovaDomacinstva(0);
-        p.setUkupnaPrimanja(new BigDecimal("1000"));
-
-        assertDoesNotThrow(() -> service.izracunaj(p));
-        assertEquals(0.0, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    private double bodoviZaPrimanja(double ukupno, int clanova) {
-        Prijava p = new Prijava();
-        p.setBrojClanovaDomacinstva(clanova);
-        p.setUkupnaPrimanja(BigDecimal.valueOf(ukupno));
-        return service.izracunaj(p).potvrdjeno();
-    }
-
-    // ================= BRANIOCI: uzima se najveci =================
-
-    @Test
-    @DisplayName("Od vise kriterija iz grupe BRANIOCI racuna se samo najveci")
-    void braniociNajveci() {
-        Prijava p = prazna();
-        dodaj(p, fiksni("BEZ_JEDNOG_RODIT", "Bez jednog roditelja",
-                15, GrupeKriterija.BRANIOCI), null, true);
-        dodaj(p, fiksni("POGINULI_BRANILAC", "Dijete šehida",
-                50, GrupeKriterija.BRANIOCI), null, true);
-        dodaj(p, fiksni("INVALIDNOST", "Invalidnost",
-                10, GrupeKriterija.BRANIOCI), null, true);
-
-        // ne 75, nego 50
-        assertEquals(50.0, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Dva jednaka kriterija daju bodove samo jednom")
-    void braniociJednaki() {
-        Prijava p = prazna();
-        dodaj(p, fiksni("BEZ_OBA_RODITELJA", "Bez oba roditelja",
-                20, GrupeKriterija.BRANIOCI), null, true);
-        dodaj(p, fiksni("CLAN_POR_SEHIDA", "Član porodice šehida",
-                20, GrupeKriterija.BRANIOCI), null, true);
-
-        assertEquals(20.0, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Student RVI ispod 60 posto daje 15 bodova")
-    void rviIspod60() {
-        Prijava p = prazna();
-        dodaj(p, parametarski("STUDENT_RVI", "Student RVI",
-                GrupeKriterija.BRANIOCI), 40.0, true);
-
-        assertEquals(15.0, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Student RVI od 60 posto i vise daje 20 bodova")
-    void rviIznad60() {
-        Prijava p = prazna();
-        dodaj(p, parametarski("STUDENT_RVI", "Student RVI",
-                GrupeKriterija.BRANIOCI), 60.0, true);
-
-        assertEquals(20.0, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Invalidnost roditelja: postotak puta 0.1")
-    void invalidnostRoditelja() {
-        Prijava p = prazna();
-        dodaj(p, parametarski("INVALID_RODITELJA", "Invalidnost roditelja",
-                GrupeKriterija.BRANIOCI), 80.0, true);
-
-        assertEquals(8.0, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Dijete OSRBiH: mjeseci puta 0.3")
-    void dijeteOsrbih() {
-        Prijava p = prazna();
-        dodaj(p, parametarski("DIJETE_OSRBIH", "Dijete učesnika OS RBiH",
-                GrupeKriterija.BRANIOCI), 36.0, true);
-
-        assertEquals(10.8, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Parametarski kriterij bez parametra daje 0")
-    void parametarskiBezParametra() {
-        Prijava p = prazna();
-        dodaj(p, parametarski("STUDENT_RVI", "Student RVI",
-                GrupeKriterija.BRANIOCI), null, true);
-
-        assertEquals(0.0, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    // ================= DODATNI: zbrajaju se =================
-
-    @Test
-    @DisplayName("Kriteriji iz grupe DODATNI se zbrajaju")
-    void dodatniSeZbrajaju() {
-        Prijava p = prazna();
-        dodaj(p, fiksni("IZBJEGLICA", "Izbjeglica",
-                3, GrupeKriterija.DODATNI), null, true);
-        dodaj(p, fiksni("BRAT_SESTRA", "Brat/sestra studiraju",
-                2, GrupeKriterija.DODATNI), null, true);
-
-        assertEquals(5.0, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Isti kriterij se ne moze bodovati dvaput")
-    void nemaDuplogBodovanja() {
-        Prijava p = prazna();
-        var bratSestra = fiksni("BRAT_SESTRA", "Brat/sestra studiraju",
-                2, GrupeKriterija.DODATNI);
-
-        dodaj(p, bratSestra, null, true);
-        dodaj(p, bratSestra, null, true);   // baza bi ovo odbila (UNIQUE)
-
-        // servis svejedno broji jednom
-        assertEquals(2.0, service.izracunaj(p).potvrdjeno(), 0.001);
-    }
-
-    // ================= VERIFIKACIJA =================
-
-    @Test
-    @DisplayName("Neverifikovan kriterij ne ulazi u potvrdjene bodove")
-    void neverifikovanNeUlazi() {
-        Prijava p = prazna();
-        dodaj(p, fiksni("POGINULI_BRANILAC", "Dijete šehida",
-                50, GrupeKriterija.BRANIOCI), null, false);
-
-        var r = service.izracunaj(p);
-        assertEquals(0.0, r.potvrdjeno(), 0.001);
-        assertEquals(50.0, r.potencijalno(), 0.001);
-        assertTrue(r.cekaVerifikaciju());
-    }
-
-    @Test
-    @DisplayName("Neverifikovan uspjeh ne ulazi u potvrdjene bodove")
-    void neverifikovanUspjeh() {
-        Prijava p = new Prijava();
-        p.setBrojClanovaDomacinstva(1);
-        p.setGodinaStudija(1);
-        p.setProsjek(new BigDecimal("4.00"));
-        // uspjehVerifikovan ostaje false
-
-        var r = service.izracunaj(p);
-        assertEquals(0.0, r.potvrdjeno(), 0.001);
-        assertEquals(37.0, r.potencijalno(), 0.001);
-        assertTrue(r.cekaVerifikaciju());
-    }
-
-    @Test
-    @DisplayName("Verifikacija uspjeha ne priznaje primanja")
-    void verifikacijaJePoStavci() {
-        Prijava p = new Prijava();
-        p.setBrojClanovaDomacinstva(4);
-        p.setGodinaStudija(1);
-        p.setProsjek(new BigDecimal("4.00"));       // 37
-        p.setUkupnaPrimanja(new BigDecimal("400")); // 20
-        p.setUspjehVerifikovan(true);
-        // primanjaVerifikovana ostaje false
-
-        var r = service.izracunaj(p);
-        assertEquals(37.0, r.potvrdjeno(), 0.001);
-        assertEquals(57.0, r.potencijalno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Bodovi su konacni tek kad je prijava odobrena")
-    void konacnoTekNakonOdobrenja() {
-        Prijava p = prazna();
-        p.setGodinaStudija(1);
-        p.setProsjek(new BigDecimal("4.00"));
-
-        assertFalse(service.izracunaj(p).konacno());
-
-        StatusPrijave odobreno = new StatusPrijave();
-        odobreno.setNaziv(Statusi.ODOBRENO);
-        p.setStatus(odobreno);
-
-        assertTrue(service.izracunaj(p).konacno());
-    }
-
-    @Test
-    @DisplayName("Verifikovan i neverifikovan kriterij zajedno")
-    void mjesovito() {
-        Prijava p = prazna();
-        dodaj(p, fiksni("IZBJEGLICA", "Izbjeglica",
-                3, GrupeKriterija.DODATNI), null, true);
-        dodaj(p, fiksni("BRAT_SESTRA", "Brat/sestra",
-                2, GrupeKriterija.DODATNI), null, false);
-
-        var r = service.izracunaj(p);
-        assertEquals(3.0, r.potvrdjeno(), 0.001);
-        assertEquals(5.0, r.potencijalno(), 0.001);
-    }
-
-    @Test
-    @DisplayName("Najveci branilac se bira odvojeno za potvrdjeno i potencijalno")
-    void najveciOdvojeno() {
-        Prijava p = prazna();
-        dodaj(p, fiksni("POGINULI_BRANILAC", "Dijete šehida",
-                50, GrupeKriterija.BRANIOCI), null, false);   // ceka
-        dodaj(p, fiksni("INVALIDNOST", "Invalidnost",
-                10, GrupeKriterija.BRANIOCI), null, true);    // potvrdjeno
-
-        var r = service.izracunaj(p);
-        assertEquals(10.0, r.potvrdjeno(), 0.001);
-        assertEquals(50.0, r.potencijalno(), 0.001);
-    }
-
-    // ================= RAZLOZENI PRIKAZ =================
-
-    @Test
-    @DisplayName("Rezultat sadrzi stavke sa obrazlozenjem")
-    void stavkeSuRazlozene() {
-        Prijava p = prazna();
-        p.setGodinaStudija(2);
-        p.setProsjek(new BigDecimal("8.00"));
-        p.setPolozeniIspiti(10);
-        p.setUdaljenostKm(new BigDecimal("100"));
-
-        var r = service.izracunaj(p);
-
-        assertFalse(r.stavke().isEmpty());
-        assertTrue(r.stavke().stream()
-                .anyMatch(s -> s.naziv().contains("Uspjeh")));
-        assertTrue(r.stavke().stream()
-                .anyMatch(s -> s.naziv().contains("Udaljenost")));
-    }
-
-    // ================= POTPUNA PRIJAVA =================
-
-    @Test
-    @DisplayName("Potpuna prijava: svi kriteriji zajedno")
-    void potpunaPrijava() {
-        Prijava p = new Prijava();
-        p.setGodinaStudija(3);
-        p.setProsjek(new BigDecimal("8.00"));
-        p.setPolozeniIspiti(12);                          // 54.6
-        p.setUdaljenostKm(new BigDecimal("130"));         // 12
-        p.setBrojClanovaDomacinstva(5);
-        p.setUkupnaPrimanja(new BigDecimal("500"));       // 100/clan -> 20
-
-        dodaj(p, fiksni("BEZ_JEDNOG_RODIT", "Bez jednog roditelja",
-                15, GrupeKriterija.BRANIOCI), null, true);   // 15
-        dodaj(p, fiksni("IZBJEGLICA", "Izbjeglica",
-                3, GrupeKriterija.DODATNI), null, true);     // 3
-
-        // 54.6 + 12 + 20 + 15 + 3 = 104.6
-        assertEquals(104.6, service.izracunaj(p).potvrdjeno(), 0.001);
+    private double bodovi(Prijava p, String naziv) {
+        StavkaBodovanja s = stavka(servis.izracunaj(p), naziv);
+        assertNotNull(s, "Nema stavke '" + naziv + "'");
+        return s.bodovi();
     }
 }

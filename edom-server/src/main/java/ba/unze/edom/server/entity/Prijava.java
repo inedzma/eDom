@@ -79,6 +79,18 @@ public class Prijava {
     @Column(name = "napomena_administratora", length = 500)
     private String napomenaAdmina;
 
+    /** Pitanje 1: koji put student upisuje tekuću godinu (1 = prvi put). */
+    @Column(name = "upis_godine_put")
+    private Integer upisGodinePut;
+
+    /** Pitanje 7: da li je ikada obnavljao godinu. */
+    @Column(name = "obnavljao_godinu")
+    private Boolean obnavljaoGodinu;
+
+    /** Pitanje 7: koje akademske godine je obnavljao. */
+    @Column(name = "obnovljene_godine", length = 100)
+    private String obnovljeneGodine;
+
     public void dodajKriterij(PrijavaKriterij k) {
         kriteriji.add(k);
         k.setPrijava(this);

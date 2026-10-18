@@ -73,6 +73,14 @@
                                 <input type="number" step="0.01"
                                        th:field="*{kriteriji[__${stat.index}__].parametar}">
                             </div>
+
+                            <div class="krit-param krit-period" th:if="${k.traziPeriod}">
+                                <label th:for="${'kriteriji' + stat.index + '.datumOd'}">Početak učešća</label>
+                                <input type="date" th:field="*{kriteriji[__${stat.index}__].datumOd}">
+                                <label th:for="${'kriteriji' + stat.index + '.datumDo'}">Kraj učešća</label>
+                                <input type="date" th:field="*{kriteriji[__${stat.index}__].datumDo}">
+                                <small class="hint">Boduju se puni mjeseci učešća (0,3 boda po mjesecu). Započeti mjesec se ne računa.</small>
+                            </div>
                         </div>
                     </th:block>
                 </div>
@@ -94,6 +102,13 @@
                                 <span class="krit-name" th:text="${k.naziv}">Kriterij</span>
                                 <span class="krit-doc">Potreban dokument</span>
                             </label>
+                            <div class="krit-param krit-period" th:if="${k.traziPeriod}">
+                                <label th:for="${'kriteriji' + stat.index + '.datumOd'}">Početak učešća</label>
+                                <input type="date" th:field="*{kriteriji[__${stat.index}__].datumOd}">
+                                <label th:for="${'kriteriji' + stat.index + '.datumDo'}">Kraj učešća</label>
+                                <input type="date" th:field="*{kriteriji[__${stat.index}__].datumDo}">
+                                <small class="hint">Boduju se puni mjeseci učešća (0,3 boda po mjesecu). Započeti mjesec se ne računa.</small>
+                            </div>
                         </div>
                     </th:block>
                 </div>

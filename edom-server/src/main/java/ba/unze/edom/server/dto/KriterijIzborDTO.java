@@ -1,6 +1,9 @@
 package ba.unze.edom.server.dto;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class KriterijIzborDTO {
 
@@ -35,4 +38,21 @@ public class KriterijIzborDTO {
 
     public String getNazivParametra() { return nazivParametra; }
     public void setNazivParametra(String v) { nazivParametra = v; }
+
+    private boolean traziPeriod;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate datumOd;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate datumDo;
+
+    public boolean isTraziPeriod() { return traziPeriod; }
+    public void setTraziPeriod(boolean v) { traziPeriod = v; }
+
+    public LocalDate getDatumOd() { return datumOd; }
+    public void setDatumOd(LocalDate v) { datumOd = v; }
+
+    public LocalDate getDatumDo() { return datumDo; }
+    public void setDatumDo(LocalDate v) { datumDo = v; }
 }

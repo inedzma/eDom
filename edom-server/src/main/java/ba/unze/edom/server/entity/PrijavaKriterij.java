@@ -28,4 +28,12 @@ public class PrijavaKriterij {
     /** Bez verifikacije administratora kriterij ne donosi bodove. */
     @Column(name = "verifikovan", nullable = false)
     private boolean verifikovan = false;
+
+    /** Za kriterije s periodom (OS RBiH): početak. */
+    @Column(name = "datum_od")
+    private java.time.LocalDate datumOd;
+
+    /** Za kriterije s periodom (OS RBiH): kraj. */
+    @Column(name = "datum_do")
+    private java.time.LocalDate datumDo;
 }

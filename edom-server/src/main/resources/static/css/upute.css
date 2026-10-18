@@ -319,7 +319,7 @@
 .up-table td:first-child { font-weight: 700; color: var(--up-heading); width: 40%; }
 
 /* ---------------- UPLATNICA (slika) ---------------- */
-.upl-slika { margin: 22px 0 0; max-width: 900px; }
+.upl-slika { margin: 22px 0 0; max-width: 650px; }
 .upl-slika a { display: block; }
 .upl-slika img {
     display: block;
@@ -340,7 +340,7 @@
     line-height: 1.55;
 }
 .upl-slika figcaption a {
-    display: inline-block;
+    display: inline;
     margin-top: 6px;
     color: var(--up-mint-dark);
     font-weight: 700;

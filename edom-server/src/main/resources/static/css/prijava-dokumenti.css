@@ -1,0 +1,258 @@
+/* =========================================================
+   E-Dom — korak "Dokumenti" u prijavi
+   Ide uz student.css i prijava.css (isti izgled kao ostali koraci).
+   ========================================================= */
+
+:root {
+    --pd-teal: #0b4a5e;
+    --pd-mint: #00bf9a;
+    --pd-mint-dark: #00a886;
+    --pd-mint-soft: #e8f8f3;
+    --pd-text: #3d5f69;
+    --pd-muted: #7f9aa2;
+    --pd-border: #dcebe7;
+    --pd-bg-soft: #f6fbfa;
+    --pd-warn: #c47f12;
+    --pd-warn-soft: #fff4e0;
+    --pd-danger: #c0392b;
+    --pd-danger-soft: #fdecea;
+}
+
+/* ---------- zaglavlje kartice s brojačem ---------- */
+.pd-card-head { align-items: center; }
+.pd-card-naslov { flex: 1; min-width: 220px; }
+
+.pd-napredak {
+    flex: 0 0 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: var(--pd-bg-soft);
+    border: 1px solid var(--pd-border);
+}
+.pd-napredak-broj { display: flex; align-items: baseline; gap: 4px; color: var(--pd-teal); }
+.pd-napredak-broj b { font-size: 28px; line-height: 1; }
+.pd-napredak-broj span { font-size: 16px; font-weight: 700; color: var(--pd-muted); }
+.pd-napredak small { color: var(--pd-muted); font-size: 13px; }
+.pd-traka { height: 8px; border-radius: 999px; background: var(--pd-border); overflow: hidden; }
+.pd-traka-ispuna { height: 100%; background: var(--pd-mint); border-radius: 999px; transition: width .4s ease; }
+
+/* ---------- grupe ---------- */
+.pd-grupa { margin-top: 26px; }
+.pd-grupa .krit-title { margin-bottom: 12px; }
+.pd-bez-dokaza { margin-top: 12px; }
+
+/* ---------- jedan red ---------- */
+.pd-lista { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+
+.pd-red {
+    position: relative;
+    background: #fff;
+    border: 1.5px solid var(--pd-border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    transition: border-color .2s, box-shadow .2s, background-color .6s;
+    scroll-margin-top: 100px;
+}
+.pd-red:hover { box-shadow: 0 6px 18px rgba(11, 74, 94, .06); }
+.pd-red--ok { border-color: #b3e6d7; }
+.pd-red--bljesak { background-color: var(--pd-mint-soft); }
+
+.pd-red-glava { display: flex; align-items: flex-start; gap: 14px; }
+
+.pd-status {
+    flex: 0 0 26px;
+    height: 26px;
+    margin-top: 1px;
+    border-radius: 50%;
+    border: 2px dashed #c3d9d4;
+    display: grid;
+    place-items: center;
+    color: transparent;
+}
+.pd-status--ok { border: 0; background: var(--pd-mint); color: #fff; }
+
+.pd-red-tekst { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.pd-red-tekst b { color: var(--pd-teal); font-size: 16px; line-height: 1.35; }
+.pd-red-tekst small { color: var(--pd-text); font-size: 14px; line-height: 1.5; }
+.pd-napomena-tekst a { color: var(--pd-mint-dark); font-weight: 800; text-decoration: underline; text-underline-offset: 2px; }
+.pd-napomena-tekst a:hover { color: var(--pd-teal); }
+
+.pd-oznaka {
+    flex: 0 0 auto;
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 800;
+    white-space: nowrap;
+    background: var(--pd-warn-soft);
+    color: var(--pd-warn);
+}
+.pd-oznaka--ok { background: var(--pd-mint-soft); color: var(--pd-mint-dark); }
+
+/* ---------- priloženi fajlovi ---------- */
+.pd-fajlovi { list-style: none; padding: 0; margin: 12px 0 0 40px; display: grid; gap: 6px; }
+.pd-fajlovi li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: var(--pd-bg-soft);
+    border: 1px solid var(--pd-border);
+    font-size: 14px;
+}
+.pd-fajl-ikona { color: var(--pd-mint-dark); display: grid; }
+.pd-fajl-naziv { flex: 1; min-width: 140px; color: var(--pd-teal); font-weight: 700; }
+.pd-fajl-naziv em { font-style: normal; font-weight: 600; color: var(--pd-text); }
+.pd-fajl-datum { color: var(--pd-muted); font-size: 13px; }
+.pd-obrisi { margin: 0; display: inline; }
+.pd-fajl-akcija {
+    border: 0;
+    background: none;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--pd-mint-dark);
+    text-decoration: none;
+    cursor: pointer;
+}
+.pd-fajl-akcija:hover { background: var(--pd-mint-soft); }
+.pd-fajl-akcija--obrisi { color: var(--pd-danger); }
+.pd-fajl-akcija--obrisi:hover { background: var(--pd-danger-soft); }
+
+/* ---------- forma za prilaganje ---------- */
+.pd-upload {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 14px 0 0 40px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--pd-bg-soft);
+}
+.pd-polje { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.pd-polje span {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: var(--pd-muted);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+.pd-polje select,
+.pd-polje input[type=text] {
+    box-sizing: border-box;
+    height: 42px;
+    padding: 0 12px;
+    border: 1.5px solid var(--pd-border);
+    border-radius: 10px;
+    font: inherit;
+    font-size: 15px;
+    color: var(--pd-teal);
+    background: #fff;
+    min-width: 200px;
+    max-width: 340px;
+}
+.pd-polje select:focus,
+.pd-polje input:focus { outline: none; border-color: var(--pd-mint); box-shadow: 0 0 0 3px rgba(0,191,154,.15); }
+
+/* dugme za izbor fajla umjesto "Choose file" */
+.pd-fajl-izbor {
+    box-sizing: border-box;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 14px;
+    max-width: 280px;
+    border: 1.5px dashed #b9d6cf;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--pd-text);
+    font-weight: 700;
+    font-size: 14.5px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+}
+.pd-fajl-izbor:hover { border-color: var(--pd-mint); }
+.pd-fajl-izbor input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+}
+.pd-fajl-izbor svg { flex: 0 0 auto; color: var(--pd-mint-dark); }
+.pd-fajl-ime { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pd-fajl-izbor--odabran { border-style: solid; border-color: var(--pd-mint); background: var(--pd-mint-soft); color: var(--pd-teal); }
+
+.pd-prilozi { height: 42px; min-width: 110px; justify-content: center; }
+
+/* poruka nakon prilaganja/brisanja */
+.pd-poruka {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--pd-mint-dark);
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: opacity .3s, max-height .3s;
+}
+.pd-poruka--vidljiva { max-height: 80px; opacity: 1; }
+.pd-poruka--greska { color: var(--pd-danger); }
+.pd-red > .pd-poruka { margin: 10px 0 0 40px; }
+
+.pd-greska { margin: 10px 0 0 40px; color: var(--pd-danger); font-size: 14px; }
+
+/* ---------- popup ---------- */
+.pd-dialog {
+    width: min(460px, calc(100vw - 32px));
+    border: 0;
+    border-radius: 20px;
+    padding: 28px 26px 22px;
+    box-shadow: 0 24px 60px rgba(11, 74, 94, .25);
+    color: var(--pd-text);
+}
+.pd-dialog::backdrop { background: rgba(11, 74, 94, .35); backdrop-filter: blur(2px); }
+.pd-dialog-ikona {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--pd-warn-soft);
+    color: var(--pd-warn);
+    font-size: 22px;
+    font-weight: 900;
+    margin-bottom: 12px;
+}
+.pd-dialog h3 { margin: 0 0 10px; color: var(--pd-teal); font-size: 20px; }
+.pd-dialog p { margin: 8px 0; line-height: 1.5; }
+.pd-dialog ul { margin: 6px 0 10px; padding-left: 20px; }
+.pd-dialog li { margin: 3px 0; font-weight: 700; color: var(--pd-teal); }
+.pd-dialog-dugmad { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+/* ---------- mobitel ---------- */
+@media (max-width: 640px) {
+    .pd-napredak { flex-basis: 100%; }
+    .pd-red { padding: 14px; }
+    .pd-red-glava { flex-wrap: wrap; row-gap: 8px; }
+    .pd-red-tekst { flex: 1 1 calc(100% - 40px); }
+    .pd-oznaka { margin-left: 40px; }
+    .pd-fajlovi, .pd-upload, .pd-greska, .pd-red > .pd-poruka { margin-left: 0; }
+    .pd-polje, .pd-polje select, .pd-polje input[type=text], .pd-fajl-izbor, .pd-prilozi {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+    }
+    .pd-dialog-dugmad .btn { flex: 1; justify-content: center; }
+}

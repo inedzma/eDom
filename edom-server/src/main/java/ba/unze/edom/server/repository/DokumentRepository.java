@@ -2,6 +2,7 @@ package ba.unze.edom.server.repository;
 
 import ba.unze.edom.common.dto.DokumentDTO;
 import ba.unze.edom.server.dto.DokumentPregled;
+import ba.unze.edom.server.dto.PrilozeniDokument;
 import ba.unze.edom.server.entity.Dokument;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -43,4 +44,16 @@ public interface DokumentRepository extends JpaRepository<Dokument, Integer> {
     List<Object[]> brojPoPrijavi(@Param("godina") Integer godina);
 
     boolean existsByIdDokumentAndPrijava_IdPrijava(Integer idDokument, Integer idPrijava);
+
+    /** Priloženi dokumenti prijave, bez Base64 sadržaja. */
+    @Query("""
+           select new ba.unze.edom.server.dto.PrilozeniDokument(
+               d.idDokument, d.naziv, v.idVrsta, v.naziv, d.datumUpload,
+               case when d.dokumentB64 is not null then true else false end)
+           from Dokument d
+             left join d.vrstaDokumenta v
+           where d.prijava.idPrijava = :idPrijave
+           order by d.idDokument
+           """)
+    List<PrilozeniDokument> prilozeniZaPrijavu(@Param("idPrijave") Integer idPrijave);
 }

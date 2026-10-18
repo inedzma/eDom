@@ -4,6 +4,7 @@ import ba.unze.edom.server.dto.*;
 import ba.unze.edom.server.exception.PrijavaException;
 import ba.unze.edom.server.security.KorisnikPrincipal;
 import ba.unze.edom.server.service.BodovanjeService;
+import ba.unze.edom.server.service.PotrebniDokumentiService;
 import ba.unze.edom.server.service.PrijavaService;
 import ba.unze.edom.server.service.DokumentService;
 import jakarta.validation.Valid;
@@ -28,6 +29,7 @@ public class PrijavaWebController {
 
     private final PrijavaService prijavaService;
     private final BodovanjeService bodovanjeService;
+    private final PotrebniDokumentiService potrebniDokumentiService;
 
     // ---------- KREIRANJE ----------
 
@@ -150,7 +152,7 @@ public class PrijavaWebController {
                                    Model model) {
         try {
             prijavaService.sacuvajKriterije(id, k.getIdStudenta(), forma);
-            return "redirect:/student/prijava/" + id + "/pregled";
+            return "redirect:/student/prijava/" + id + "/dokumenti";
         } catch (RuntimeException e) {
             model.addAttribute("idPrijave", id);
             model.addAttribute("korak", 3);
@@ -174,6 +176,7 @@ public class PrijavaWebController {
         model.addAttribute("korak", 4);
         model.addAttribute("prijava", p);
         model.addAttribute("rezultat", bodovanjeService.izracunaj(p));
+        model.addAttribute("korak", 5);
 
         return "student/prijava/pregled";
     }
@@ -231,15 +234,14 @@ public class PrijavaWebController {
                             @AuthenticationPrincipal KorisnikPrincipal k,
                             Model model) {
 
-        var p = prijavaService.dohvatiSvoju(id, k.getIdStudenta());
+        var p = prijavaService.dohvatiSvoju(id, k.getIdStudenta());   // provjera vlasništva
+        String status = p.getStatus() != null ? p.getStatus().getNaziv() : "";
 
-        model.addAttribute("prijava", p);
         model.addAttribute("idPrijave", id);
-        model.addAttribute("dokumenti", dokumentService.zaPrijavu(id));
-        model.addAttribute("vrste", dokumentService.vrstePoKategoriji());
-        model.addAttribute("uIzradi",
-                p.getStatus() != null
-                        && "u izradi".equals(p.getStatus().getNaziv()));
+        model.addAttribute("korak", 4);
+        model.addAttribute("spisak", potrebniDokumentiService.zaPrijavu(id));
+        model.addAttribute("uIzradi", "u izradi".equals(status));
+        model.addAttribute("mozeMijenjati", "u izradi".equals(status) || "na pregledu".equals(status));
 
         return "student/prijava/dokumenti";
     }

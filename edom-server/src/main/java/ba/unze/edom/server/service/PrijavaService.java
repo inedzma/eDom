@@ -104,11 +104,14 @@ public class PrijavaService {
             red.setGrupa(v.getGrupa());
             red.setTraziParametar(v.isTraziParametar());
             red.setNazivParametra(v.getNazivParametra());
+            red.setTraziPeriod(v.isTraziPeriod());
 
             PrijavaKriterij vec = izabrani.get(v.getIdVrstaKriterija());
             if (vec != null) {
                 red.setIzabran(true);
                 red.setParametar(vec.getParametar());
+                red.setDatumOd(vec.getDatumOd());
+                red.setDatumDo(vec.getDatumDo());
             }
 
             forma.getKriteriji().add(red);
