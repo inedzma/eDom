@@ -17,5 +17,7 @@ public record PrijavaUnosDTO(
         /** original pregledan pri ručnom unosu */
         boolean uspjehVerifikovan,
         boolean udaljenostVerifikovana,
-        boolean primanjaVerifikovana
+        boolean primanjaVerifikovana,
+
+        Integer upisGodinePut
 ) {}

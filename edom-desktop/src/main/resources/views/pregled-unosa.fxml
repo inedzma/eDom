@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.PregledUnosaController"
+            styleClass="scroll-pane"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED">
+
+    <stylesheets>
+        <URL value="@../styles/nova-prijava-style.css"/>
+        <URL value="@../styles/dodaj-dokument-style.css"/>
+    </stylesheets>
+
+    <content>
+        <StackPane styleClass="page-wrapper">
+            <padding>
+                <Insets top="30" right="30" bottom="30" left="30"/>
+            </padding>
+
+            <VBox styleClass="card" spacing="18">
+
+                <VBox spacing="6">
+                    <Label text="Nova prijava: pregled" styleClass="page-title"/>
+                    <Label text="Provjerite podatke prije podnošenja." styleClass="page-subtitle"/>
+                </VBox>
+
+                <VBox spacing="10">
+                    <ProgressBar fx:id="traka" styleClass="progress-top"/>
+                    <HBox fx:id="stepper" styleClass="stepper"/>
+                </VBox>
+
+                <Label text="Podaci" styleClass="section-pill"/>
+                <Separator styleClass="soft-separator"/>
+                <VBox fx:id="vboxSazetak" spacing="8"/>
+
+                <Label text="Bodovi" styleClass="section-pill"/>
+                <Separator styleClass="soft-separator"/>
+                <VBox spacing="6" styleClass="doc-card">
+                    <Label fx:id="lblBodovi" styleClass="page-title"/>
+                    <Label fx:id="lblBodoviOpis" wrapText="true" styleClass="doc-subtitle"/>
+                    <VBox fx:id="vboxUpozorenja" spacing="6"/>
+                </VBox>
+
+                <VBox spacing="6">
+                    <Label text="Napomena" styleClass="field-label"/>
+                    <TextArea fx:id="txtNapomena" prefHeight="90" styleClass="area"/>
+                </VBox>
+
+                <HBox alignment="CENTER" spacing="16" styleClass="footer-box">
+                    <Button text="← Nazad" onAction="#onNazad" styleClass="btn-back"/>
+                    <Button fx:id="btnPodnesi" text="Podnesi prijavu" onAction="#onPodnesi"
+                            prefWidth="240" styleClass="btn-next"/>
+                </HBox>
+
+            </VBox>
+        </StackPane>
+    </content>
+</ScrollPane>

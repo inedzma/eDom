@@ -1,160 +1,177 @@
 package controllers;
 
-import ba.unze.edom.common.dto.VrstaKriterijaDTO;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import unos.NacrtPrijave;
 import util.Ekrani;
+import util.KoraciUnosa;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
+/** Korak 2: domaćinstvo (broj članova, udaljenost, članovi s primanjima). */
 public class NovaPrijavaController {
 
-    @FXML private TextField txtAkGod;
+    private static final int NAJVISE_CLANOVA = 20;
+
+    @FXML private HBox stepper;
+    @FXML private ProgressBar traka;
     @FXML private TextField txtClanovi;
     @FXML private TextField txtUdaljenost;
-    @FXML private TextArea txtNapomena;
-    @FXML private VBox vboxKriteriji;
+    @FXML private VBox vboxClanovi;
+    @FXML private Label lblUkupno;
 
     private NacrtPrijave nacrt;
 
-    /** Jedan kriterij na ekranu: kvačica i, ako treba, polje za parametar. */
-    private record KriterijPolje(VrstaKriterijaDTO vrsta, CheckBox chk, TextField parametar) {}
+    private record ClanPolja(TextField ime, TextField primanja) {}
 
-    private final List<KriterijPolje> polja = new ArrayList<>();
+    private final List<ClanPolja> polja = new ArrayList<>();
+
+    @FXML
+    public void initialize() {
+        KoraciUnosa.popuni(stepper, traka, 2);
+        txtClanovi.textProperty().addListener((obs, o, n) -> napraviClanove());
+    }
 
     public void setNacrt(NacrtPrijave n) {
         this.nacrt = n;
-        napraviKriterije();
-        popuni();
+        if (n.udaljenostKm != null) txtUdaljenost.setText(n.udaljenostKm.toPlainString());
+        if (n.brojClanova != null) txtClanovi.setText(String.valueOf(n.brojClanova));
+        napraviClanove();
     }
 
-    // ---------- kriteriji iz baze ----------
+    // ---------- članovi ----------
 
-    private void napraviKriterije() {
-        vboxKriteriji.getChildren().clear();
+    private void napraviClanove() {
+        if (nacrt == null) return;
+        sacuvajClanove();
+        vboxClanovi.getChildren().clear();
         polja.clear();
 
-        Map<String, List<VrstaKriterijaDTO>> poGrupi = nacrt.sifarnici.kriteriji().stream()
-                .collect(Collectors.groupingBy(VrstaKriterijaDTO::grupa,
-                        LinkedHashMap::new, Collectors.toList()));
-
-        poGrupi.forEach((grupa, vrste) -> {
-            Label naslov = new Label(nazivGrupe(grupa));
-            naslov.getStyleClass().add("field-label");
-            vboxKriteriji.getChildren().add(naslov);
-
-            for (VrstaKriterijaDTO v : vrste) {
-                CheckBox chk = new CheckBox(v.naziv());
-                chk.getStyleClass().add("checkbox");
-                chk.setWrapText(true);
-                chk.setMaxWidth(Double.MAX_VALUE);
-
-                VBox red = new VBox(6, chk);
-
-                TextField param = null;
-                if (v.traziParametar()) {
-                    param = new TextField();
-                    param.setPromptText(v.nazivParametra());
-                    param.getStyleClass().add("field");
-                    param.setMaxWidth(320);
-                    VBox.setMargin(param, new Insets(0, 0, 0, 34));   // uvučeno ispod kvačice
-                    param.visibleProperty().bind(chk.selectedProperty());
-                    param.managedProperty().bind(chk.selectedProperty());
-                    red.getChildren().add(param);
-                }
-
-                polja.add(new KriterijPolje(v, chk, param));
-                vboxKriteriji.getChildren().add(red);
-            }
-        });
-    }
-
-    private String nazivGrupe(String grupa) {
-        if ("BRANIOCI".equalsIgnoreCase(grupa)) return "Boračke i socijalne kategorije (boduje se samo najveća)";
-        if ("DODATNI".equalsIgnoreCase(grupa)) return "Ostali kriteriji (sabiraju se)";
-        return grupa;
-    }
-
-    private void popuni() {
-        txtAkGod.setText(String.valueOf(
-                nacrt.akademskaGodina != null ? nacrt.akademskaGodina : LocalDate.now().getYear()));
-        if (nacrt.brojClanova != null) txtClanovi.setText(String.valueOf(nacrt.brojClanova));
-        if (nacrt.udaljenostKm != null) txtUdaljenost.setText(nacrt.udaljenostKm.toPlainString());
-        if (nacrt.napomena != null) txtNapomena.setText(nacrt.napomena);
-
-        for (KriterijPolje p : polja) {
-            String sifra = p.vrsta().sifra();
-            if (nacrt.kriteriji.containsKey(sifra)) {
-                p.chk().setSelected(true);
-                BigDecimal param = nacrt.kriteriji.get(sifra);
-                if (p.parametar() != null && param != null) p.parametar().setText(param.toPlainString());
-            }
+        Integer broj = cijeli(txtClanovi);
+        if (broj == null || broj < 1) {
+            vboxClanovi.getChildren().add(opis("Unesite broj članova domaćinstva, zajedno sa studentom."));
+            osvjeziUkupno();
+            return;
         }
+
+        int ostalih = Math.min(broj, NAJVISE_CLANOVA) - 1;
+        vboxClanovi.getChildren().add(opis(ostalih == 0
+                ? "Student živi sam: nema drugih članova."
+                : "Ostali članovi domaćinstva, bez studenta (" + ostalih + "):"));
+
+        for (int i = 0; i < ostalih; i++) {
+            NacrtPrijave.Clan stari = i < nacrt.clanovi.size() ? nacrt.clanovi.get(i) : null;
+
+            TextField ime = new TextField(stari != null && stari.ime() != null ? stari.ime() : "");
+            ime.setPromptText("Ime / uloga (npr. majka)");
+            ime.getStyleClass().add("field");
+            HBox.setHgrow(ime, Priority.ALWAYS);
+
+            TextField primanja = new TextField(stari != null && stari.primanja() != null
+                    ? stari.primanja().toPlainString() : "");
+            primanja.setPromptText("Mjesečna primanja (KM)");
+            primanja.getStyleClass().add("field");
+            primanja.setPrefWidth(220);
+            primanja.textProperty().addListener((obs, o, n) -> osvjeziUkupno());
+
+            Label naslov = new Label("Član " + (i + 1));
+            naslov.getStyleClass().add("member-title");
+
+            VBox kartica = new VBox(10, naslov, new HBox(12, ime, primanja));
+            kartica.getStyleClass().add("household-member-card");
+            vboxClanovi.getChildren().add(kartica);
+
+            polja.add(new ClanPolja(ime, primanja));
+        }
+        osvjeziUkupno();
+    }
+
+    /** Ono što je upisano ne smije nestati kad se promijeni broj članova. */
+    private void sacuvajClanove() {
+        if (polja.isEmpty()) return;
+        nacrt.clanovi.clear();
+        for (ClanPolja p : polja) {
+            nacrt.clanovi.add(new NacrtPrijave.Clan(p.ime().getText(), decimalni(p.primanja())));
+        }
+    }
+
+    private void osvjeziUkupno() {
+        BigDecimal ukupno = BigDecimal.ZERO;
+        for (ClanPolja p : polja) {
+            BigDecimal b = decimalni(p.primanja());
+            if (b != null) ukupno = ukupno.add(b);
+        }
+        lblUkupno.setText("Ukupna mjesečna primanja domaćinstva: " + ukupno.toPlainString() + " KM");
     }
 
     // ---------- navigacija ----------
 
     @FXML
-    private void onSaveClicked() {
-        Integer akGod = cijeli(txtAkGod);
+    private void onDalje() {
         Integer clanovi = cijeli(txtClanovi);
         BigDecimal udaljenost = decimalni(txtUdaljenost);
 
-        if (akGod == null || clanovi == null || udaljenost == null) {
-            alert("Akademska godina, broj članova i udaljenost su obavezni i moraju biti brojevi.");
+        if (clanovi == null || clanovi < 1) {
+            alert("Broj članova domaćinstva je obavezan (najmanje 1, sa studentom).");
             return;
         }
-        if (akGod < LocalDate.now().getYear()) {
-            alert("Akademska godina ne može biti manja od tekuće.");
+        if (clanovi > NAJVISE_CLANOVA) {
+            alert("Najviše " + NAJVISE_CLANOVA + " članova domaćinstva.");
             return;
         }
-        if (clanovi < 1) {
-            alert("Domaćinstvo ima najmanje jednog člana (studenta).");
+        if (udaljenost == null || udaljenost.signum() < 0) {
+            alert("Udaljenost je obavezna i mora biti broj, npr. 43.");
             return;
         }
 
-        Map<String, BigDecimal> izabrani = new LinkedHashMap<>();
-        for (KriterijPolje p : polja) {
-            if (!p.chk().isSelected()) continue;
-
-            BigDecimal param = null;
-            if (p.parametar() != null) {
-                param = decimalni(p.parametar());
-                if (param == null) {
-                    alert("Za kriterij '" + p.vrsta().naziv() + "' unesite "
-                            + p.vrsta().nazivParametra().toLowerCase() + ".");
+        List<NacrtPrijave.Clan> novi = new ArrayList<>();
+        for (int i = 0; i < polja.size(); i++) {
+            ClanPolja p = polja.get(i);
+            BigDecimal primanja = null;
+            if (!p.primanja().getText().isBlank()) {
+                primanja = decimalni(p.primanja());
+                if (primanja == null || primanja.signum() < 0) {
+                    alert("Primanja za člana " + (i + 1) + " moraju biti broj (0 ako nema primanja).");
                     return;
                 }
             }
-            izabrani.put(p.vrsta().sifra(), param);
+            novi.add(new NacrtPrijave.Clan(p.ime().getText().trim(), primanja));
         }
 
-        nacrt.akademskaGodina = akGod;
         nacrt.brojClanova = clanovi;
         nacrt.udaljenostKm = udaljenost;
-        nacrt.napomena = txtNapomena.getText();
-        nacrt.kriteriji.clear();
-        nacrt.kriteriji.putAll(izabrani);
+        nacrt.clanovi.clear();
+        nacrt.clanovi.addAll(novi);
 
-        Ekrani.<DodajDokumenteController>zamijeni(txtAkGod, "/views/dodaj-dokumente.fxml",
+        Ekrani.<KriterijiUnosController>zamijeni(txtClanovi, "/views/kriteriji-unos.fxml",
                 c -> c.setNacrt(nacrt));
     }
 
     @FXML
-    private void onBackClicked() {
-        Ekrani.<NoviStudentController>zamijeni(txtAkGod, "/views/novi-student.fxml",
+    private void onNazad() {
+        sacuvajClanove();
+        Integer clanovi = cijeli(txtClanovi);
+        if (clanovi != null) nacrt.brojClanova = clanovi;
+        BigDecimal udaljenost = decimalni(txtUdaljenost);
+        if (udaljenost != null) nacrt.udaljenostKm = udaljenost;
+
+        Ekrani.<NoviStudentController>zamijeni(txtClanovi, "/views/novi-student.fxml",
                 c -> c.setNacrt(nacrt));
     }
 
     // ---------- pomoćne ----------
+
+    private Label opis(String tekst) {
+        Label l = new Label(tekst);
+        l.getStyleClass().add("doc-subtitle");
+        l.setWrapText(true);
+        return l;
+    }
 
     private Integer cijeli(TextField t) {
         try {

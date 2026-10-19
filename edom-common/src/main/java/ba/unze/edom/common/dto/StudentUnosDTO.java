@@ -16,5 +16,11 @@ public record StudentUnosDTO(
         @NotNull(message = "Godina studija je obavezna.") @Min(1) @Max(8) Integer godinaStudija,
         @NotBlank(message = "Adresa je obavezna.") @Size(max = 50) String adresa,
         @NotBlank(message = "Ime roditelja je obavezno.") @Size(max = 20) String imeRoditelja,
-        Integer idSocijalnogStatusa
+        Integer idSocijalnogStatusa,
+
+        // traži se u prijavi (web korak 1, desktop ručni unos), ne pri registraciji
+        @Size(max = 20) String brojLicneKarte,
+        @Size(max = 30) String telefonRoditelja,
+        @Size(max = 60) String kanton,
+        @Size(max = 60) String opcina
 ) {}

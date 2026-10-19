@@ -24,7 +24,6 @@
         <p class="muted">Popunite podatke korak po korak.</p>
     </div>
 
-    <!-- koraci (tvoj postojeći fragment) -->
     <div class="wizard-steps">
         <div th:replace="~{fragments/koraci :: koraci(${korak})}"></div>
     </div>
@@ -37,24 +36,28 @@
             </span>
             <div>
                 <h2>Podaci o studiju</h2>
-                <p class="muted">Akademska godina, godina studija i uspjeh.</p>
+                <p class="muted">Akademska godina, godina studija, uspjeh i lični podaci.</p>
             </div>
         </div>
 
         <form th:action="@{/student/prijava/{id}/studij(id=${idPrijave})}"
               th:object="${forma}" method="post" id="studijForm">
 
+            <!-- greška iz servisa (npr. općina ne pripada kantonu) -->
+            <p class="field-err" th:if="${greska}" th:text="${greska}"></p>
+
+            <!-- ---------- studij ---------- -->
             <div class="grid-2">
                 <div class="f-field">
                     <label for="akademskaGodina">Akademska godina</label>
-                    <input type="number" th:field="*{akademskaGodina}" th:errorclass="is-invalid" placeholder="npr. 2025">
+                    <input type="number" id="akademskaGodina" th:field="*{akademskaGodina}" th:errorclass="is-invalid" placeholder="npr. 2026">
                     <span class="field-err" th:if="${#fields.hasErrors('akademskaGodina')}" th:errors="*{akademskaGodina}"></span>
                 </div>
 
                 <div class="f-field">
                     <label for="godinaStudija">Godina studija</label>
                     <div class="select-wrap">
-                        <select th:field="*{godinaStudija}" th:errorclass="is-invalid">
+                        <select id="godinaStudija" th:field="*{godinaStudija}" th:errorclass="is-invalid">
                             <option value="">Odaberite</option>
                             <option value="1">1. godina (brucoš)</option>
                             <option value="2">2. godina</option>
@@ -71,7 +74,7 @@
 
                 <div class="f-field">
                     <label for="prosjek">Prosjek ocjena</label>
-                    <input type="number" step="0.01" th:field="*{prosjek}" th:errorclass="is-invalid" placeholder="npr. 8.45">
+                    <input type="number" step="0.01" id="prosjek" th:field="*{prosjek}" th:errorclass="is-invalid" placeholder="npr. 8.45">
                     <span class="field-err" th:if="${#fields.hasErrors('prosjek')}" th:errors="*{prosjek}"></span>
                     <p class="hint" id="prosjekHint">
                         Brucoši unose prosjek srednje škole (1.00–5.00),
@@ -81,9 +84,64 @@
 
                 <div class="f-field" id="ispitiField">
                     <label for="polozeniIspiti">Broj položenih ispita</label>
-                    <input type="number" th:field="*{polozeniIspiti}" th:errorclass="is-invalid" min="0" placeholder="npr. 12">
+                    <input type="number" id="polozeniIspiti" th:field="*{polozeniIspiti}" th:errorclass="is-invalid" min="0" placeholder="npr. 12">
                     <span class="field-err" th:if="${#fields.hasErrors('polozeniIspiti')}" th:errors="*{polozeniIspiti}"></span>
                     <p class="hint" id="ispitiHint">Brucoši ostavljaju prazno.</p>
+                </div>
+
+                <div class="f-field">
+                    <label for="upisGodinePut">Koji put upisujete ovu godinu studija</label>
+                    <div class="select-wrap">
+                        <select id="upisGodinePut" th:field="*{upisGodinePut}" th:errorclass="is-invalid">
+                            <option value="1">1. put (prvi upis)</option>
+                            <option value="2">2. put (ponavljam godinu)</option>
+                            <option value="3">3. put</option>
+                            <option value="4">4. put ili više</option>
+                        </select>
+                    </div>
+                    <span class="field-err" th:if="${#fields.hasErrors('upisGodinePut')}" th:errors="*{upisGodinePut}"></span>
+                    <p class="hint">Ako ponavljate godinu, oduzimaju se 3 boda (prema Pravilniku).</p>
+                </div>
+            </div>
+
+            <!-- ---------- lični podaci ---------- -->
+            <span class="eyebrow dark">Lični podaci</span>
+
+            <div class="grid-2">
+                <div class="f-field">
+                    <label for="brojLicneKarte">Broj lične karte</label>
+                    <input type="text" id="brojLicneKarte" th:field="*{brojLicneKarte}" th:errorclass="is-invalid" maxlength="20" placeholder="npr. 1E2A3B4C5">
+                    <span class="field-err" th:if="${#fields.hasErrors('brojLicneKarte')}" th:errors="*{brojLicneKarte}"></span>
+                </div>
+
+                <div class="f-field">
+                    <label for="telefonRoditelja">Broj telefona roditelja</label>
+                    <input type="tel" id="telefonRoditelja" th:field="*{telefonRoditelja}" th:errorclass="is-invalid" maxlength="30" placeholder="+387 6x xxx xxx">
+                    <span class="field-err" th:if="${#fields.hasErrors('telefonRoditelja')}" th:errors="*{telefonRoditelja}"></span>
+                </div>
+
+                <div class="f-field">
+                    <label for="kanton">Kanton / entitet prebivališta</label>
+                    <div class="select-wrap">
+                        <select id="kanton" th:field="*{kanton}" th:errorclass="is-invalid">
+                            <option value="">Odaberite</option>
+                            <option th:each="kan : ${opcinePoKantonu.keySet()}" th:value="${kan}" th:text="${kan}"></option>
+                        </select>
+                    </div>
+                    <span class="field-err" th:if="${#fields.hasErrors('kanton')}" th:errors="*{kanton}"></span>
+                </div>
+
+                <div class="f-field">
+                    <label for="opcina">Općina / grad prebivališta</label>
+                    <div class="select-wrap">
+                        <select id="opcina" th:field="*{opcina}" th:errorclass="is-invalid">
+                            <option value="">Prvo odaberite kanton</option>
+                            <th:block th:each="e : ${opcinePoKantonu}">
+                                <option th:each="o : ${e.value}" th:value="${o}" th:text="${o}" th:attr="data-kanton=${e.key}"></option>
+                            </th:block>
+                        </select>
+                    </div>
+                    <span class="field-err" th:if="${#fields.hasErrors('opcina')}" th:errors="*{opcina}"></span>
                 </div>
             </div>
 
@@ -150,9 +208,35 @@
         godina.addEventListener('change', azuriraj);
         azuriraj();
 
+        // općine samo za izabrani kanton
+        const kanton = document.getElementById('kanton');
+        const opcina = document.getElementById('opcina');
+
+        function filtrirajOpcine(zadrzi) {
+            const k = kanton.value;
+            let nadjena = false;
+            Array.prototype.forEach.call(opcina.options, function (o) {
+                if (!o.value) return;                    // "Odaberite"
+                const pripada = o.dataset.kanton === k;
+                o.hidden = !pripada;
+                o.disabled = !pripada;
+                o.selected = false;
+                if (pripada && zadrzi && o.value === zadrzi && !nadjena) {
+                    o.selected = true;
+                    nadjena = true;
+                }
+            });
+            if (!nadjena) opcina.value = '';
+            opcina.options[0].textContent = k ? 'Odaberite' : 'Prvo odaberite kanton';
+        }
+        const pocetnaOpcina = opcina.value;              // kad se vrati s greškom ili nazad
+        kanton.addEventListener('change', function () { filtrirajOpcine(null); });
+        filtrirajOpcine(pocetnaOpcina);
+
         // skini crveni okvir čim korisnik ispravi polje
         form.querySelectorAll('.is-invalid').forEach(function (el) {
-            el.addEventListener('input', function () {
+            const ev = el.tagName === 'SELECT' ? 'change' : 'input';
+            el.addEventListener(ev, function () {
                 el.classList.remove('is-invalid');
                 const err = el.closest('.f-field').querySelector('.field-err');
                 if (err) err.style.display = 'none';

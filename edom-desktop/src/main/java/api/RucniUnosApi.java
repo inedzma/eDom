@@ -1,9 +1,6 @@
 package api;
 
-import ba.unze.edom.common.dto.RucniUnosDTO;
-import ba.unze.edom.common.dto.RucniUnosRezultatDTO;
-import ba.unze.edom.common.dto.SifarniciDTO;
-import ba.unze.edom.common.dto.StudentPronadjenDTO;
+import ba.unze.edom.common.dto.*;
 
 import java.util.Optional;
 
@@ -13,6 +10,14 @@ public final class RucniUnosApi {
 
     public static SifarniciDTO sifarnici() {
         return ApiClient.get("/api/sifarnici", SifarniciDTO.class);
+    }
+
+    public static SpisakUnosDTO spisakDokumenata(SpisakUnosZahtjevDTO z) {
+        return ApiClient.post("/api/prijave/rucni-unos/spisak-dokumenata", z, SpisakUnosDTO.class);
+    }
+
+    public static RezultatBodovanja pregledBodova(RucniUnosDTO z) {
+        return ApiClient.post("/api/prijave/rucni-unos/pregled-bodova", z, RezultatBodovanja.class);
     }
 
     public static Optional<StudentPronadjenDTO> nadjiPoJmbg(String jmbg) {

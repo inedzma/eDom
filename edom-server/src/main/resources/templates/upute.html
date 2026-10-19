@@ -231,13 +231,20 @@
                             </span>
                         </label>
                     </li>
-                    <li class="up-check">
+                    <li class="up-check" id="garancija">
                         <label>
                             <input type="checkbox" data-key="garancija" data-obavezno>
                             <span>
                                 <b>Ovjerena garancija</b>
-                                <small>Garancija o preuzimanju obaveza, ovjerena u općini ili kod notara. Obrazac se preuzima u Centru ili na web stranici. Garant prilaže svoje dokumente — pogledajte ispod.</small>
-                            </span>
+                                    <small>
+                                        Garancija o preuzimanju obaveza, ovjerena u općini ili kod notara.
+                                        Preuzmite obrazac:
+                                        <a th:href="@{/dokumenti/garancija.doc}" download="Garancija.docx">Word (za popunjavanje na računaru)</a>
+                                        ili
+                                        <a th:href="@{/dokumenti/garancija.pdf}" target="_blank" rel="noopener">PDF (za štampanje)</a>.
+                                        Garant prilaže svoje dokumente — pogledajte ispod.
+                                    </small>
+                                </span>
                         </label>
                     </li>
                 </ul>

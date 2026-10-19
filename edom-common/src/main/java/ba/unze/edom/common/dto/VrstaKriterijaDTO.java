@@ -9,5 +9,6 @@ public record VrstaKriterijaDTO(
         String nazivParametra,
 
         Integer idDokaza,
-        String nazivDokaza
+        String nazivDokaza,
+        boolean traziPeriod
 ) {}

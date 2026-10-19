@@ -27,7 +27,9 @@ public class RegistracijaService {
     public Korisnik registruj(RegistracijaZahtjev z) {
         Student student = studentEvidencija.nadjiIliKreiraj(new StudentUnosDTO(
                 z.ime(), z.prezime(), z.jmbg(), z.brojIndeksa(), z.email(), z.telefon(),
-                z.fakultet(), z.godinaStudija(), z.adresa(), z.imeRoditelja(), null));
+                z.fakultet(), z.godinaStudija(), z.adresa(), z.imeRoditelja(), null,
+                // lična karta, telefon roditelja, kanton, općina: unose se u prijavi
+                null, null, null, null));
 
         if (korisnikRepository.findByStudent_IdStudent(student.getIdStudent()).isPresent()) {
             throw new RegistracijaException(

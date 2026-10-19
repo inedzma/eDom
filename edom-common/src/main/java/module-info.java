@@ -3,4 +3,7 @@ module ba.unze.edom.common {
 
     exports ba.unze.edom.common.dto;
     opens ba.unze.edom.common.dto;
+
+    exports ba.unze.edom.common.util;
+    opens ba.unze.edom.common.util;
 }

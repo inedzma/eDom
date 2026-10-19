@@ -2,9 +2,12 @@ package controllers;
 
 import api.ApiException;
 import api.RucniUnosApi;
+import ba.unze.edom.common.dto.SifarniciDTO;
 import ba.unze.edom.common.dto.SocijalniStatusDTO;
 import ba.unze.edom.common.dto.StudentPronadjenDTO;
 import ba.unze.edom.common.dto.StudentUnosDTO;
+import ba.unze.edom.common.util.Jmbg;
+import ba.unze.edom.common.util.Opcine;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
@@ -13,15 +16,20 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import unos.NacrtPrijave;
 import util.Ekrani;
+import util.KoraciUnosa;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/** Korak 1: student, lični podaci i studij. */
 public class NoviStudentController {
 
     private static final List<String> FAKULTETI = List.of(
@@ -37,37 +45,81 @@ public class NoviStudentController {
     private static final List<String> GODINE =
             List.of("1", "2", "3", "4", "5", "6", "Apsolvent", "Postdiplomac");
 
+    /** Redni broj u listi + 1 = upisGodinePut (zadnja stavka znači 4 ili više). */
+    private static final List<String> UPIS = List.of(
+            "1. put (prvi upis)", "2. put (ponavlja godinu)", "3. put", "4. put ili više");
+
+    @FXML private HBox stepper;
+    @FXML private ProgressBar traka;
+    @FXML private Label lblPostojeci;
+
+    // osnovno
     @FXML private TextField txtIme;
     @FXML private TextField txtPrezime;
+    @FXML private TextField txtRoditelj;
+    @FXML private TextField txtJMBG;
+    @FXML private Label lblSpol;
     @FXML private TextField txtIndeks;
     @FXML private ComboBox<String> cmbFakultet;
     @FXML private ComboBox<String> cmbGodina;
     @FXML private TextField txtProsjek;
     @FXML private TextField txtEmail;
     @FXML private TextField txtTelefon;
-    @FXML private ComboBox<SocijalniStatusDTO> cmbSocijalniStatus;
-    @FXML private TextField txtJMBG;
     @FXML private TextField txtAdresa;
-    @FXML private TextField txtRoditelj;
-    @FXML private Label lblPostojeci;
+    @FXML private ComboBox<SocijalniStatusDTO> cmbSocijalniStatus;
+
+    // lični podaci za prijavu
+    @FXML private TextField txtLicnaKarta;
+    @FXML private TextField txtTelefonRoditelja;
+    @FXML private ComboBox<String> cmbKanton;
+    @FXML private ComboBox<String> cmbOpcina;
+
+    // studij
+    @FXML private TextField txtAkGod;
+    @FXML private ComboBox<String> cmbUpisPut;
+    @FXML private VBox boxIspiti;
+    @FXML private TextField txtIspiti;
 
     private NacrtPrijave nacrt = new NacrtPrijave();
 
     @FXML
     public void initialize() {
+        KoraciUnosa.popuni(stepper, traka, 1);
+
         cmbFakultet.setItems(FXCollections.observableArrayList(FAKULTETI));
         cmbGodina.setItems(FXCollections.observableArrayList(GODINE));
+        cmbUpisPut.setItems(FXCollections.observableArrayList(UPIS));
+        cmbUpisPut.getSelectionModel().selectFirst();
         cmbSocijalniStatus.setCellFactory(c -> statusCell());
         cmbSocijalniStatus.setButtonCell(statusCell());
 
+        // kanton -> općine tog kantona
+        cmbKanton.setItems(FXCollections.observableArrayList(Opcine.kantoni()));
+        cmbOpcina.setDisable(true);
+        cmbKanton.valueProperty().addListener((obs, o, n) -> {
+            cmbOpcina.setItems(FXCollections.observableArrayList(Opcine.opcine(n)));
+            cmbOpcina.setValue(null);
+            cmbOpcina.setDisable(n == null);
+        });
+
+        txtAkGod.setText(String.valueOf(LocalDate.now().getYear()));
+
         txtTelefon.setTextFormatter(new TextFormatter<>(ch ->
                 ch.getText().matches("[0-9+()\\-\\s]*") ? ch : null));
+        txtTelefonRoditelja.setTextFormatter(new TextFormatter<>(ch ->
+                ch.getText().matches("[0-9+()\\-\\s]*") ? ch : null));
 
-        // čim je JMBG kompletan, provjeri postoji li student
+        // broj položenih ispita ne pita se za 1. godinu
+        cmbGodina.valueProperty().addListener((obs, o, n) -> prikaziIspite(n));
+        prikaziIspite(null);
+
+        // čim je JMBG kompletan: spol + provjera postoji li student
         txtJMBG.textProperty().addListener((obs, o, n) -> {
+            prikaziSpol(n);
             if (n != null && n.matches("\\d{13}")) potraziPoJmbg(n);
             else sakrijPostojeceg();
         });
+        prikaziSpol(null);
 
         // setNacrt (ako se vraćamo s koraka 2) poziva se prije ovoga
         Platform.runLater(() -> {
@@ -76,19 +128,24 @@ public class NoviStudentController {
         });
     }
 
-    /** Povratak s koraka 2 — popuni polja iz nacrta. */
+    /** Povratak s koraka 2: popuni polja iz nacrta. */
     public void setNacrt(NacrtPrijave n) {
         this.nacrt = n;
         if (n.student != null) popuniPolja(n.student);
         if (n.prosjek != null) txtProsjek.setText(n.prosjek.toPlainString());
+        if (n.akademskaGodina != null) txtAkGod.setText(String.valueOf(n.akademskaGodina));
+        if (n.polozeniIspiti != null) txtIspiti.setText(String.valueOf(n.polozeniIspiti));
+        if (n.upisGodinePut != null) {
+            cmbUpisPut.getSelectionModel().select(Math.min(Math.max(n.upisGodinePut, 1), UPIS.size()) - 1);
+        }
     }
 
     // ---------- server ----------
 
     private void ucitajSifarnike() {
-        Task<ba.unze.edom.common.dto.SifarniciDTO> t = new Task<>() {
+        Task<SifarniciDTO> t = new Task<>() {
             @Override
-            protected ba.unze.edom.common.dto.SifarniciDTO call() {
+            protected SifarniciDTO call() {
                 return RucniUnosApi.sifarnici();
             }
         };
@@ -131,8 +188,26 @@ public class NoviStudentController {
         }
         if (prazno(txtIme) || prazno(txtPrezime) || prazno(txtIndeks) || prazno(txtJMBG)
                 || prazno(txtAdresa) || prazno(txtRoditelj) || prazno(txtEmail) || prazno(txtProsjek)
-                || cmbFakultet.getValue() == null || cmbGodina.getValue() == null) {
+                || prazno(txtAkGod) || cmbFakultet.getValue() == null || cmbGodina.getValue() == null) {
             alert("Sva obavezna polja moraju biti popunjena.");
+            return;
+        }
+
+        if (!txtJMBG.getText().trim().matches("\\d{13}")) {
+            alert("JMBG mora imati tačno 13 cifara.");
+            return;
+        }
+
+        if (prazno(txtLicnaKarta) || prazno(txtTelefonRoditelja)) {
+            alert("Broj lične karte i telefon roditelja su obavezni.");
+            return;
+        }
+        if (!txtLicnaKarta.getText().trim().matches("[A-Za-z0-9]{1,20}")) {
+            alert("Broj lične karte smije imati samo slova i brojeve (do 20 znakova).");
+            return;
+        }
+        if (!Opcine.postoji(cmbKanton.getValue(), cmbOpcina.getValue())) {
+            alert("Odaberite kanton i općinu prebivališta.");
             return;
         }
 
@@ -144,9 +219,24 @@ public class NoviStudentController {
             return;
         }
 
-        if (!txtJMBG.getText().trim().matches("\\d{13}")) {
-            alert("JMBG mora imati tačno 13 cifara.");
+        Integer akGod = cijeli(txtAkGod);
+        if (akGod == null) {
+            alert("Akademska godina mora biti broj, npr. " + LocalDate.now().getYear() + ".");
             return;
+        }
+        if (akGod < LocalDate.now().getYear()) {
+            alert("Akademska godina ne može biti manja od tekuće.");
+            return;
+        }
+
+        int godina = godinaUBroj(cmbGodina.getValue());
+        Integer ispiti = null;
+        if (godina != 1) {
+            ispiti = cijeli(txtIspiti);
+            if (ispiti == null || ispiti < 0) {
+                alert("Unesite broj položenih ispita (0 ako nema).");
+                return;
+            }
         }
 
         SocijalniStatusDTO status = cmbSocijalniStatus.getValue();
@@ -159,11 +249,18 @@ public class NoviStudentController {
                 txtEmail.getText().trim(),
                 txtTelefon.getText().trim(),
                 cmbFakultet.getValue(),
-                godinaUBroj(cmbGodina.getValue()),
+                godina,
                 txtAdresa.getText().trim(),
                 txtRoditelj.getText().trim(),
-                status != null ? status.idStatus() : null);
+                status != null ? status.idStatus() : null,
+                txtLicnaKarta.getText().trim().toUpperCase(),
+                txtTelefonRoditelja.getText().trim(),
+                cmbKanton.getValue(),
+                cmbOpcina.getValue());
         nacrt.prosjek = prosjek;
+        nacrt.akademskaGodina = akGod;
+        nacrt.polozeniIspiti = ispiti;
+        nacrt.upisGodinePut = cmbUpisPut.getSelectionModel().getSelectedIndex() + 1;
 
         Ekrani.<NovaPrijavaController>zamijeni(txtIme, "/views/nova-prijava.fxml",
                 c -> c.setNacrt(nacrt));
@@ -188,6 +285,18 @@ public class NoviStudentController {
 
     // ---------- pomoćne ----------
 
+    private void prikaziIspite(String godina) {
+        boolean vidi = godina != null && !"1".equals(godina);
+        boxIspiti.setVisible(vidi);
+        boxIspiti.setManaged(vidi);
+    }
+
+    private void prikaziSpol(String jmbg) {
+        String spol = Jmbg.spol(jmbg != null ? jmbg.trim() : null);
+        lblSpol.setText(spol == null ? "Spol se računa iz JMBG-a."
+                : "Spol: " + ("M".equals(spol) ? "muški" : "ženski") + " (iz JMBG-a)");
+    }
+
     private void popuniPolja(StudentUnosDTO s) {
         txtIme.setText(s.ime());
         txtPrezime.setText(s.prezime());
@@ -200,6 +309,11 @@ public class NoviStudentController {
         txtAdresa.setText(s.adresa());
         txtRoditelj.setText(s.imeRoditelja());
         odaberiStatus(s.idSocijalnogStatusa());
+
+        txtLicnaKarta.setText(s.brojLicneKarte());
+        txtTelefonRoditelja.setText(s.telefonRoditelja());
+        cmbKanton.setValue(s.kanton());      // ovo napuni listu općina
+        cmbOpcina.setValue(s.opcina());      // pa tek onda općina
     }
 
     private void popuniStatuse() {
@@ -247,6 +361,14 @@ public class NoviStudentController {
                 setText(empty || item == null ? "" : item.naziv());
             }
         };
+    }
+
+    private Integer cijeli(TextField t) {
+        try {
+            return Integer.parseInt(t.getText().trim());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private boolean prazno(TextField t) {

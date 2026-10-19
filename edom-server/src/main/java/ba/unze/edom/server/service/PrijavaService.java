@@ -1,5 +1,7 @@
 package ba.unze.edom.server.service;
 
+import ba.unze.edom.common.util.Jmbg;
+import ba.unze.edom.common.util.Opcine;
 import ba.unze.edom.server.dto.*;
 import ba.unze.edom.server.entity.*;
 import ba.unze.edom.server.exception.PrijavaException;
@@ -57,15 +59,39 @@ public class PrijavaService {
 
     // ---------- KORAK 1 ----------
 
+    /** Forma za korak 1: podaci prijave + lični podaci iz profila studenta. */
+    @Transactional(readOnly = true)
+    public StudijKorakDTO pripremiStudij(Integer idPrijave, Integer idStudenta) {
+        Prijava p = dohvatiSvoju(idPrijave, idStudenta);
+        Student s = p.getStudent();
+        return new StudijKorakDTO(
+                p.getAkademskaGodina(), p.getGodinaStudija(), p.getProsjek(), p.getPolozeniIspiti(),
+                p.getUpisGodinePut() != null ? p.getUpisGodinePut() : 1,
+                s.getBrojLicneKarte(), s.getTelefonRoditelja(), s.getKanton(), s.getOpcina());
+    }
+
     @Transactional
     public void sacuvajStudij(Integer idPrijave, Integer idStudenta,
                               StudijKorakDTO dto) {
         Prijava p = dohvatiZaIzmjenu(idPrijave, idStudenta);
 
+        if (!Opcine.postoji(dto.kanton(), dto.opcina())) {
+            throw new PrijavaException("Odaberite općinu iz liste za izabrani kanton.");
+        }
+
         p.setAkademskaGodina(dto.akademskaGodina());
         p.setGodinaStudija(dto.godinaStudija());
         p.setProsjek(dto.prosjek());
         p.setPolozeniIspiti(dto.polozeniIspiti());
+        p.setUpisGodinePut(dto.upisGodinePut());
+
+        // lični podaci se pamte u profilu, pa ih sljedeće godine ne treba ponovo unositi
+        Student s = p.getStudent();
+        s.setBrojLicneKarte(dto.brojLicneKarte().trim().toUpperCase());
+        s.setTelefonRoditelja(dto.telefonRoditelja().trim());
+        s.setKanton(dto.kanton());
+        s.setOpcina(dto.opcina());
+        s.setSpol(Jmbg.spol(s.getJmbg()));
     }
 
     // ---------- KORAK 2 ----------
@@ -148,6 +174,17 @@ public class PrijavaService {
             k.setVrsta(v);
             k.setParametar(v.isTraziParametar() ? red.getParametar() : null);
             k.setVerifikovan(false);   // uvijek ceka administratora
+            if (v.isTraziPeriod()) {
+                if (red.getDatumOd() == null || red.getDatumDo() == null) {
+                    throw new PrijavaException("Za kriterij '" + v.getNaziv() + "' unesite datum od i datum do.");
+                }
+                if (red.getDatumOd().isAfter(red.getDatumDo())) {
+                    throw new PrijavaException("Za kriterij '" + v.getNaziv()
+                            + "' datum od ne može biti poslije datuma do.");
+                }
+                k.setDatumOd(red.getDatumOd());
+                k.setDatumDo(red.getDatumDo());
+            }
             p.dodajKriterij(k);
         }
     }
@@ -180,6 +217,11 @@ public class PrijavaService {
         if (p.getBrojClanovaDomacinstva() == null) nedostaje.add("broj članova domaćinstva");
         if (p.getUkupnaPrimanja() == null) nedostaje.add("primanja domaćinstva");
         if (p.getUdaljenostKm() == null) nedostaje.add("udaljenost do doma");
+
+        Student s = p.getStudent();
+        if (s.getBrojLicneKarte() == null) nedostaje.add("broj lične karte");
+        if (s.getTelefonRoditelja() == null) nedostaje.add("telefon roditelja");
+        if (s.getOpcina() == null) nedostaje.add("kanton i općina");
 
         return nedostaje;
     }

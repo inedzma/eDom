@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.KriterijiUnosController"
+            styleClass="scroll-pane"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED">
+
+    <stylesheets>
+        <URL value="@../styles/nova-prijava-style.css"/>
+    </stylesheets>
+
+    <content>
+        <StackPane styleClass="page-wrapper">
+            <padding>
+                <Insets top="30" right="30" bottom="30" left="30"/>
+            </padding>
+
+            <VBox styleClass="card" spacing="18">
+
+                <VBox spacing="6">
+                    <Label text="Nova prijava: kriteriji" styleClass="page-title"/>
+                    <Label text="Označite dodatne kriterije koje student ispunjava." styleClass="page-subtitle"/>
+                </VBox>
+
+                <VBox spacing="10">
+                    <ProgressBar fx:id="traka" styleClass="progress-top"/>
+                    <HBox fx:id="stepper" styleClass="stepper"/>
+                </VBox>
+
+                <Label text="Dodatni kriteriji" styleClass="section-pill"/>
+                <Separator styleClass="soft-separator"/>
+
+                <VBox fx:id="vboxKriteriji" spacing="10"/>
+
+                <HBox alignment="CENTER" spacing="16" styleClass="footer-box">
+                    <Button text="← Nazad" onAction="#onNazad" styleClass="btn-back"/>
+                    <Button text="Dalje →" onAction="#onDalje" styleClass="btn-next"/>
+                </HBox>
+
+            </VBox>
+        </StackPane>
+    </content>
+</ScrollPane>

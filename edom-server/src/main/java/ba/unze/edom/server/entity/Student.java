@@ -51,4 +51,19 @@ public class Student {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "socijalni_status_id_status")
     private SocijalniStatus socijalniStatus;
+
+    @Column(name = "spol", length = 1)
+    private String spol;
+
+    @Column(name = "broj_licne_karte", length = 20)
+    private String brojLicneKarte;
+
+    @Column(name = "telefon_roditelja", length = 30)
+    private String telefonRoditelja;
+
+    @Column(name = "kanton", length = 60)
+    private String kanton;
+
+    @Column(name = "opcina", length = 60)
+    private String opcina;
 }

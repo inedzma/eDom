@@ -1,6 +1,7 @@
 package ba.unze.edom.server.service;
 
 import ba.unze.edom.common.dto.StudentUnosDTO;
+import ba.unze.edom.common.util.Jmbg;
 import ba.unze.edom.server.entity.Student;
 import ba.unze.edom.server.exception.RegistracijaException;
 import ba.unze.edom.server.repository.SocijalniStatusRepository;
@@ -31,6 +32,7 @@ public class StudentEvidencijaService {
             s.setEmail(z.email());
             s.setTelefon(z.telefon());
             s.setGodinaStudija(z.godinaStudija());
+            prijavniPodaci(s, z);
             return s;
         }
 
@@ -56,6 +58,25 @@ public class StudentEvidencijaService {
             socijalniStatusRepository.findById(z.idSocijalnogStatusa())
                     .ifPresent(s::setSocijalniStatus);
         }
+        prijavniPodaci(s, z);
         return studentRepository.save(s);
+    }
+
+    /**
+     * Podaci koje traži prijava (lična karta, telefon roditelja, prebivalište) i spol iz JMBG-a.
+     * Registracija ih ne šalje (null), pa se postojeće vrijednosti ne brišu.
+     */
+    private void prijavniPodaci(Student s, StudentUnosDTO z) {
+        if (z.brojLicneKarte() != null && !z.brojLicneKarte().isBlank()) {
+            s.setBrojLicneKarte(z.brojLicneKarte().trim().toUpperCase());
+        }
+        if (z.telefonRoditelja() != null && !z.telefonRoditelja().isBlank()) {
+            s.setTelefonRoditelja(z.telefonRoditelja().trim());
+        }
+        if (z.kanton() != null && z.opcina() != null) {
+            s.setKanton(z.kanton());
+            s.setOpcina(z.opcina());
+        }
+        s.setSpol(Jmbg.spol(s.getJmbg()));
     }
 }

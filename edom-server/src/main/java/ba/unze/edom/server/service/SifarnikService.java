@@ -27,7 +27,8 @@ public class SifarnikService {
                         .map(v -> new VrstaKriterijaDTO(v.getIdVrstaKriterija(), v.getSifra(), v.getNaziv(),
                                 v.getGrupa(), v.isTraziParametar(), v.getNazivParametra(),
                                 v.getDokaz() != null ? v.getDokaz().getIdVrsta() : null,
-                                v.getDokaz() != null ? v.getDokaz().getNaziv() : null))
+                                v.getDokaz() != null ? v.getDokaz().getNaziv() : null,
+                                v.isTraziPeriod()))
                         .toList(),
                 vrstaDokumentaRepository.findAll(Sort.by("kategorija", "naziv")).stream()
                         .map(v -> new VrstaDokumentaDTO(v.getIdVrsta(), v.getNaziv(), v.getKategorija()))

@@ -1,5 +1,6 @@
 package ba.unze.edom.server.web;
 
+import ba.unze.edom.common.util.Opcine;
 import ba.unze.edom.server.dto.*;
 import ba.unze.edom.server.exception.PrijavaException;
 import ba.unze.edom.server.security.KorisnikPrincipal;
@@ -48,19 +49,15 @@ public class PrijavaWebController {
 
     // ---------- KORAK 1 ----------
 
+    // ---------- KORAK 1 ----------
+
     @GetMapping("/{id}/studij")
     public String studij(@PathVariable Integer id,
                          @AuthenticationPrincipal KorisnikPrincipal k,
                          Model model) {
 
-        var p = prijavaService.dohvatiSvoju(id, k.getIdStudenta());
-
-        model.addAttribute("idPrijave", id);
-        model.addAttribute("korak", 1);
-        model.addAttribute("forma", new StudijKorakDTO(
-                p.getAkademskaGodina(), p.getGodinaStudija(),
-                p.getProsjek(), p.getPolozeniIspiti()));
-
+        modelStudij(model, id);
+        model.addAttribute("forma", prijavaService.pripremiStudij(id, k.getIdStudenta()));
         return "student/prijava/studij";
     }
 
@@ -72,8 +69,7 @@ public class PrijavaWebController {
                                 Model model) {
 
         if (greske.hasErrors()) {
-            model.addAttribute("idPrijave", id);
-            model.addAttribute("korak", 1);
+            modelStudij(model, id);
             return "student/prijava/studij";
         }
 
@@ -81,11 +77,16 @@ public class PrijavaWebController {
             prijavaService.sacuvajStudij(id, k.getIdStudenta(), forma);
             return "redirect:/student/prijava/" + id + "/domacinstvo";
         } catch (RuntimeException e) {
-            model.addAttribute("idPrijave", id);
-            model.addAttribute("korak", 1);
+            modelStudij(model, id);
             model.addAttribute("greska", e.getMessage());
             return "student/prijava/studij";
         }
+    }
+
+    private void modelStudij(Model model, Integer id) {
+        model.addAttribute("idPrijave", id);
+        model.addAttribute("korak", 1);
+        model.addAttribute("opcinePoKantonu", Opcine.PO_KANTONU);
     }
 
     // ---------- KORAK 2 ----------
