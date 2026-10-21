@@ -66,4 +66,7 @@ public class Student {
 
     @Column(name = "opcina", length = 60)
     private String opcina;
+
+    @Column(name = "napomena", length = 1000)
+    private String napomena;
 }

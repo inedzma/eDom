@@ -16,4 +16,6 @@ public interface ZeljaSmjestajaRepository extends JpaRepository<ZeljaSmjestaja, 
            where p.akademskaGodina = :godina
            """)
     List<ZeljaSmjestaja> zaGodinu(@Param("godina") Integer godina);
+
+    java.util.Optional<ZeljaSmjestaja> findByPrijava_IdPrijava(Integer idPrijave);
 }

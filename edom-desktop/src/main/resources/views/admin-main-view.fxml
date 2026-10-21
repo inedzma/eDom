@@ -55,6 +55,12 @@
                           maxWidth="Infinity"
                           styleClass="nav-btn"/>
 
+            <ToggleButton text="Sobe"
+                          toggleGroup="$navGroup"
+                          onAction="#showSobe"
+                          maxWidth="Infinity"
+                          styleClass="nav-btn"/>
+
             <ToggleButton text="Moj profil"
                           toggleGroup="$navGroup"
                           onAction="#onMojProfil"

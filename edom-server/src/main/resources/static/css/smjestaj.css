@@ -1,0 +1,87 @@
+/* E-Dom — Moj smještaj (ide uz student.css) */
+
+.sm-stranica { max-width: 860px; }
+.sm-glava { margin-bottom: 18px; }
+.sm-glava h1 { margin: 6px 0 4px; color: #0b4a5e; }
+
+.sm-kartica { margin-bottom: 18px; padding: 22px 24px; }
+.sm-kartica h2 { margin: 0 0 12px; color: #0b4a5e; font-size: 20px; }
+.sm-naslov { display: flex; align-items: center; gap: 12px; }
+.sm-podnaslov { margin: 22px 0 10px; color: #0b4a5e; font-size: 16px; }
+
+.sm-poruka { padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; font-weight: 700; }
+.sm-poruka--ok { background: #e6f8f3; color: #00866b; }
+.sm-poruka--greska { background: #fdecea; color: #c0392b; }
+
+.sm-oznaka {
+    display: inline-block; padding: 4px 10px; border-radius: 999px;
+    background: #e6f8f3; color: #00a886; font-size: 12.5px; font-weight: 800;
+}
+.sm-oznaka--plava { background: #e3eefc; color: #1f5fa8; }
+
+/* ---------- forme ---------- */
+.sm-forma { display: grid; gap: 16px; margin-top: 16px; }
+.sm-polje { display: flex; flex-direction: column; gap: 6px; border: 0; padding: 0; margin: 0; }
+.sm-polje > span, .sm-polje > legend {
+    font-size: 12.5px; font-weight: 800; color: #7f9aa2; text-transform: uppercase; letter-spacing: .03em;
+    padding: 0; margin-bottom: 4px;
+}
+.sm-polje input[type=text], .sm-polje input[type=number], .sm-polje textarea {
+    padding: 10px 12px; border: 1.5px solid #d4ece6; border-radius: 10px;
+    font: inherit; color: #0b4a5e; background: #fff;
+}
+.sm-polje input:focus, .sm-polje textarea:focus {
+    outline: none; border-color: #00bf9a; box-shadow: 0 0 0 3px rgba(0,191,154,.15);
+}
+.sm-izbor {
+    display: inline-flex; align-items: center; gap: 8px; margin-right: 18px;
+    font-weight: 600; color: #0b4a5e; cursor: pointer;
+}
+.sm-dva { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.sm-akcije { display: flex; justify-content: flex-end; }
+
+/* ---------- dodijeljena soba ---------- */
+.sm-soba { display: flex; gap: 22px; align-items: center; }
+.sm-soba-broj {
+    flex: 0 0 110px; height: 110px; border-radius: 20px;
+    background: #0b4a5e; color: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.sm-soba-broj small { opacity: .75; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.sm-soba-broj b { font-size: 44px; line-height: 1; }
+.sm-soba-info h2 { margin: 0 0 2px; }
+.sm-soba-info p { margin: 4px 0; }
+.sm-cimeri { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: #0b4a5e; }
+.sm-cimer { padding: 4px 10px; border-radius: 999px; background: #eef5f7; font-weight: 600; }
+
+/* ---------- zahtjevi ---------- */
+.sm-zahtjevi { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.sm-zahtjevi li { border: 1px solid #d4ece6; border-radius: 12px; padding: 12px 14px; }
+.sm-zahtjevi p { margin: 6px 0 0; color: #3d5f69; }
+.sm-zahtjev-glava { display: flex; justify-content: space-between; gap: 10px; color: #0b4a5e; }
+.sm-status { padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; }
+.sm-status--na_cekanju { background: #fff4e0; color: #c47f12; }
+.sm-status--odobren { background: #e6f8f3; color: #00a886; }
+.sm-status--odbijen { background: #fdecea; color: #c0392b; }
+.sm-status--povucen { background: #eef1f3; color: #6b7f86; }
+.sm-odgovor { background: #f6fbfa; border-radius: 8px; padding: 8px 10px; }
+.sm-link {
+    border: 0; background: none; padding: 0; margin-top: 8px;
+    color: #c0392b; font: inherit; font-weight: 700; cursor: pointer;
+}
+.sm-link:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+    .sm-dva { grid-template-columns: 1fr; }
+    .sm-soba { flex-direction: column; align-items: flex-start; }
+}
+
+.sm-cimeri-blok { margin-top: 12px; color: #0b4a5e; }
+.sm-cimeri-lista { list-style: none; margin: 8px 0 6px; padding: 0; display: grid; gap: 8px; }
+.sm-cimeri-lista li {
+    display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center;
+    padding: 8px 12px; border-radius: 10px; background: #eef5f7;
+}
+.sm-cimer-ime { font-weight: 800; min-width: 160px; }
+.sm-cimeri-lista a { color: #00866b; font-weight: 700; text-decoration: none; }
+.sm-cimeri-lista a:hover { text-decoration: underline; }

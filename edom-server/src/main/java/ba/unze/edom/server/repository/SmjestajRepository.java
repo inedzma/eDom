@@ -71,4 +71,24 @@ public interface SmjestajRepository extends JpaRepository<Smjestaj, Integer> {
            """)
     List<Prijava> zaRaspored(@Param("godina") Integer godina,
                              @Param("statusi") Collection<String> statusi);
+
+    /** Stanari jedne sobe u godini (bez iseljenih). */
+    @Query("""
+           select sm from Smjestaj sm
+             join fetch sm.prijava p
+             join fetch p.student st
+           where sm.soba.idSoba = :idSobe
+             and p.akademskaGodina = :godina
+             and sm.status <> 'ISELJEN'
+           """)
+    List<Smjestaj> stanariSobe(@Param("idSobe") Integer idSobe, @Param("godina") Integer godina);
+
+    /** Prijave studenta, najnovija prva (za stranicu "Moj smještaj"). */
+    @Query("""
+           select p from Prijava p
+             join fetch p.status s
+           where p.student.idStudent = :idStudenta
+           order by p.akademskaGodina desc, p.idPrijava desc
+           """)
+    List<Prijava> prijaveStudenta(@Param("idStudenta") Integer idStudenta);
 }

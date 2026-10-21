@@ -20,36 +20,28 @@
     </top>
 
     <center>
-        <VBox styleClass="rang-card" spacing="14">
+        <VBox styleClass="rang-card" spacing="10">
 
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <ToggleButton fx:id="btnBrucosi" text="Brucoši"/>
-                <ToggleButton fx:id="btnVisi" text="Više godine"/>
+                <ToggleButton fx:id="btnSaUslovom" text="S uslovom"/>
+                <ToggleButton fx:id="btnCekanje" text="Lista čekanja"/>
+                <ToggleButton fx:id="btnSve" text="Sve"/>
                 <Region HBox.hgrow="ALWAYS"/>
+                <CheckBox fx:id="chkPopuniBrucosima" text="Slobodna mjesta popuni brucošima"/>
                 <Button text="⟳" onAction="#onRefresh"/>
                 <MenuBar>
                     <Menu fx:id="menuKolone" text="Prikaži kolone"/>
                 </MenuBar>
             </HBox>
 
-            <TableView fx:id="tblRangLista" VBox.vgrow="ALWAYS" styleClass="rang-table">
-                <columns>
-                    <TableColumn fx:id="colRedniBroj" text="R.br" prefWidth="60" styleClass="centered-cell"/>
-                    <TableColumn fx:id="colIdPrijave" text="ID prijave" prefWidth="80" styleClass="centered-cell"/>
-                    <TableColumn fx:id="colImePrezime" text="Prezime (ime oca) ime" prefWidth="260"/>
-                    <TableColumn fx:id="colGodinaStudija" text="Godina" prefWidth="80" styleClass="centered-cell"/>
-                    <TableColumn fx:id="colUspjeh" text="Uspjeh" prefWidth="90" styleClass="centered-cell"/>
-                    <TableColumn fx:id="colUdaljenost" text="Udaljenost" prefWidth="90" styleClass="centered-cell"/>
-                    <TableColumn fx:id="colPrimanja" text="Primanja" prefWidth="90" styleClass="centered-cell"/>
-                    <TableColumn fx:id="colBranioci" text="Branioci" prefWidth="90" styleClass="centered-cell"/>
-                    <TableColumn fx:id="colDodatni" text="Dodatni" prefWidth="90" styleClass="centered-cell"/>
-                    <TableColumn fx:id="colUkupniBodovi" text="Ukupno" prefWidth="110" styleClass="centered-cell"/>
-                    <TableColumn fx:id="colDetalji" text="" prefWidth="110"/>
-                </columns>
-            </TableView>
+            <Label fx:id="lblSazetak" styleClass="rang-sazetak" wrapText="true"/>
+
+            <!-- kolone pravi RangListaController.napraviKolone() -->
+            <TableView fx:id="tblRangLista" VBox.vgrow="ALWAYS" styleClass="rang-table"/>
 
             <HBox spacing="10" alignment="CENTER_RIGHT">
-                <Button fx:id="btnExportHtmlPdf" text="Export PDF (HTML)" onAction="#onExportHtmlPdf"/>
+                <Button text="Export PDF…" onAction="#onExportHtmlPdf"/>
             </HBox>
         </VBox>
     </center>

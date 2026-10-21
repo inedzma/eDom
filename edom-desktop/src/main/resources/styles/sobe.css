@@ -1,0 +1,106 @@
+/* E-Dom desktop — Sobe i raspored (boje kao na webu) */
+
+.sobe-stranica { -fx-background-color: #f1f9f6; }
+
+.sobe-naslov { -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0b4a5e; }
+.sobe-podnaslov { -fx-text-fill: #5f7f88; -fx-font-size: 13px; }
+.sobe-oznaka-polja { -fx-text-fill: #5f7f88; -fx-font-weight: bold; }
+
+.sobe-traka { -fx-background-color: white; -fx-background-radius: 14; -fx-padding: 12 14; }
+
+/* ---------- dugmad ---------- */
+.sobe-btn-glavno, .sobe-btn, .sobe-btn-tiho, .sobe-btn-opasno {
+    -fx-background-radius: 10;
+    -fx-padding: 8 14;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+.sobe-btn-glavno { -fx-background-color: #00bf9a; -fx-text-fill: white; }
+.sobe-btn-glavno:hover { -fx-background-color: #00a886; }
+.sobe-btn { -fx-background-color: #e6f8f3; -fx-text-fill: #0b4a5e; }
+.sobe-btn:hover { -fx-background-color: #d3f1e8; }
+.sobe-btn-tiho { -fx-background-color: transparent; -fx-text-fill: #0b4a5e; -fx-border-color: #cfe3de; -fx-border-radius: 10; }
+.sobe-btn-opasno { -fx-background-color: #fdecea; -fx-text-fill: #c0392b; }
+
+.sobe-combo { -fx-background-radius: 10; }
+
+/* ---------- brojevi ---------- */
+.broj-kartica { -fx-background-color: white; -fx-background-radius: 14; -fx-padding: 12 16; }
+.broj-vrijednost { -fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #0b4a5e; }
+.broj-naziv { -fx-text-fill: #5f7f88; -fx-font-size: 12.5px; }
+.broj-upozorenje { -fx-background-color: #fff4e0; }
+.broj-upozorenje .broj-vrijednost { -fx-text-fill: #c47f12; }
+
+/* ---------- legenda ---------- */
+.legenda-kvadrat {
+    -fx-min-width: 16; -fx-min-height: 16;
+    -fx-max-width: 16; -fx-max-height: 16;
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-border-width: 2;
+}
+.legenda-tekst { -fx-text-fill: #5f7f88; -fx-font-size: 12px; }
+
+/* ---------- sprat ---------- */
+.sprat-blok { -fx-background-color: white; -fx-background-radius: 16; -fx-padding: 14 16 16 16; }
+.sprat-naslov { -fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: #0b4a5e; }
+.sprat-opis { -fx-text-fill: #5f7f88; }
+
+/* ---------- kartica sobe ---------- */
+.soba-kartica { -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-width: 2; -fx-padding: 10 12; }
+.soba-kartica:hover { -fx-effect: dropshadow(gaussian, rgba(11,74,94,0.18), 10, 0, 0, 2); }
+
+.soba-prazna     { -fx-background-color: #ffffff; -fx-border-color: #cfe3de; }
+.soba-djelimicno { -fx-background-color: #e6f8f3; -fx-border-color: #00bf9a; }
+.soba-puna       { -fx-background-color: #eef1f3; -fx-border-color: #b7c4c9; }
+.soba-van        { -fx-background-color: #f6f6f6; -fx-border-color: #c9c9c9; -fx-border-style: segments(6, 4); }
+.soba-gosti      { -fx-background-color: #ffecec; -fx-border-color: #e03131; }
+
+.soba-broj { -fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #0b4a5e; }
+.soba-popunjenost { -fx-text-fill: #5f7f88; -fx-font-weight: bold; }
+.soba-spol { -fx-padding: 1 6; -fx-background-radius: 6; -fx-font-size: 11px; -fx-font-weight: bold; }
+.soba-spol-m { -fx-background-color: #e3eefc; -fx-text-fill: #1f5fa8; }
+.soba-spol-z { -fx-background-color: #fce7f1; -fx-text-fill: #a8326b; }
+
+.soba-stanar { -fx-text-fill: #24444d; -fx-font-size: 12.5px; }
+.soba-stanar-prijedlog { -fx-font-style: italic; -fx-text-fill: #5f7f88; }
+.soba-stanar-uselio { -fx-font-weight: bold; }
+.soba-slobodno-mjesto { -fx-text-fill: #9db6bd; -fx-font-size: 12px; -fx-font-style: italic; }
+.soba-napomena { -fx-text-fill: #8a5a5a; -fx-font-size: 12px; }
+
+.soba-tacka {
+    -fx-min-width: 10; -fx-min-height: 10;
+    -fx-max-width: 10; -fx-max-height: 10;
+    -fx-background-radius: 5;
+}
+
+/* ---------- detalji sobe ---------- */
+.detalji-naslov { -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0b4a5e; -fx-padding: 4 0 0 0; }
+.detalji-stanar {
+    -fx-background-color: #f6fbfa;
+    -fx-border-color: #dcebe7;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 10 12;
+}
+.detalji-ime { -fx-font-weight: bold; -fx-text-fill: #0b4a5e; -fx-font-size: 14px; }
+.detalji-status { -fx-padding: 2 8; -fx-background-radius: 999; -fx-font-size: 11.5px; -fx-font-weight: bold; }
+.status-predlozen  { -fx-background-color: #fff4e0; -fx-text-fill: #c47f12; }
+.status-dodijeljen { -fx-background-color: #e3eefc; -fx-text-fill: #1f5fa8; }
+.status-useljen    { -fx-background-color: #e6f8f3; -fx-text-fill: #00a886; }
+
+.sobe-pretraga {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #cfe3de;
+    -fx-background-color: white;
+    -fx-padding: 7 12;
+}
+.sobe-pretraga:focused { -fx-border-color: #00bf9a; }
+
+.soba-stanar-pogodak {
+    -fx-background-color: #fff2b3;
+    -fx-background-radius: 4;
+    -fx-font-weight: bold;
+    -fx-padding: 0 3;
+}

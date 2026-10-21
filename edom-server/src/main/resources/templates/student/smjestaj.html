@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
+    <title>E-Dom — Moj smještaj</title>
+    <link rel="stylesheet" th:href="@{/css/student.css}">
+    <link rel="stylesheet" th:href="@{/css/smjestaj.css}">
+</head>
+<body class="app">
+
+<header th:replace="~{fragments/layout :: navbarStudent('smjestaj')}"></header>
+
+<main class="content sm-stranica">
+
+    <div class="sm-glava">
+        <span class="eyebrow dark">Smještaj</span>
+        <h1>Moj smještaj</h1>
+        <p class="muted" th:if="${stanje != null}"
+           th:text="'Akademska ' + ${stanje.akademskaGodina} + '/' + ${stanje.akademskaGodina + 1} + '. godina'">Akademska 2026/2027.</p>
+    </div>
+
+    <div class="sm-poruka sm-poruka--ok" th:if="${poruka}" th:text="${poruka}">Sačuvano.</div>
+    <div class="sm-poruka sm-poruka--greska" th:if="${greska}" th:text="${greska}">Greška.</div>
+
+    <!-- nema prijave -->
+    <section class="panel sm-kartica" th:if="${stanje == null}">
+        <h2>Nemate prijavu</h2>
+        <p class="muted">Ovdje ćete vidjeti svoj smještaj kada vam prijava bude odobrena.</p>
+        <a class="btn btn-primary" th:href="@{/student/pocetna}">Na početnu</a>
+    </section>
+
+    <!-- nije primljen -->
+    <section class="panel sm-kartica" th:if="${stanje != null and !stanje.primljen}">
+        <h2>Prijava još nije odobrena</h2>
+        <p class="muted">
+            Status vaše prijave: <b th:text="${stanje.statusPrijave}">na pregledu</b>.
+            Kada prijava bude odobrena, ovdje ćete moći iskazati želje za sobu i cimere.
+        </p>
+    </section>
+
+    <!-- primljen, soba nije dodijeljena: želje -->
+    <section class="panel sm-kartica" th:if="${stanje != null and stanje.primljen and stanje.soba == null}">
+        <div class="sm-naslov">
+            <h2>Želje za smještaj</h2>
+            <span class="sm-oznaka" th:if="${stanje.zeljaSacuvana}">Sačuvano</span>
+        </div>
+
+        <div class="info-note">
+            <span><b>Ovo nije dodjela sobe.</b> Vaše želje administracija razmatra prilikom rasporeda,
+                u skladu sa slobodnim mjestima i pravilima Studentskog centra. Želje možete mijenjati dok vam
+                soba ne bude dodijeljena.</span>
+        </div>
+
+        <form th:action="@{/student/smjestaj/zelja}" th:object="${zelja}" method="post" class="sm-forma">
+
+            <fieldset class="sm-polje">
+                <legend>Vrsta sobe</legend>
+                <label class="sm-izbor"><input type="radio" th:field="*{zeljeniKapacitet}" value=""> Svejedno</label>
+                <label class="sm-izbor"><input type="radio" th:field="*{zeljeniKapacitet}" value="2"> Dvokrevetna</label>
+                <label class="sm-izbor"><input type="radio" th:field="*{zeljeniKapacitet}" value="3"> Trokrevetna</label>
+                <small class="hint">Prednost za dvokrevetne sobe imaju apsolventi, master studenti i studenti
+                    4. i viših godina, zatim 3. godina, pa ostali, a unutar grupe pozicija na rang listi.</small>
+            </fieldset>
+
+            <label class="sm-polje">
+                <span>Željena soba (broj, nije obavezno)</span>
+                <input type="number" min="1" th:field="*{zeljenaSoba}" placeholder="npr. 45">
+            </label>
+
+            <div class="sm-dva">
+                <label class="sm-polje">
+                    <span>Cimer 1 (email)</span>
+                    <input type="text" maxlength="100" th:field="*{cimer1}" placeholder="npr. 421 ili ime.prezime@size.ba">
+                </label>
+                <label class="sm-polje">
+                    <span>Cimer 2 (email)</span>
+                    <input type="text" maxlength="100" th:field="*{cimer2}">
+                </label>
+            </div>
+            <small class="hint">Želja za cimerom se uzima u obzir samo ako i drugi student navede vas.</small>
+
+            <label class="sm-polje">
+                <span>Napomena</span>
+                <textarea rows="3" maxlength="255" th:field="*{napomena}"
+                          placeholder="Npr. zdravstveni razlog, prizemlje…"></textarea>
+            </label>
+
+            <div class="sm-akcije">
+                <button type="submit" class="btn btn-primary">Sačuvaj želje</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- soba dodijeljena -->
+    <th:block th:if="${stanje != null and stanje.soba != null}">
+
+        <section class="panel sm-kartica sm-soba">
+            <div class="sm-soba-broj">
+                <small>Soba</small>
+                <b th:text="${stanje.soba.broj}">45</b>
+            </div>
+            <div class="sm-soba-info">
+                <h2 th:text="${stanje.soba.sprat}">III sprat</h2>
+                <p class="muted" th:text="${stanje.soba.kapacitet} + '-krevetna soba'">3-krevetna soba</p>
+                <p th:if="${stanje.soba.uselio}">
+                    <span class="sm-oznaka">Useljeni</span>
+                    <span class="muted" th:if="${stanje.soba.datumUseljenja != null}"
+                          th:text="'od ' + ${#temporals.format(stanje.soba.datumUseljenja, 'dd.MM.yyyy.')}"></span>
+                </p>
+                <p th:unless="${stanje.soba.uselio}">
+                    <span class="sm-oznaka sm-oznaka--plava">Dodijeljena</span>
+                    <span class="muted">Javite se na recepciju radi useljenja i preuzimanja ključeva.</span>
+                </p>
+                <div class="sm-cimeri-blok">
+                    <b>Cimeri</b>
+                    <p th:if="${#lists.isEmpty(stanje.soba.cimeri)}" class="muted">Još nema cimera u sobi.</p>
+                    <ul class="sm-cimeri-lista" th:unless="${#lists.isEmpty(stanje.soba.cimeri)}">
+                        <li th:each="c : ${stanje.soba.cimeri}">
+                            <span class="sm-cimer-ime" th:text="${c.ime}">Ime Prezime</span>
+                            <a th:if="${c.telefon != null and !#strings.isEmpty(c.telefon)}"
+                               th:href="'tel:' + ${c.telefon}" th:text="${c.telefon}">061 000 000</a>
+                            <a th:if="${c.email != null and !#strings.isEmpty(c.email)}"
+                               th:href="'mailto:' + ${c.email}" th:text="${c.email}">ime@mail.com</a>
+                        </li>
+                    </ul>
+                    <small class="muted">Kontakt cimera vam može pomoći da se dogovorite prije useljenja.</small>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel sm-kartica" id="zahtjev">
+            <h2>Zahtjev za promjenu sobe</h2>
+
+            <div class="info-note">
+                <span>Zahtjev pregleda administracija i odlučuje o njemu. Kod <b>zamjene</b> sobe
+                    i drugi student mora podnijeti isti zahtjev s vašim emailom.</span>
+            </div>
+
+            <p class="muted" th:if="${stanje.imaZahtjevNaCekanju}">
+                Imate zahtjev na čekanju. Novi možete podnijeti kada ga administracija riješi ili ako ga povučete.
+            </p>
+
+            <form th:unless="${stanje.imaZahtjevNaCekanju}"
+                  th:action="@{/student/smjestaj/zahtjev}" th:object="${zahtjev}" method="post" class="sm-forma">
+
+                <fieldset class="sm-polje">
+                    <legend>Šta tražite</legend>
+                    <label class="sm-izbor"><input type="radio" th:field="*{vrsta}" value="ZAMJENA"
+                                                   onchange="smVrsta()"> Zamjena sobe s drugim studentom</label>
+                    <label class="sm-izbor"><input type="radio" th:field="*{vrsta}" value="PREMJESTAJ"
+                                                   onchange="smVrsta()"> Premještaj u drugu sobu</label>
+                </fieldset>
+
+                <label class="sm-polje" id="smZamjena">
+                    <span>S kim mijenjate sobu (email)</span>
+                    <input type="text" maxlength="100" th:field="*{saStudentom}">
+                </label>
+
+                <label class="sm-polje" id="smPremjestaj">
+                    <span>Željena soba (broj, nije obavezno)</span>
+                    <input type="number" min="1" th:field="*{zeljenaSoba}">
+                </label>
+
+                <label class="sm-polje">
+                    <span>Razlog</span>
+                    <textarea rows="3" maxlength="500" th:field="*{razlog}" required></textarea>
+                </label>
+
+                <div class="sm-akcije">
+                    <button type="submit" class="btn btn-primary">Podnesi zahtjev</button>
+                </div>
+            </form>
+
+            <h3 class="sm-podnaslov" th:unless="${#lists.isEmpty(stanje.zahtjevi)}">Vaši zahtjevi</h3>
+            <ul class="sm-zahtjevi" th:unless="${#lists.isEmpty(stanje.zahtjevi)}">
+                <li th:each="z : ${stanje.zahtjevi}">
+                    <div class="sm-zahtjev-glava">
+                        <b th:text="${z.opis}">Zamjena sobe</b>
+                        <span class="sm-status" th:classappend="'sm-status--' + ${#strings.toLowerCase(z.status)}"
+                              th:text="${z.statusTekst()}">Na čekanju</span>
+                    </div>
+                    <small class="muted" th:text="${#temporals.format(z.datum, 'dd.MM.yyyy. HH:mm')}">21.10.2026.</small>
+                    <p th:text="${z.razlog}">Razlog</p>
+                    <p class="sm-odgovor" th:if="${z.odgovor != null}">
+                        <b>Odgovor administracije:</b> <span th:text="${z.odgovor}"></span>
+                    </p>
+                    <form th:if="${z.naCekanju()}" method="post"
+                          th:action="@{/student/smjestaj/zahtjev/{id}/povuci(id=${z.id})}"
+                          onsubmit="return confirm('Povući zahtjev?');">
+                        <button type="submit" class="sm-link">Povuci zahtjev</button>
+                    </form>
+                </li>
+            </ul>
+        </section>
+    </th:block>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+
+<script>
+    // prikaži samo polje koje odgovara vrsti zahtjeva
+    function smVrsta() {
+        const izabrana = document.querySelector('input[name="vrsta"]:checked');
+        const zamjena = !izabrana || izabrana.value === 'ZAMJENA';
+        const z = document.getElementById('smZamjena');
+        const p = document.getElementById('smPremjestaj');
+        if (z) z.style.display = zamjena ? '' : 'none';
+        if (p) p.style.display = zamjena ? 'none' : '';
+    }
+    smVrsta();
+</script>
+</body>
+</html>

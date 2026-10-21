@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,5 +106,29 @@ public class Prijava {
     public void ukloniDokument(Dokument d) {
         dokumenti.remove(d);
         d.setPrijava(null);
+    }
+
+    /** Kad je dostavljen dokaz o ispunjavanju uslova za upis naredne godine; null = nije dostavljen. */
+    @Column(name = "dokaz_uslova_at")
+    private LocalDateTime dokazUslovaAt;
+
+    /** Email admina koji je dokaz naknadno evidentirao; null = dokaz priložen uz prijavu. */
+    @Column(name = "dokaz_uslova_evidentirao", length = 100)
+    private String dokazUslovaEvidentirao;
+
+    public LocalDateTime getDokazUslovaAt() {
+        return dokazUslovaAt;
+    }
+
+    public void setDokazUslovaAt(LocalDateTime dokazUslovaAt) {
+        this.dokazUslovaAt = dokazUslovaAt;
+    }
+
+    public String getDokazUslovaEvidentirao() {
+        return dokazUslovaEvidentirao;
+    }
+
+    public void setDokazUslovaEvidentirao(String dokazUslovaEvidentirao) {
+        this.dokazUslovaEvidentirao = dokazUslovaEvidentirao;
     }
 }

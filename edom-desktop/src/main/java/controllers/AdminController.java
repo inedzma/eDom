@@ -38,6 +38,9 @@ public class AdminController {
     }
 
     @FXML
+    public void showSobe(ActionEvent event) {loadView("/views/sobe.fxml");}
+
+    @FXML
     public void onMojProfil(ActionEvent event) {
         loadView("/views/moj-profil.fxml");
     }

@@ -8,5 +8,7 @@ public record StudentBezSobeDTO(
         Integer godinaStudija,
         int rang,
         double bodovi,
-        String zelja
+        String zelja,
+        String brojIndeksa,
+        String email
 ) {}

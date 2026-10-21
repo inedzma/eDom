@@ -16,4 +16,6 @@ public interface SobaRepository extends JpaRepository<Soba, Integer> {
            order by sp.redoslijed, s.broj
            """)
     List<Soba> sveSaSpratom();
+
+    java.util.Optional<Soba> findByBroj(Integer broj);
 }

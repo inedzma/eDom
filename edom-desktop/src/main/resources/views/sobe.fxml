@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<!-- Sobe i raspored: pregled po spratovima, prijedlog rasporeda, ručne izmjene -->
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.SobeController"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED"
+            styleClass="scroll-pane">
+
+    <stylesheets>
+        <URL value="@../styles/sobe.css"/>
+    </stylesheets>
+
+    <content>
+        <VBox styleClass="sobe-stranica" spacing="18">
+            <padding>
+                <Insets top="26" right="30" bottom="30" left="30"/>
+            </padding>
+
+            <!-- naslov i godina -->
+            <HBox alignment="CENTER_LEFT" spacing="16">
+                <VBox spacing="4">
+                    <Label text="Sobe i raspored" styleClass="sobe-naslov"/>
+                    <Label text="Pregled kapaciteta, prijedlog rasporeda po rang listi i ručne izmjene."
+                           styleClass="sobe-podnaslov"/>
+                </VBox>
+                <Button fx:id="btnZahtjevi" text="Zahtjevi za promjenu sobe" onAction="#onZahtjevi"
+                        styleClass="sobe-btn"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Akademska godina" styleClass="sobe-oznaka-polja"/>
+                <ComboBox fx:id="cmbGodina" styleClass="sobe-combo"/>
+            </HBox>
+
+            <!-- brojevi -->
+            <HBox fx:id="boxBrojevi" spacing="12"/>
+
+            <!-- raspored i filteri -->
+            <!-- raspored -->
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="sobe-traka">
+                <Button fx:id="btnPrijedlog" text="Napravi prijedlog rasporeda" onAction="#onPrijedlog"
+                        styleClass="sobe-btn-glavno"/>
+                <Button fx:id="btnPotvrdi" text="Potvrdi prijedlog" onAction="#onPotvrdi" styleClass="sobe-btn"/>
+                <Button fx:id="btnPonisti" text="Poništi prijedlog" onAction="#onPonisti" styleClass="sobe-btn-tiho"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Osvježi" onAction="#onOsvjezi" styleClass="sobe-btn-tiho"/>
+            </HBox>
+
+            <!-- pretraga i filteri -->
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="sobe-traka">
+                <TextField fx:id="txtPretraga" promptText="Traži sobu ili studenta…"
+                           prefWidth="260" styleClass="sobe-pretraga"/>
+                <ComboBox fx:id="cmbSprat" styleClass="sobe-combo"/>
+                <ComboBox fx:id="cmbSpol" styleClass="sobe-combo"/>
+                <ComboBox fx:id="cmbRedoslijed" styleClass="sobe-combo"/>
+                <CheckBox fx:id="chkSlobodne" text="Samo sa slobodnim mjestima" styleClass="sobe-check"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblPogodaka" styleClass="sobe-podnaslov"/>
+            </HBox>
+
+            <HBox fx:id="boxLegenda" spacing="16" alignment="CENTER_LEFT"/>
+
+            <Label fx:id="lblStatus" styleClass="sobe-podnaslov" wrapText="true"/>
+
+            <VBox fx:id="vboxSpratovi" spacing="16"/>
+        </VBox>
+    </content>
+</ScrollPane>

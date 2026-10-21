@@ -307,3 +307,44 @@
 .centered-cell {
     -fx-alignment: CENTER;
 }
+
+
+.rang-sazetak {
+    -fx-text-fill: #555555;
+    -fx-font-size: 12px;
+}
+
+.rang-table .table-row-cell.red-ispod-crte .table-cell {
+    -fx-text-fill: #8a8a8a;
+}
+
+.rang-table .table-row-cell.red-cekanje {
+    -fx-background-color: -fx-table-cell-border-color, #fff8e1;
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+.rang-table .table-row-cell.red-greska {
+    -fx-background-color: -fx-table-cell-border-color, #fdecea;
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+.rang-table .table-row-cell.red-crta {
+    -fx-border-color: transparent transparent #c62828 transparent;
+    -fx-border-width: 0 0 2 0;
+}
+
+.rang-table .table-row-cell.red-cekanje:selected,
+.rang-table .table-row-cell.red-greska:selected {
+    -fx-background-color: -fx-selection-bar;
+}
+
+.dokaz-btn {
+    -fx-background-color: #2e7d32;
+    -fx-text-fill: white;
+}
+
+.ponisti-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: #c62828;
+    -fx-text-fill: #c62828;
+}

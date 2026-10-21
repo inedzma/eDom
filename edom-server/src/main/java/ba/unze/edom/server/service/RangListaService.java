@@ -1,6 +1,7 @@
 package ba.unze.edom.server.service;
 
 import ba.unze.edom.common.dto.KategorijaBodovanja;
+import ba.unze.edom.common.dto.KategorijaRanga;
 import ba.unze.edom.common.dto.RangListaAdminDTO;
 import ba.unze.edom.common.dto.RangRedDTO;
 import ba.unze.edom.common.dto.RezultatBodovanja;
@@ -12,40 +13,37 @@ import ba.unze.edom.server.entity.Student;
 import ba.unze.edom.server.exception.NevalidnaPrijavaException;
 import ba.unze.edom.server.repository.PrijavaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
 public class RangListaService {
 
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
     private final PrijavaRepository prijavaRepository;
     private final BodovanjeService bodovanjeService;
+    private final RangRaspodjela raspodjela;
+
+    @Value("${edom.rang.kapacitet:220}")
+    private int kapacitetPoDefaultu;
+
+    @Value("${edom.rang.udio-brucosa:0.35}")
+    private double udioBrucosa;
 
     // ---------- interni model ----------
 
-    /** Jedna rangirana prijava; iz nje nastaju i javni i admin prikaz. */
     private record Rangirana(Prijava prijava, RezultatBodovanja rezultat, String greska) {
         double bodovi() {
             return rezultat != null ? rezultat.potvrdjeno() : 0.0;
         }
     }
-
-    private record Podjela(List<Rangirana> brucosi, List<Rangirana> visegodisnji) {}
-
-    /**
-     * Najviše potvrđenih bodova prvo.
-     * TODO: pravilo za izjednačene bodove prema Pravilniku (pitanje za Studentski centar).
-     */
-    private static final Comparator<Rangirana> PORADAK = Comparator
-            .comparingDouble(Rangirana::bodovi).reversed()
-            .thenComparing(r -> r.prijava().getStudent().getPrezime(),
-                    Comparator.nullsLast(String::compareToIgnoreCase));
 
     // ---------- JAVNO (web) ----------
 
@@ -58,42 +56,39 @@ public class RangListaService {
         return zaGodinu(godina);
     }
 
+    /** Isti redoslijed kao na desktopu; viši: prvo s uslovom, pa lista čekanja. */
     @Transactional(readOnly = true)
     public RangListaDTO zaGodinu(Integer godina) {
-        Podjela d = rangiraj(godina);
-        return new RangListaDTO(naziv(godina), javno(d.brucosi()), javno(d.visegodisnji()));
+        RangListaAdminDTO a = izracunaj(godina, kapacitetPoDefaultu, false);
+        List<RangRedDTO> visi = new ArrayList<>(a.saUslovom());
+        visi.addAll(a.listaCekanja());
+        return new RangListaDTO(a.akademskaGodina(), javno(a.brucosi()), javno(visi));
     }
 
     // ---------- ADMIN (desktop) ----------
 
     @Transactional(readOnly = true)
-    public RangListaAdminDTO zaAdmina(Integer godina) {
+    public RangListaAdminDTO zaAdmina(Integer godina, Integer kapacitet, boolean popuniBrucosima) {
         Integer g = godina != null ? godina : prijavaRepository.zadnjaAkademskaGodina();
+        int kap = kapacitet != null && kapacitet > 0 ? kapacitet : kapacitetPoDefaultu;
         if (g == null) {
-            return new RangListaAdminDTO(null, null, List.of(), List.of());
+            return raspodjela.rasporedi(null, null, List.of(), kap, udioBrucosa, popuniBrucosima);
         }
-        Podjela d = rangiraj(g);
-        return new RangListaAdminDTO(naziv(g), g, admin(d.brucosi()), admin(d.visegodisnji()));
+        return izracunaj(g, kap, popuniBrucosima);
     }
 
     // ---------- rangiranje ----------
 
-    private Podjela rangiraj(Integer godina) {
-        List<Rangirana> brucosi = new ArrayList<>();
-        List<Rangirana> visegodisnji = new ArrayList<>();
-
-        for (Prijava p : prijavaRepository.rangLista(godina)) {
-            if (!jeOdobrena(p)) continue;
-            Rangirana r = izracunaj(p);
-            (jeBrucos(p) ? brucosi : visegodisnji).add(r);
-        }
-
-        brucosi.sort(PORADAK);
-        visegodisnji.sort(PORADAK);
-        return new Podjela(brucosi, visegodisnji);
+    private RangListaAdminDTO izracunaj(Integer godina, int kapacitet, boolean popuniBrucosima) {
+        List<RangRedDTO> redovi = prijavaRepository.rangLista(godina).stream()
+                .filter(this::jeOdobrena)
+                .map(this::boduj)
+                .map(this::uRed)
+                .toList();
+        return raspodjela.rasporedi(naziv(godina), godina, redovi, kapacitet, udioBrucosa, popuniBrucosima);
     }
 
-    private Rangirana izracunaj(Prijava p) {
+    private Rangirana boduj(Prijava p) {
         try {
             return new Rangirana(p, bodovanjeService.izracunaj(p), null);
         } catch (NevalidnaPrijavaException e) {
@@ -104,42 +99,38 @@ public class RangListaService {
     // ---------- mapiranje ----------
 
     /** Javna lista: prijave s neispravnim podacima se ne objavljuju. */
-    private List<RangStavkaDTO> javno(List<Rangirana> lista) {
+    private List<RangStavkaDTO> javno(List<RangRedDTO> lista) {
         return lista.stream()
                 .filter(r -> r.greska() == null)
-                .map(r -> {
-                    Student s = r.prijava().getStudent();
-                    return new RangStavkaDTO(s.getIdStudent(), s.getPrezime(),
-                            s.getImeRoditelja(), s.getIme(), r.bodovi());
-                })
+                .map(r -> new RangStavkaDTO(r.idStudent(), r.prezime(), r.imeOca(), r.ime(), r.ukupno()))
                 .toList();
     }
 
-    private List<RangRedDTO> admin(List<Rangirana> lista) {
-        return IntStream.range(0, lista.size())
-                .mapToObj(i -> uRed(i + 1, lista.get(i)))
-                .toList();
-    }
-
-    private RangRedDTO uRed(int redniBroj, Rangirana r) {
+    private RangRedDTO uRed(Rangirana r) {
         Prijava p = r.prijava();
         Student s = p.getStudent();
 
         double uspjeh     = potvrdjeno(r, KategorijaBodovanja.USPJEH);
         double udaljenost = potvrdjeno(r, KategorijaBodovanja.UDALJENOST);
-        double primanja   = potvrdjeno(r, KategorijaBodovanja.PRIMANJA);
-        double dodatni    = potvrdjeno(r, GrupeKriterija.DODATNI);
+        double socijalni  = zaokruzi(potvrdjeno(r, KategorijaBodovanja.PRIMANJA)
+                + potvrdjeno(r, GrupeKriterija.DODATNI));
         double ukupno     = r.bodovi();
 
         // branioci: uzima se samo najveći potvrđeni, pa se računa kao ostatak do ukupnog
         double branioci = r.rezultat() == null ? 0
-                : zaokruzi(ukupno - uspjeh - udaljenost - primanja - dodatni);
+                : zaokruzi(ukupno - uspjeh - udaljenost - socijalni);
 
         return new RangRedDTO(
-                redniBroj, p.getIdPrijava(), s.getIdStudent(),
+                0,                                   // redni broj dodjeljuje RangRaspodjela
+                p.getIdPrijava(), s.getIdStudent(),
+                String.valueOf(p.getIdPrijava()),    // šifra: privremeno ID prijave
                 s.getPrezime(), s.getImeRoditelja(), s.getIme(),
                 godinaStudija(p),
-                uspjeh, udaljenost, primanja, branioci, dodatni, ukupno,
+                kategorija(p),
+                uspjeh, branioci, socijalni, udaljenost, ukupno,
+                false,                               // primljen: računa RangRaspodjela
+                p.getDokazUslovaAt() == null ? null : p.getDokazUslovaAt().format(FMT),
+                p.getDokazUslovaEvidentirao() != null,
                 r.greska());
     }
 
@@ -153,6 +144,11 @@ public class RangListaService {
 
     // ---------- pomoćne ----------
 
+    private KategorijaRanga kategorija(Prijava p) {
+        if (jeBrucos(p)) return KategorijaRanga.BRUCOS;
+        return p.getDokazUslovaAt() == null ? KategorijaRanga.LISTA_CEKANJA : KategorijaRanga.SA_USLOVOM;
+    }
+
     private boolean jeOdobrena(Prijava p) {
         String s = p.getStatus() != null ? p.getStatus().getNaziv() : null;
         return Statusi.ODOBRENO.equalsIgnoreCase(s) || Statusi.ZAKLJUCENO.equalsIgnoreCase(s);
@@ -163,9 +159,12 @@ public class RangListaService {
         return p.getGodinaStudija() != null ? p.getGodinaStudija() : p.getStudent().getGodinaStudija();
     }
 
+    /** TODO: kad dođe upisGodinePut → brucoš = 1. godina I prvi put (ponavljač 1. godine nije brucoš). */
+    /** Brucoš = 1. godina i prvi put upisuje (ponavljač 1. godine ide među više godine). */
     private boolean jeBrucos(Prijava p) {
         Integer g = godinaStudija(p);
-        return g != null && g == GodineStudija.PRVA;
+        Integer put = p.getUpisGodinePut();   // stare prijave bez podatka računaju se kao prvi upis
+        return g != null && g == GodineStudija.PRVA && (put == null || put == 1);
     }
 
     private String naziv(Integer godina) {
