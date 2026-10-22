@@ -69,4 +69,8 @@ public class Student {
 
     @Column(name = "napomena", length = 1000)
     private String napomena;
+
+    /** Trajni broj studenta za šifru SC-00001/26; dodjeljuje SifraStudenta, ne mijenja se. */
+    @Column(name = "sifra_broj", unique = true)
+    private Integer sifraBroj;
 }

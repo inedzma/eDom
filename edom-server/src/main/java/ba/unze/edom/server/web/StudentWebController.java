@@ -5,6 +5,7 @@ import ba.unze.edom.server.exception.PrijavaException;
 import ba.unze.edom.server.exception.RegistracijaException;
 import ba.unze.edom.server.security.KorisnikPrincipal;
 import ba.unze.edom.server.service.PrijavaService;
+import ba.unze.edom.server.service.SifraStudenta;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class StudentWebController {
 
     private final PrijavaService prijavaService;
+    private final SifraStudenta sifraStudenta;
 
     @GetMapping("/pocetna")
     public String pocetna(@AuthenticationPrincipal KorisnikPrincipal korisnik, Model model) {
@@ -34,6 +36,13 @@ public class StudentWebController {
     public String ime(@AuthenticationPrincipal KorisnikPrincipal korisnik) {
         if (korisnik == null) return null;
         return profilService.ucitaj(korisnik.getIdStudenta()).ime();
+    }
+
+    /** Šifra studenta dostupna svim stranicama ovog kontrolera (profil, početna). */
+    @ModelAttribute("sifra")
+    public String sifra(@AuthenticationPrincipal KorisnikPrincipal korisnik) {
+        if (korisnik == null || korisnik.getIdStudenta() == null) return null;
+        return sifraStudenta.zaStudenta(korisnik.getIdStudenta());
     }
 
     @ExceptionHandler(PrijavaException.class)

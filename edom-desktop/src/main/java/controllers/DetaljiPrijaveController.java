@@ -24,6 +24,9 @@ import java.util.function.Supplier;
 public class DetaljiPrijaveController {
 
     private static final DateTimeFormatter DATUM = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
+    private static final String ODOBRENO = "odobreno";
+
+    private static final String NA_CEKANJU = "na čekanju";
 
     // zaglavlje
     @FXML private Label lblNaslov;
@@ -181,7 +184,7 @@ public class DetaljiPrijaveController {
         izvrsi(() -> PrijavaApi.verifikuj(id, z), "Provjera je sačuvana.");
     }
 
-    // ---------- status ----------
+
 
     private void popuniStatus(PrijavaDetaljiDTO p) {
         List<String> dozvoljeni = p.dozvoljeniStatusi() != null ? p.dozvoljeniStatusi() : List.of();
@@ -213,17 +216,24 @@ public class DetaljiPrijaveController {
 
         String pitanje = "Promijeniti status prijave u '" + novi + "'?";
         RezultatBodovanja r = prijava.bodovanje();
-        if ("odobreno".equals(novi) && r != null && r.cekaVerifikaciju()) {
+        boolean prihvacena = ODOBRENO.equals(novi) || NA_CEKANJU.equals(novi);
+        if (prihvacena && r != null && r.cekaVerifikaciju()) {
             pitanje += String.format(
                     "%n%nPažnja: %.2f bodova nije provjereno i neće biti uračunato.%nPrijava se boduje sa %.2f bodova.",
                     r.potencijalno() - r.potvrdjeno(), r.potvrdjeno());
+        }
+        if (NA_CEKANJU.equals(novi)) {
+            pitanje += "\n\nStudent ne ispunjava uslov za upis naredne godine i ide na listu čekanja."
+                    + "\nKad donese uvjerenje, odobrite prijavu (ili \"Dokaz ✓\" na rang listi).";
+        } else if (ODOBRENO.equals(novi) && prijava.trebaUslov()) {
+            pitanje += "\n\nOdobravanjem potvrđujete da student ispunjava uslov za upis naredne godine.";
         }
 
         Alert potvrda = new Alert(Alert.AlertType.CONFIRMATION, pitanje);
         potvrda.setHeaderText(null);
         if (potvrda.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
 
-        boolean saljeMail = "odobreno".equals(novi) || "odbijeno".equals(novi);
+        boolean saljeMail = ODOBRENO.equals(novi) || "odbijeno".equals(novi);
         int id = prijava.idPrijava();
         izvrsi(() -> PrijavaApi.promijeniStatus(id, new PromjenaStatusaDTO(novi, napomena)),
                 saljeMail ? "Status je promijenjen. Studentu je poslan e-mail." : "Status je promijenjen.");
@@ -358,7 +368,12 @@ public class DetaljiPrijaveController {
         List<String> redovi = new ArrayList<>(List.of(
                 "Indeks: " + str(p.brojIndeksa()),
                 "Fakultet: " + str(p.fakultet()),
-                "Godina studija: " + str(p.godinaStudija()),
+                "Godina studija: " + str(p.godinaStudija())
+        ));
+        if (p.trebaUslov()) {
+            redovi.add("Uslov za upis: " + str(p.uslovUpisa()));
+        }
+        redovi.addAll(List.of(
                 "Prosjek: " + str(p.prosjek()),
                 "Položeni ispiti: " + str(p.polozeniIspiti()),
                 "Članova domaćinstva: " + str(p.brojClanovaDomacinstva()),
@@ -378,6 +393,7 @@ public class DetaljiPrijaveController {
         String s = status.toLowerCase();
         if (s.contains("odob"))       lblStatus.getStyleClass().add("status-success");
         else if (s.contains("odbij")) lblStatus.getStyleClass().add("status-danger");
+        else if (s.contains("čekanju")) lblStatus.getStyleClass().add("status-warning");
         else if (s.contains("zaklj")) lblStatus.getStyleClass().add("status-warning");
         else                          lblStatus.getStyleClass().add("status-info");
     }

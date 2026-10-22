@@ -8,5 +8,7 @@ public final class Statusi {
 
     public static final String ZAKLJUCENO = "zaključeno";
 
+    public static final String NA_CEKANJU = "na čekanju";
+
     private Statusi() {}
 }

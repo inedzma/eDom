@@ -36,6 +36,7 @@ public class RucniUnosService {
     private final BodovanjeService bodovanjeService;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher dogadjaji;
+    private final SifraStudenta sifraStudenta;
 
     // ---------- pretraga prije unosa ----------
 
@@ -91,6 +92,7 @@ public class RucniUnosService {
         provjeriStudenta(z.student());
         // 1. student, po istim pravilima kao web registracija
         Student student = studentEvidencija.nadjiIliKreiraj(z.student());
+        sifraStudenta.dodijeli(student);
 
         // 2. nalog, ako ga nema; lozinku student postavlja sam preko linka iz maila
         boolean noviNalog = false;
@@ -115,7 +117,8 @@ public class RucniUnosService {
         prijavaRepository.save(p);
 
         dogadjaji.publishEvent(new PrijavaEvidentiranaEvent(
-                z.student().email(), student.getIme(), pz.akademskaGodina(), noviNalog));
+                z.student().email(), student.getIme(), pz.akademskaGodina(), noviNalog,
+                SifraStudenta.format(student.getSifraBroj(), pz.akademskaGodina())));
 
         return new RucniUnosRezultatDTO(p.getIdPrijava(), student.getIdStudent(),
                 noviNalog, r.potvrdjeno(), r.potencijalno());

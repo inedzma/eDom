@@ -28,6 +28,17 @@
                 <p class="muted" th:text="${profil.email}">email@primjer.ba</p>
             </div>
 
+            <div class="sifra-box" th:if="${sifra != null}">
+                <span class="sifra-label">Vaša šifra</span>
+                <strong class="sifra-value" th:text="${sifra}">SC-00001/26</strong>
+                <span class="sifra-note" th:if="${#strings.contains(sifra, '/')}">
+                    Pod ovom šifrom ste na rang listi. Broj ostaje isti svake godine, mijenja se samo godina na kraju.
+                </span>
+                <span class="sifra-note" th:unless="${#strings.contains(sifra, '/')}">
+                    Godina (npr. /26) dodaje se kada podnesete prijavu.
+                </span>
+            </div>
+
             <div class="lock-note">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 <span>Lični podaci se ne mogu mijenjati putem sistema. Za ispravku se obratite administraciji doma.</span>

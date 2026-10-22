@@ -103,7 +103,8 @@ public class RangListaController {
     private double sirina(RangKolona k) {
         return switch (k) {
             case REDNI_BROJ -> 55;
-            case SIFRA, GODINA -> 75;
+            case SIFRA -> 110;
+            case GODINA -> 75;
             case IME -> 240;
             case KATEGORIJA, SOCIJALNI -> 110;
             case USPJEH, BRANIOCI, UDALJENOST, UKUPNO -> 85;

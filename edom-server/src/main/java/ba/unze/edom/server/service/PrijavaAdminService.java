@@ -11,9 +11,13 @@ import ba.unze.edom.server.repository.PrijavaRepository;
 import ba.unze.edom.server.repository.StatusPrijaveRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,10 +25,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PrijavaAdminService {
 
-    /** Dozvoljeni prelazi statusa — jedino mjesto gdje su zapisani. */
+    private static final ZoneId ZONA = ZoneId.of("Europe/Sarajevo");
+
+    /**
+     * Dozvoljeni prelazi statusa — jedino mjesto gdje su zapisani.
+     * "na čekanju" = viši student bez uslova za upis (lista čekanja); brucošima se ne nudi.
+     */
     private static final Map<String, List<String>> PRELAZI = Map.of(
-            Statusi.NA_PREGLEDU, List.of(Statusi.ODOBRENO, Statusi.ODBIJENO),
-            Statusi.ODOBRENO,    List.of(Statusi.ZAKLJUCENO, Statusi.NA_PREGLEDU, Statusi.ODBIJENO),
+            Statusi.NA_PREGLEDU, List.of(Statusi.ODOBRENO, Statusi.NA_CEKANJU, Statusi.ODBIJENO),
+            Statusi.NA_CEKANJU,  List.of(Statusi.ODOBRENO, Statusi.NA_PREGLEDU, Statusi.ODBIJENO),
+            Statusi.ODOBRENO,    List.of(Statusi.ZAKLJUCENO, Statusi.NA_CEKANJU, Statusi.NA_PREGLEDU, Statusi.ODBIJENO),
             Statusi.ODBIJENO,    List.of(Statusi.NA_PREGLEDU),
             Statusi.ZAKLJUCENO,  List.of(),
             Statusi.U_IZRADI,    List.of()
@@ -104,9 +114,10 @@ public class PrijavaAdminService {
         String trenutni = nazivStatusa(p);
         String novi = z.status();
 
-        if (!PRELAZI.getOrDefault(trenutni, List.of()).contains(novi)) {
-            throw new PrijavaException(
-                    "Prijava u statusu '" + trenutni + "' ne može preći u '" + novi + "'.");
+        if (!dozvoljeni(p).contains(novi)) {
+            throw new PrijavaException(Statusi.NA_CEKANJU.equals(novi) && UslovUpisa.jeBrucos(p)
+                    ? "Brucoš ne ide na listu čekanja — uslov za upis gleda se samo kod viših godina."
+                    : "Prijava u statusu '" + trenutni + "' ne može preći u '" + novi + "'.");
         }
 
         String napomena = z.napomena() != null ? z.napomena().trim() : null;
@@ -114,16 +125,18 @@ public class PrijavaAdminService {
             throw new PrijavaException("Unesite razlog odbijanja — student ga dobija na e-mail.");
         }
 
-        // odobriti se ne može prijava s nevalidnim podacima; izuzetak ide do korisnika
-        RezultatBodovanja r = Statusi.ODOBRENO.equals(novi)
-                ? bodovanjeService.izracunaj(p)
-                : izracunajAkoMoze(p);
+        postaviUslov(p, trenutni, novi);
+
+        // odobriti (ili staviti na čekanje) ne može se prijava s nevalidnim podacima
+        boolean prihvacena = Statusi.ODOBRENO.equals(novi) || Statusi.NA_CEKANJU.equals(novi);
+        RezultatBodovanja r = prihvacena ? bodovanjeService.izracunaj(p) : izracunajAkoMoze(p);
 
         p.setStatus(statusRepository.findByNaziv(novi)
                 .orElseThrow(() -> new IllegalStateException("Status '" + novi + "' ne postoji u bazi.")));
         p.setNapomenaAdmina(napomena);
         if (r != null) p.setUkupniBodovi(r.potvrdjeno());
 
+        // TODO: mail za "na čekanju" (da student donese uvjerenje) — kad dodamo šablon
         if (Statusi.ODOBRENO.equals(novi) || Statusi.ODBIJENO.equals(novi)) {
             dogadjaji.publishEvent(new StatusPromijenjenEvent(
                     p.getStudent().getEmail(), p.getStudent().getIme(),
@@ -131,6 +144,34 @@ public class PrijavaAdminService {
         }
 
         return izgradiDetalje(p);
+    }
+
+    /**
+     * Uslov za upis (samo viši studenti):
+     *  - na čekanju           → nema dokaza
+     *  - na čekanju → odobreno → naknadni dokaz: sada + admin koji ga je evidentirao
+     *  - drugo → odobreno     → dokaz uz prijavu (postojeći dokaz se ne dira)
+     */
+    private void postaviUslov(Prijava p, String trenutni, String novi) {
+        if (UslovUpisa.jeBrucos(p)) return;
+
+        if (Statusi.NA_CEKANJU.equals(novi)) {
+            p.setDokazUslovaAt(null);
+            p.setDokazUslovaEvidentirao(null);
+        } else if (Statusi.ODOBRENO.equals(novi)) {
+            if (Statusi.NA_CEKANJU.equals(trenutni)) {
+                p.setDokazUslovaAt(LocalDateTime.now(ZONA));
+                p.setDokazUslovaEvidentirao(trenutniAdmin());
+            } else if (p.getDokazUslovaAt() == null) {
+                p.setDokazUslovaAt(LocalDateTime.now(ZONA));
+                p.setDokazUslovaEvidentirao(null);
+            }
+        }
+    }
+
+    private String trenutniAdmin() {
+        Authentication a = SecurityContextHolder.getContext().getAuthentication();
+        return a != null ? a.getName() : "admin";
     }
 
     // ---------- SADRŽAJ DOKUMENTA ----------
@@ -151,6 +192,13 @@ public class PrijavaAdminService {
                 .orElseThrow(() -> new PrijavaException("Prijava ne postoji."));
     }
 
+    /** Prelazi za ovu prijavu; brucošu se "na čekanju" ne nudi. */
+    private List<String> dozvoljeni(Prijava p) {
+        List<String> svi = PRELAZI.getOrDefault(nazivStatusa(p), List.of());
+        if (!UslovUpisa.jeBrucos(p)) return svi;
+        return svi.stream().filter(s -> !Statusi.NA_CEKANJU.equals(s)).toList();
+    }
+
     private PrijavaDetaljiDTO izgradiDetalje(Prijava p) {
         RezultatBodovanja r = null;
         String greska = null;
@@ -160,8 +208,11 @@ public class PrijavaAdminService {
             greska = e.getMessage();
         }
         return PrijaveMapper.uDetalje(p, r, greska,
-                dokumentRepository.pregledZaAdmina(p.getIdPrijava()),
-                PRELAZI.getOrDefault(nazivStatusa(p), List.of()));
+                        dokumentRepository.pregledZaAdmina(p.getIdPrijava()),
+                        dozvoljeni(p))
+                .saUslovom(!UslovUpisa.jeBrucos(p),
+                        p.getDokazUslovaAt() != null,
+                        UslovUpisa.opis(p, nazivStatusa(p)));
     }
 
     private void osvjeziBodove(Prijava p) {

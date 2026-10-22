@@ -123,7 +123,7 @@ public class RangListaService {
         return new RangRedDTO(
                 0,                                   // redni broj dodjeljuje RangRaspodjela
                 p.getIdPrijava(), s.getIdStudent(),
-                String.valueOf(p.getIdPrijava()),    // šifra: privremeno ID prijave
+                SifraStudenta.format(s.getSifraBroj(), p.getAkademskaGodina()),
                 s.getPrezime(), s.getImeRoditelja(), s.getIme(),
                 godinaStudija(p),
                 kategorija(p),
@@ -146,25 +146,22 @@ public class RangListaService {
 
     private KategorijaRanga kategorija(Prijava p) {
         if (jeBrucos(p)) return KategorijaRanga.BRUCOS;
-        return p.getDokazUslovaAt() == null ? KategorijaRanga.LISTA_CEKANJA : KategorijaRanga.SA_USLOVOM;
+        String s = p.getStatus() != null ? p.getStatus().getNaziv() : null;
+        return Statusi.NA_CEKANJU.equals(s) ? KategorijaRanga.LISTA_CEKANJA : KategorijaRanga.SA_USLOVOM;
     }
-
     private boolean jeOdobrena(Prijava p) {
         String s = p.getStatus() != null ? p.getStatus().getNaziv() : null;
-        return Statusi.ODOBRENO.equalsIgnoreCase(s) || Statusi.ZAKLJUCENO.equalsIgnoreCase(s);
+        return Statusi.ODOBRENO.equalsIgnoreCase(s)
+                || Statusi.ZAKLJUCENO.equalsIgnoreCase(s)
+                || Statusi.NA_CEKANJU.equalsIgnoreCase(s);
     }
 
-    /** Godina iz prijave ima prednost; ako je nema, uzima se iz profila studenta. */
     private Integer godinaStudija(Prijava p) {
-        return p.getGodinaStudija() != null ? p.getGodinaStudija() : p.getStudent().getGodinaStudija();
+        return UslovUpisa.godinaStudija(p);
     }
 
-    /** TODO: kad dođe upisGodinePut → brucoš = 1. godina I prvi put (ponavljač 1. godine nije brucoš). */
-    /** Brucoš = 1. godina i prvi put upisuje (ponavljač 1. godine ide među više godine). */
     private boolean jeBrucos(Prijava p) {
-        Integer g = godinaStudija(p);
-        Integer put = p.getUpisGodinePut();   // stare prijave bez podatka računaju se kao prvi upis
-        return g != null && g == GodineStudija.PRVA && (put == null || put == 1);
+        return UslovUpisa.jeBrucos(p);
     }
 
     private String naziv(Integer godina) {
@@ -174,4 +171,6 @@ public class RangListaService {
     private double zaokruzi(double d) {
         return Math.round(d * 100.0) / 100.0;
     }
+
+
 }

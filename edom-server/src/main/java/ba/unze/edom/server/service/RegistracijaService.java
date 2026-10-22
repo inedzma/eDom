@@ -21,6 +21,7 @@ public class RegistracijaService {
     private final KorisnikRepository korisnikRepository;
     private final UlogaRepository ulogaRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SifraStudenta sifraStudenta;
 
 
     @Transactional
@@ -30,6 +31,7 @@ public class RegistracijaService {
                 z.fakultet(), z.godinaStudija(), z.adresa(), z.imeRoditelja(), null,
                 // lična karta, telefon roditelja, kanton, općina: unose se u prijavi
                 null, null, null, null));
+        sifraStudenta.dodijeli(student);
 
         if (korisnikRepository.findByStudent_IdStudent(student.getIdStudent()).isPresent()) {
             throw new RegistracijaException(

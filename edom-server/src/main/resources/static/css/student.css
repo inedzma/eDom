@@ -184,3 +184,32 @@ body.app{display:flex;flex-direction:column;min-height:100vh}
     .grid-2{grid-template-columns:1fr}
     .form-actions .btn{width:100%}
 }
+
+.sifra-box {
+    margin: 16px 0;
+    padding: 14px 16px;
+    border: 1px dashed #9db4d6;
+    border-radius: 10px;
+    background: #f4f8fd;
+    text-align: center;
+}
+.sifra-label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #5b6b82;
+}
+.sifra-value {
+    display: block;
+    margin: 4px 0;
+    font-size: 22px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    letter-spacing: .04em;
+    user-select: all;   /* jedan klik označi cijelu šifru za kopiranje */
+}
+.sifra-note {
+    display: block;
+    font-size: 12px;
+    color: #6b7a90;
+}

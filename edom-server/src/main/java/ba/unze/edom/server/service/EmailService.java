@@ -63,14 +63,15 @@ public class EmailService {
     }
 
     public void posaljiObavijestORucnomUnosu(String email, String ime, int godina,
-                                             boolean noviNalog, String webUrl) {
+                                             boolean noviNalog, String sifra, String webUrl) {
 
         String akGod = godina + "/" + (godina + 1);
 
         StringBuilder tekst = new StringBuilder()
                 .append("Poštovani/a ").append(ime).append(",\n\n")
                 .append("vaša prijava za smještaj u Studentskom centru Univerziteta u Zenici ")
-                .append("za akademsku ").append(akGod).append(". godinu evidentirana je u sistemu E-Dom.\n\n");
+                .append("za akademsku ").append(akGod).append(". godinu evidentirana je u sistemu E-Dom.\n\n")
+                .append(sifraTekst(sifra, webUrl));
 
         if (noviNalog) {
             tekst.append("Za vas je kreiran korisnički nalog. Korisničko ime je ova e-mail adresa.\n")
@@ -85,11 +86,37 @@ public class EmailService {
         tekst.append("Studentski centar Zenica");
 
         SimpleMailMessage poruka = new SimpleMailMessage();
-        poruka.setFrom(od);                 // ili kako se kod tebe zove adresa pošiljaoca
+        poruka.setFrom(od);
         poruka.setTo(email);
         poruka.setSubject("E-Dom: vaša prijava za smještaj je evidentirana");
         poruka.setText(tekst.toString());
         mailSender.send(poruka);
+    }
+
+    /** Potvrda nakon što student sam podnese prijavu na webu. */
+    public void posaljiPotvrduPrijave(String email, String ime, int godina, String sifra, String webUrl) {
+
+        String akGod = godina + "/" + (godina + 1);
+
+        String tekst = "Poštovani/a " + ime + ",\n\n"
+                + "vaša prijava za smještaj u Studentskom centru Univerziteta u Zenici za akademsku "
+                + akGod + ". godinu je zaprimljena i čeka pregled dokumentacije.\n\n"
+                + sifraTekst(sifra, webUrl)
+                + "O svakoj promjeni statusa prijave bićete obaviješteni e-mailom. "
+                + "Status možete pratiti i na " + webUrl + ".\n\n"
+                + "Studentski centar Zenica";
+
+        posalji(email, "E-Dom: prijava za smještaj je zaprimljena", tekst);
+    }
+
+    /** Isti tekst o šifri u svim mailovima. */
+    private String sifraTekst(String sifra, String webUrl) {
+        if (sifra == null || sifra.isBlank() || "—".equals(sifra)) return "";
+        return "Vaša šifra: " + sifra + "\n\n"
+                + "Pod ovom šifrom bićete na preliminarnoj i konačnoj rang listi "
+                + "(radi zaštite ličnih podataka liste ne sadrže imena). "
+                + "Šifru uvijek možete pogledati na stranici Moj profil: "
+                + webUrl + "/student/profil\n\n";
     }
 
     public void posaljiPromjenuStatusa(String email, String ime, int godina, String status,

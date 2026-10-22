@@ -7,6 +7,7 @@ import ba.unze.edom.server.entity.*;
 import ba.unze.edom.server.exception.PrijavaException;
 import ba.unze.edom.server.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,8 @@ public class PrijavaService {
     private final StatusPrijaveRepository statusRepository;
     private final VrstaKriterijaRepository vrstaKriterijaRepository;
     private final BodovanjeService bodovanjeService;
+    private final ApplicationEventPublisher dogadjaji;
+    private final SifraStudenta sifraStudenta;
 
     // ---------- KREIRANJE ----------
 
@@ -207,6 +210,13 @@ public class PrijavaService {
 
         // kes potvrdjenih bodova; u ovom trenutku jos nista nije verifikovano
         p.setUkupniBodovi(bodovanjeService.izracunaj(p).potvrdjeno());
+
+        // potvrda studentu sa šifrom (mail ide tek kad je prijava sigurno u bazi)
+        Student s = p.getStudent();
+        sifraStudenta.dodijeli(s);   // za svaki slučaj, ako student još nema broj
+        dogadjaji.publishEvent(new PrijavaPodnesenaEvent(
+                s.getEmail(), s.getIme(), p.getAkademskaGodina(),
+                SifraStudenta.format(s.getSifraBroj(), p.getAkademskaGodina())));
     }
 
     private List<String> provjeriPotpunost(Prijava p) {
