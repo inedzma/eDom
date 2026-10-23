@@ -7,12 +7,16 @@ import java.util.List;
 import java.util.Set;
 
 public record ExportOpcije(
-        Set<KategorijaRanga> liste,   // svaka odabrana lista ide kao posebna tabela
-        boolean objedinjeno,          // + jedna tabela sa svima, po bodovima
-        boolean javna,                // true = samo R.br, šifra, bodovi
-        List<RangKolona> kolone,      // za internu verziju: kolone vidljive u tabeli
-        boolean konacna,
+        String format,                // "PDF" ili "EXCEL"
+        Set<KategorijaRanga> liste,   // svaka odabrana lista ide posebno
+        boolean objedinjeno,          // + jedna tabela/list sa svima, po bodovima
+        List<RangKolona> kolone,      // odabrane kolone, redom
+        boolean konacna,              // samo PDF
         boolean samoPrimljeni,        // važi za brucoše i listu s uslovom
-        LocalDate useljenjeOd,
-        LocalDate useljenjeDo
-) {}
+        LocalDate useljenjeOd,        // samo PDF
+        LocalDate useljenjeDo         // samo PDF
+) {
+    public boolean excel() {
+        return "EXCEL".equals(format);
+    }
+}

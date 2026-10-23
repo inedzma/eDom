@@ -71,7 +71,7 @@ public class RangListaHtmlExportService {
     // ---------- HTML ----------
 
     private String sastaviHtml(RangListaAdminDTO lista, ExportOpcije o) {
-        List<RangKolona> kolone = o.javna() ? JAVNE_KOLONE : o.kolone();
+        List<RangKolona> kolone = o.kolone();
         String akGod = kratkaGodina(lista.akademskaGodina());
         String danas = LocalDate.now().format(DF);
         String vrsta = o.konacna() ? "KONAČNE" : "PRELIMINARNE";

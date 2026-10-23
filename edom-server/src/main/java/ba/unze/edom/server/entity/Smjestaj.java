@@ -55,4 +55,19 @@ public class Smjestaj {
 
     @Column(name = "napomena")
     private String napomena;
+
+    /** Kartica za ishranu: kad je preuzeta / razdužena (null = nije). */
+    @Column(name = "kartica_preuzeta")
+    private LocalDate karticaPreuzeta;
+
+    @Column(name = "kartica_razduzena")
+    private LocalDate karticaRazduzena;
+
+    /** Ljekarsko uvjerenje "sposoban za kolektivni smještaj" predano pri useljenju. */
+    @Column(name = "ljekarsko_predano")
+    private LocalDate ljekarskoPredano;
+
+    /** Uvjerenje s fakulteta predano pri useljenju (ako nije priloženo uz prijavu). */
+    @Column(name = "uvjerenje_fakultet_predano")
+    private LocalDate uvjerenjeFakultetPredano;
 }

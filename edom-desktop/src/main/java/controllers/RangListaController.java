@@ -21,6 +21,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import service.export.ExportOpcije;
 import service.export.RangKolona;
+import service.export.RangListaExcelExportService;
 import service.export.RangListaHtmlExportService;
 
 import java.io.File;
@@ -418,21 +419,28 @@ public class RangListaController {
         if (izbor.isEmpty()) return;
         ExportOpcije o = izbor.get();
 
+        String ekstenzija = o.excel() ? ".xlsx" : ".pdf";
         FileChooser fc = new FileChooser();
         fc.setTitle("Sačuvaj rang listu");
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF fajl", "*.pdf"));
-        fc.setInitialFileName("Rang_lista_" + (o.konacna() ? "konacna_" : "preliminarna_")
-                + (o.javna() ? "javna_" : "interna_") + lista.godina() + ".pdf");
+        fc.getExtensionFilters().add(o.excel()
+                ? new FileChooser.ExtensionFilter("Excel fajl", "*.xlsx")
+                : new FileChooser.ExtensionFilter("PDF fajl", "*.pdf"));
+        fc.setInitialFileName("Rang_lista_"
+                + (o.excel() ? "" : (o.konacna() ? "konacna_" : "preliminarna_"))
+                + lista.godina() + ekstenzija);
 
         File file = fc.showSaveDialog(tblRangLista.getScene().getWindow());
         if (file == null) return;
 
         try {
-            int izostavljeno = new RangListaHtmlExportService().export(lista, o, file);
-            String poruka = "PDF uspješno kreiran!";
+            int izostavljeno = o.excel()
+                    ? new RangListaExcelExportService().export(lista, o, file)
+                    : new RangListaHtmlExportService().export(lista, o, file);
+
+            String poruka = o.excel() ? "Excel fajl je kreiran!" : "PDF uspješno kreiran!";
             if (izostavljeno > 0) {
                 poruka += "\n\n" + izostavljeno + " prijav" + (izostavljeno == 1 ? "a nije" : "e nisu")
-                        + " u PDF-u zbog neispravnih podataka (⚠ u tabeli).";
+                        + " u izvozu zbog neispravnih podataka (⚠ u tabeli).";
             }
             new Alert(Alert.AlertType.INFORMATION, poruka, ButtonType.OK).showAndWait();
         } catch (RuntimeException ex) {

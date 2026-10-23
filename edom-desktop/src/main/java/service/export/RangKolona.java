@@ -63,4 +63,17 @@ public enum RangKolona {
     private static String broj(double v) {
         return String.format("%.2f", v);
     }
+    /** Brojčana vrijednost za Excel; null = kolona je tekst. */
+    public Number broj(RangRedDTO r, int rb) {
+        return switch (this) {
+            case REDNI_BROJ -> rb;
+            case GODINA -> r.godinaStudija();
+            case USPJEH -> r.uspjeh();
+            case BRANIOCI -> r.branioci();
+            case SOCIJALNI -> r.socijalni();
+            case UDALJENOST -> r.udaljenost();
+            case UKUPNO -> r.greska() != null ? null : r.ukupno();
+            default -> null;
+        };
+    }
 }
