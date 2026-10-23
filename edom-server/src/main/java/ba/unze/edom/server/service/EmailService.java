@@ -168,4 +168,26 @@ public class EmailService {
         poruka.setText(t.toString());
         mailSender.send(poruka);
     }
+
+    /** Poruka studenta domu; Reply-To = student, pa se može odgovoriti direktno iz inboxa. */
+    public void posaljiPorukuDomu(String adresaDoma, String emailStudenta, String imeStudenta,
+                                  String sifra, String naslov, String tekst) {
+        try {
+            MimeMessage poruka = mailSender.createMimeMessage();
+            MimeMessageHelper h = new MimeMessageHelper(poruka, "UTF-8");
+            h.setFrom(new InternetAddress(od, naziv, "UTF-8"));
+            h.setTo(adresaDoma);
+            if (emailStudenta != null && !emailStudenta.isBlank()) h.setReplyTo(emailStudenta);
+            h.setSubject("E-Dom poruka: " + naslov);
+            h.setText("Poruka studenta iz sistema E-Dom\n\n"
+                    + "Student: " + imeStudenta + " (" + sifra + ")\n"
+                    + "E-mail: " + emailStudenta + "\n\n"
+                    + "Naslov: " + naslov + "\n\n"
+                    + tekst + "\n\n"
+                    + "— Odgovorom na ovaj mail odgovarate direktno studentu.");
+            mailSender.send(poruka);
+        } catch (Exception e) {
+            throw new IllegalStateException("Slanje poruke domu nije uspjelo: " + e.getMessage(), e);
+        }
+    }
 }

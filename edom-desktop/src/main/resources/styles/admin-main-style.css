@@ -98,3 +98,34 @@
 .logout-btn:focused {
     -fx-border-color: rgba(231, 76, 60, 0.85);
 }
+
+/* ---------- obavijesti ---------- */
+.obavijesti-btn { -fx-font-weight: bold; }
+.obavijesti-btn.ima-novih { -fx-background-color: #c62828; -fx-text-fill: white; }
+
+.obav-scroll, .obav-scroll > .viewport { -fx-background-color: transparent; }
+.obav-root { -fx-background-color: transparent; }
+.obav-naslov { -fx-font-size: 22px; -fx-font-weight: bold; }
+.obav-grupa { -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #455a64; -fx-padding: 10 0 0 0; }
+.obav-prazno { -fx-text-fill: #6b7a90; -fx-font-size: 14px; }
+
+.obav-kartica {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #e3e8ef;
+    -fx-border-radius: 10;
+    -fx-padding: 12 16;
+}
+.obav-kartica:hover { -fx-border-color: #90a4ae; }
+.obav-kartica--upozorenje { -fx-border-color: #f0a23a; -fx-background-color: #fffaf0; }
+
+.obav-stavka-naslov { -fx-font-weight: bold; -fx-font-size: 14px; }
+.obav-novo {
+    -fx-background-color: #c62828; -fx-text-fill: white;
+    -fx-font-size: 10px; -fx-font-weight: bold;
+    -fx-padding: 1 6; -fx-background-radius: 6;
+}
+.obav-opis { -fx-text-fill: #5b6b82; }
+.obav-upozorenje { -fx-text-fill: #b86e00; }
+.obav-datum { -fx-text-fill: #8a97a8; }
+.obav-strelica { -fx-font-size: 20px; -fx-text-fill: #90a4ae; }

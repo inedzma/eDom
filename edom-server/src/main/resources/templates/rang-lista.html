@@ -22,11 +22,14 @@
     <section class="welcome rang-hero">
         <div>
             <span class="eyebrow">Studentski centar Univerziteta u Zenici</span>
-            <h1>Rang lista</h1>
-            <p>
-                Rang lista kandidata za smještaj i ishranu
-                <th:block th:if="${akademskaGodina}">za akademsku <b th:text="${akademskaGodina}">2025/2026</b>. godinu</th:block>.
+            <h1 th:text="${lista == null} ? 'Rang lista'
+                         : (${lista.vrsta == 'KONACNA'} ? 'Konačna rang lista' : 'Preliminarna rang lista')">Rang lista</h1>
+            <p th:if="${lista != null}">
+                Rang lista kandidata za smještaj i ishranu za akademsku
+                <b th:text="${lista.akademskaGodina}">2026/2027</b>. godinu.
+                <br><span class="objava-info">Objavljeno <b th:text="${lista.objavljeno}">22.10.2026 17:45</b></span>
             </p>
+            <p th:if="${lista == null}">Rang lista još nije objavljena.</p>
         </div>
 
         <!-- vidi se samo prijavljenom studentu koji je na listi -->
@@ -46,95 +49,149 @@
         </div>
     </section>
 
-    <!-- ======================= ALATI ======================= -->
-    <div class="rang-tools">
-        <nav class="chips">
-            <a href="#brucosi" class="chip">
-                Brucoši <span th:text="${brucosi != null} ? ${#lists.size(brucosi)} : 0">0</span>
-            </a>
-            <a href="#visegodisnji" class="chip">
-                Studenti viših godina <span th:text="${visegodisnji != null} ? ${#lists.size(visegodisnji)} : 0">0</span>
-            </a>
-        </nav>
-        <label class="search">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-            <input type="search" id="search" placeholder="Pretraži po imenu ili prezimenu" autocomplete="off">
-        </label>
-    </div>
-
-    <!-- ======================= BRUCOŠI ======================= -->
-    <section class="panel rang-panel" id="brucosi">
-        <div class="rang-head">
-            <span class="rang-dot rang-dot--green"></span>
-            <h2>Brucoši</h2>
+    <!-- ======================= NIJE OBJAVLJENA ======================= -->
+    <section class="panel" th:if="${lista == null}">
+        <div class="empty-small">
+            Rang lista za tekuću akademsku godinu još nije objavljena. Kada bude objavljena, pojaviće se na ovoj stranici.
+            Svoju šifru možete vidjeti na stranici <a th:href="@{/student/profil}">Moj profil</a>.
         </div>
-
-        <div class="empty-small" th:if="${brucosi == null or #lists.isEmpty(brucosi)}">Nema kandidata na ovoj listi.</div>
-
-        <table class="tbl rang-tbl" th:unless="${brucosi == null or #lists.isEmpty(brucosi)}">
-            <thead>
-            <tr>
-                <th class="c-rank">#</th>
-                <th>Prezime (ime oca) i ime studenta</th>
-                <th class="c-pts">Bodovi</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="s, st : ${brucosi}"
-                th:classappend="${mojId != null and s.idStudenta == mojId} ? 'ja'"
-                th:attr="data-group='Brucoši'">
-                <td class="c-rank"><span class="rank" th:classappend="${st.count <= 3} ? 'rank--top'" th:text="${st.count}">1</span></td>
-                <td class="c-name">
-                    <span class="name">
-                        <b th:text="${s.prezime}">Prezime</b>
-                        <span class="father" th:text="'(' + ${s.imeOca} + ')'">(Otac)</span>
-                        <b th:text="${s.ime}">Ime</b>
-                    </span>
-                    <span class="me-tag" th:if="${mojId != null and s.idStudenta == mojId}">Vi</span>
-                </td>
-                <td class="c-pts"><b th:text="${#numbers.formatDecimal(s.bodovi, 1, 'NONE', 2, 'POINT')}">0.00</b></td>
-            </tr>
-            </tbody>
-        </table>
     </section>
 
-    <!-- ======================= STUDENTI VIŠIH GODINA ======================= -->
-    <section class="panel rang-panel" id="visegodisnji">
-        <div class="rang-head">
-            <span class="rang-dot rang-dot--blue"></span>
-            <h2>Studenti viših godina</h2>
+    <th:block th:if="${lista != null}">
+
+        <div class="rang-info">
+            Radi zaštite ličnih podataka na listi su šifre studenata, a ne imena.
+            Svoju šifru našli ste u e-mailu nakon prijave, a uvijek je možete vidjeti na stranici
+            <a th:href="@{/student/profil}">Moj profil</a>.
         </div>
 
-        <div class="empty-small" th:if="${visegodisnji == null or #lists.isEmpty(visegodisnji)}">Nema kandidata na ovoj listi.</div>
+        <!-- ======================= ALATI ======================= -->
+        <div class="rang-tools">
+            <nav class="chips">
+                <a href="#brucosi" class="chip">Brucoši <span th:text="${#lists.size(lista.brucosi)}">0</span></a>
+                <a href="#sa-uslovom" class="chip">Više godine <span th:text="${#lists.size(lista.saUslovom)}">0</span></a>
+                <a href="#lista-cekanja" class="chip">Lista čekanja <span th:text="${#lists.size(lista.listaCekanja)}">0</span></a>
+            </nav>
+            <label class="search">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                <input type="search" id="search" placeholder="Pretraži po šifri, npr. SC-00012" autocomplete="off">
+            </label>
+        </div>
 
-        <table class="tbl rang-tbl" th:unless="${visegodisnji == null or #lists.isEmpty(visegodisnji)}">
-            <thead>
-            <tr>
-                <th class="c-rank">#</th>
-                <th>Prezime (ime oca) i ime studenta</th>
-                <th class="c-pts">Bodovi</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="s, st : ${visegodisnji}"
-                th:classappend="${mojId != null and s.idStudenta == mojId} ? 'ja'"
-                th:attr="data-group='Studenti viših godina'">
-                <td class="c-rank"><span class="rank" th:classappend="${st.count <= 3} ? 'rank--top'" th:text="${st.count}">1</span></td>
-                <td class="c-name">
-                    <span class="name">
-                        <b th:text="${s.prezime}">Prezime</b>
-                        <span class="father" th:text="'(' + ${s.imeOca} + ')'">(Otac)</span>
-                        <b th:text="${s.ime}">Ime</b>
-                    </span>
-                    <span class="me-tag" th:if="${mojId != null and s.idStudenta == mojId}">Vi</span>
-                </td>
-                <td class="c-pts"><b th:text="${#numbers.formatDecimal(s.bodovi, 1, 'NONE', 2, 'POINT')}">0.00</b></td>
-            </tr>
-            </tbody>
-        </table>
-    </section>
+        <!-- ======================= BRUCOŠI ======================= -->
+        <section class="panel rang-panel" id="brucosi">
+            <div class="rang-head">
+                <span class="rang-dot rang-dot--green"></span>
+                <h2>Brucoši</h2>
+            </div>
 
-    <p class="no-results" id="noResults" hidden>Nijedan student ne odgovara pretrazi.</p>
+            <div class="empty-small" th:if="${#lists.isEmpty(lista.brucosi)}">Nema kandidata na ovoj listi.</div>
+
+            <table class="tbl rang-tbl" th:unless="${#lists.isEmpty(lista.brucosi)}">
+                <thead>
+                <tr>
+                    <th class="c-rank">#</th>
+                    <th>Šifra</th>
+                    <th class="c-status">Status</th>
+                    <th class="c-pts">Bodovi</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s, st : ${lista.brucosi}"
+                    th:classappend="|${mojId != null and s.idStudent == mojId ? 'ja' : ''} ${s.primljen ? '' : 'ispod'} ${s.primljen and (st.last or !lista.brucosi[st.index + 1].primljen) ? 'crta' : ''}|"
+                    data-group="Brucoši">
+                    <td class="c-rank"><span class="rank" th:classappend="${st.count <= 3} ? 'rank--top'" th:text="${s.redniBroj}">1</span></td>
+                    <td class="c-sifra">
+                        <span class="sifra" th:text="${s.sifra}">SC-00001/26</span>
+                        <span class="me-tag" th:if="${mojId != null and s.idStudent == mojId}">Vi</span>
+                    </td>
+                    <td class="c-status">
+                        <span class="st st--da" th:if="${s.primljen}">Primljen</span>
+                        <span class="st st--ne" th:unless="${s.primljen}">Ispod crte</span>
+                    </td>
+                    <td class="c-pts"><b th:text="${#numbers.formatDecimal(s.bodovi, 1, 'NONE', 2, 'POINT')}">0.00</b></td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- ======================= VIŠE GODINE S USLOVOM ======================= -->
+        <section class="panel rang-panel" id="sa-uslovom">
+            <div class="rang-head">
+                <span class="rang-dot rang-dot--blue"></span>
+                <h2>Studenti viših godina</h2>
+            </div>
+
+            <div class="empty-small" th:if="${#lists.isEmpty(lista.saUslovom)}">Nema kandidata na ovoj listi.</div>
+
+            <table class="tbl rang-tbl" th:unless="${#lists.isEmpty(lista.saUslovom)}">
+                <thead>
+                <tr>
+                    <th class="c-rank">#</th>
+                    <th>Šifra</th>
+                    <th class="c-status">Status</th>
+                    <th class="c-pts">Bodovi</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s, st : ${lista.saUslovom}"
+                    th:classappend="|${mojId != null and s.idStudent == mojId ? 'ja' : ''} ${s.primljen ? '' : 'ispod'} ${s.primljen and (st.last or !lista.saUslovom[st.index + 1].primljen) ? 'crta' : ''}|"
+                    data-group="Studenti viših godina">
+                    <td class="c-rank"><span class="rank" th:classappend="${st.count <= 3} ? 'rank--top'" th:text="${s.redniBroj}">1</span></td>
+                    <td class="c-sifra">
+                        <span class="sifra" th:text="${s.sifra}">SC-00001/26</span>
+                        <span class="me-tag" th:if="${mojId != null and s.idStudent == mojId}">Vi</span>
+                    </td>
+                    <td class="c-status">
+                        <span class="st st--da" th:if="${s.primljen}">Primljen</span>
+                        <span class="st st--ne" th:unless="${s.primljen}">Ispod crte</span>
+                    </td>
+                    <td class="c-pts"><b th:text="${#numbers.formatDecimal(s.bodovi, 1, 'NONE', 2, 'POINT')}">0.00</b></td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- ======================= LISTA ČEKANJA ======================= -->
+        <section class="panel rang-panel" id="lista-cekanja">
+            <div class="rang-head">
+                <span class="rang-dot rang-dot--orange"></span>
+                <h2>Lista čekanja</h2>
+            </div>
+            <p class="muted rang-note">
+                Studenti viših godina koji još nisu dostavili dokaz o ispunjavanju uslova za upis naredne godine.
+                Nakon dostavljanja uvjerenja pravo na smještaj ostvaruju prema poziciji na listi i slobodnim mjestima.
+            </p>
+
+            <div class="empty-small" th:if="${#lists.isEmpty(lista.listaCekanja)}">Nema kandidata na ovoj listi.</div>
+
+            <table class="tbl rang-tbl" th:unless="${#lists.isEmpty(lista.listaCekanja)}">
+                <thead>
+                <tr>
+                    <th class="c-rank">#</th>
+                    <th>Šifra</th>
+                    <th class="c-status">Status</th>
+                    <th class="c-pts">Bodovi</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s, st : ${lista.listaCekanja}"
+                    th:classappend="${mojId != null and s.idStudent == mojId} ? 'ja'"
+                    data-group="Lista čekanja">
+                    <td class="c-rank"><span class="rank" th:text="${s.redniBroj}">1</span></td>
+                    <td class="c-sifra">
+                        <span class="sifra" th:text="${s.sifra}">SC-00001/26</span>
+                        <span class="me-tag" th:if="${mojId != null and s.idStudent == mojId}">Vi</span>
+                    </td>
+                    <td class="c-status"><span class="st st--cek">Čeka dokaz</span></td>
+                    <td class="c-pts"><b th:text="${#numbers.formatDecimal(s.bodovi, 1, 'NONE', 2, 'POINT')}">0.00</b></td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <p class="no-results" id="noResults" hidden>Nijedna šifra ne odgovara pretrazi.</p>
+    </th:block>
 </main>
 
 <!-- plutajuće dugme – pojavi se kad se tvoj red ne vidi na ekranu -->
@@ -164,8 +221,10 @@
         // ---------- "Vaša pozicija" + dugmad ----------
         if (me) {
             document.getElementById('meRank').textContent = me.querySelector('.rank').textContent + '.';
-            document.getElementById('meGroup').textContent = me.dataset.group;
-            document.getElementById('mePoints').textContent = me.querySelector('.c-pts b').textContent + ' bodova';
+            document.getElementById('meGroup').textContent =
+                me.dataset.group + ' · ' + me.querySelector('.st').textContent;
+            document.getElementById('mePoints').textContent =
+                me.querySelector('.sifra').textContent + ' · ' + me.querySelector('.c-pts b').textContent + ' bodova';
             card.hidden = false;
             document.getElementById('findMe').addEventListener('click', goToMe);
             fab.addEventListener('click', goToMe);
@@ -178,17 +237,18 @@
             }
         }
 
-        // ---------- pretraga ----------
+        // ---------- pretraga po šifri ----------
         const search = document.getElementById('search');
+        if (!search) return;   // lista nije objavljena
         const rows = document.querySelectorAll('.rang-tbl tbody tr');
         const noRes = document.getElementById('noResults');
-        const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'dj');
+        const norm = s => s.toLowerCase().replace(/\s+/g, '');
 
         search.addEventListener('input', function () {
-            const q = norm(search.value.trim());
+            const q = norm(search.value);
             let shown = 0;
             rows.forEach(function (r) {
-                const hit = !q || norm(r.querySelector('.name').textContent).includes(q);
+                const hit = !q || norm(r.querySelector('.sifra').textContent).includes(q);
                 r.hidden = !hit;
                 if (hit) shown++;
             });

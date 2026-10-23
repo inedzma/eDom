@@ -1,7 +1,9 @@
 package api;
 
 import ba.unze.edom.common.dto.DokazUslovaDTO;
+import ba.unze.edom.common.dto.ObjavaRangListeDTO;
 import ba.unze.edom.common.dto.RangListaAdminDTO;
+import ba.unze.edom.common.dto.RangObjavaDTO;
 
 import java.util.Map;
 
@@ -21,5 +23,14 @@ public final class RangListaApi {
 
     public static DokazUslovaDTO ponistiDokaz(int idPrijave) {
         return ApiClient.post("/api/rang-lista/prijave/" + idPrijave + "/dokaz-uslova/ponisti", Map.of(), DokazUslovaDTO.class);
+    }
+
+    public static RangObjavaDTO objavi(String vrsta, boolean popuniBrucosima) {
+        return ApiClient.post("/api/rang-lista/objavi",
+                new ObjavaRangListeDTO(vrsta, popuniBrucosima), RangObjavaDTO.class);
+    }
+
+    public static RangObjavaDTO zadnjaObjava() {
+        return ApiClient.get("/api/rang-lista/objava", RangObjavaDTO.class);
     }
 }

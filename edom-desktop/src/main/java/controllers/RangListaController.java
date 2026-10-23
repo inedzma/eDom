@@ -28,6 +28,13 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import ba.unze.edom.common.dto.RangObjavaDTO;
+import javafx.geometry.Pos;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import java.util.stream.Stream;
+
 public class RangListaController {
 
     @FXML private Label lblGodina;
@@ -38,6 +45,8 @@ public class RangListaController {
     @FXML private ToggleButton btnSve;
     @FXML private CheckBox chkPopuniBrucosima;
     @FXML private Menu menuKolone;
+    private final Label lblObjava = new Label();
+    private final Button btnObjavi = new Button("Objavi na webu…");
 
     @FXML private TableView<RangRedDTO> tblRangLista;
 
@@ -53,6 +62,7 @@ public class RangListaController {
     @FXML
     public void initialize() {
         provjeriFxml();
+        initObjava();
         napraviKolone();
         initKolone();
         initAkcije();
@@ -245,7 +255,74 @@ public class RangListaController {
                     l.kapacitet(), l.primljenoBrucosa(), l.kvotaBrucosi(),
                     l.primljenoVisih(), l.kvotaVisi(), l.slobodno(), l.listaCekanja().size()));
             prikaziGrupu();
+            initObjava();
         }, "Greška pri učitavanju rang liste.");
+    }
+
+    // ---------- objava na webu ----------
+
+    private void initObjava() {
+        lblObjava.getStyleClass().add("rang-sazetak");
+        btnObjavi.getStyleClass().add("dokaz-btn");
+        btnObjavi.setOnAction(e -> objavi());
+
+        Region razmak = new Region();
+        HBox.setHgrow(razmak, Priority.ALWAYS);
+        HBox traka = new HBox(10, lblObjava, razmak, btnObjavi);
+        traka.setAlignment(Pos.CENTER_LEFT);
+
+        VBox kartica = (VBox) lblSazetak.getParent();
+        kartica.getChildren().add(kartica.getChildren().indexOf(lblSazetak) + 1, traka);
+    }
+
+    private void ucitajObjavu() {
+        uPozadini(RangListaApi::zadnjaObjava, o -> lblObjava.setText(o.idObjava() == null
+                        ? "Na webu: rang lista još nije objavljena."
+                        : "Na webu: " + nazivVrste(o.vrsta()) + " lista, objavljena " + o.objavljeno()
+                        + " (" + o.objavio() + "), " + o.brojStudenata() + " studenata."),
+                "Greška pri provjeri objave.");
+    }
+
+    private void objavi() {
+        if (lista == null) return;
+
+        ChoiceDialog<String> izbor = new ChoiceDialog<>("Preliminarna", "Preliminarna", "Konačna");
+        izbor.setTitle("Objava rang liste");
+        izbor.setHeaderText("Koju listu objavljujete na webu?");
+        izbor.setContentText("Vrsta:");
+        Optional<String> odabrano = izbor.showAndWait();
+        if (odabrano.isEmpty()) return;
+
+        String vrsta = "Konačna".equals(odabrano.get()) ? "KONACNA" : "PRELIMINARNA";
+        boolean popuni = chkPopuniBrucosima.isSelected();
+        long neispravnih = Stream.of(lista.brucosi(), lista.saUslovom(), lista.listaCekanja())
+                .flatMap(List::stream)
+                .filter(r -> r.greska() != null)
+                .count();
+
+        String poruka = "Objaviti " + odabrano.get().toLowerCase() + " rang listu za akademsku "
+                + lista.akademskaGodina() + "?\n\n"
+                + "Studenti će na webu vidjeti listu kakva je SADA (šifra i bodovi).\n"
+                + "Kasnije izmjene prijava neće se vidjeti na webu dok ne objavite ponovo."
+                + (popuni ? "\n\nSlobodna mjesta su popunjena brucošima." : "")
+                + (neispravnih > 0
+                ? "\n\n" + neispravnih + " prijava s neispravnim podacima (⚠) neće biti objavljeno."
+                : "");
+
+        Alert potvrda = new Alert(Alert.AlertType.CONFIRMATION, poruka, ButtonType.YES, ButtonType.NO);
+        potvrda.setHeaderText("Objava rang liste");
+        if (potvrda.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) return;
+
+        uPozadini(() -> RangListaApi.objavi(vrsta, popuni), o -> {
+            new Alert(Alert.AlertType.INFORMATION,
+                    nazivVrste(o.vrsta()) + " rang lista je objavljena (" + o.objavljeno() + ", "
+                            + o.brojStudenata() + " studenata).", ButtonType.OK).showAndWait();
+            ucitajObjavu();
+        }, "Greška pri objavi rang liste.");
+    }
+
+    private String nazivVrste(String vrsta) {
+        return "KONACNA".equals(vrsta) ? "Konačna" : "Preliminarna";
     }
 
     private void prikaziGrupu() {
