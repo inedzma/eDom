@@ -156,7 +156,8 @@ final class SobaDetaljiDijalog {
         } else {
             Button iseli = new Button("Iseli");
             iseli.getStyleClass().add("sobe-btn");
-            iseli.setOnAction(e -> pitajBroj("Iseljenje", st.imePrezime() + " vraća ključeve.",
+            iseli.setOnAction(e -> pitajBroj("Iseljenje", st.imePrezime() + " vraća ključeve i više nije u domu "
+                            + "(prijava dobija status \"iseljen\"). Napomenu studentu upišite klikom na ime.",
                     "Broj vraćenih ključeva:", st.kljuceviPreuzeti())
                     .ifPresent(n -> akcija.izvrsi(() -> {
                         int fali = SobeApi.iseli(st.idSmjestaj(), n);

@@ -25,6 +25,28 @@
         </a>
     </section>
 
+    <!-- ======================= DOPUNA DOKUMENTACIJE ======================= -->
+    <section class="panel dopuna-panel" th:if="${zaDopunu != null and !#maps.isEmpty(zaDopunu)}">
+        <div class="panel-head">
+            <div>
+                <h2>Potrebna dopuna dokumentacije</h2>
+                <p class="muted">Administracija je pregledala vašu prijavu i traži dopunu.</p>
+            </div>
+        </div>
+        <div class="dopuna-stavka" th:each="e : ${zaDopunu}">
+            <p class="dopuna-napomena"
+               th:text="${e.value != null and !#strings.isEmpty(e.value)} ? ${e.value} : 'Detalji su vam poslani na e-mail.'">
+                Nedostaje kućna lista.</p>
+            <div class="dopuna-akcije">
+                <a class="btn btn-primary" th:href="@{/student/prijava/{id}/dokumenti(id=${e.key})}">Dodaj dokumente</a>
+                <form th:action="@{/student/prijava/{id}/dopuna(id=${e.key})}" method="post"
+                      onsubmit="return confirm('Poslati dopunu na pregled?');">
+                    <button type="submit" class="btn btn-ghost">Pošalji dopunu na pregled</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
     <!-- ======================= MOJE PRIJAVE ======================= -->
     <section class="panel">
         <div class="panel-head">

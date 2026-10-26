@@ -26,9 +26,8 @@ public class StudentWebController {
 
     @GetMapping("/pocetna")
     public String pocetna(@AuthenticationPrincipal KorisnikPrincipal korisnik, Model model) {
-        model.addAttribute("prijave",
-                prijavaService.pregledZaStudenta(korisnik.getIdStudenta()));
-
+        model.addAttribute("prijave", prijavaService.pregledZaStudenta(korisnik.getIdStudenta()));
+        model.addAttribute("zaDopunu", prijavaService.zaDopunu(korisnik.getIdStudenta()));
         return "student/pocetna";
     }
 

@@ -308,4 +308,28 @@ public class PrijavaService {
                 ))
                 .toList();
     }
+
+    // ---------- DOPUNA (status "nepotpuna") ----------
+
+    /** Prijave koje čekaju dopunu: id → napomena administratora (šta fali). */
+    @Transactional(readOnly = true)
+    public Map<Integer, String> zaDopunu(Integer idStudenta) {
+        Map<Integer, String> m = new LinkedHashMap<>();
+        for (Prijava p : prijavaRepository.nadjiZaStudenta(idStudenta)) {
+            if (Statusi.NEPOTPUNA.equals(nazivStatusa(p))) {
+                m.put(p.getIdPrijava(), p.getNapomenaAdmina());
+            }
+        }
+        return m;
+    }
+
+    /** Student je dodao tražene dokumente: prijava se vraća na pregled. */
+    @Transactional
+    public void posaljiDopunu(Integer idPrijave, Integer idStudenta) {
+        Prijava p = dohvatiSvoju(idPrijave, idStudenta);
+        if (!Statusi.NEPOTPUNA.equals(nazivStatusa(p))) {
+            throw new PrijavaException("Ova prijava ne čeka dopunu.");
+        }
+        p.setStatus(status(Statusi.NA_PREGLEDU));
+    }
 }

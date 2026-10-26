@@ -209,8 +209,11 @@ public class DetaljiPrijaveController {
         }
 
         String napomena = txtNapomenaAdmina.getText();
-        if ("odbijeno".equals(novi) && (napomena == null || napomena.isBlank())) {
-            info("Unesite razlog odbijanja u napomenu — student ga dobija na e-mail.");
+        boolean trebaNapomena = "odbijeno".equals(novi) || "nepotpuna".equals(novi);
+        if (trebaNapomena && (napomena == null || napomena.isBlank())) {
+            info("nepotpuna".equals(novi)
+                    ? "Upišite u napomenu šta student treba dopuniti — dobija to na e-mail."
+                    : "Unesite razlog odbijanja u napomenu — student ga dobija na e-mail.");
             return;
         }
 
@@ -228,12 +231,18 @@ public class DetaljiPrijaveController {
         } else if (ODOBRENO.equals(novi) && prijava.trebaUslov()) {
             pitanje += "\n\nOdobravanjem potvrđujete da student ispunjava uslov za upis naredne godine.";
         }
+        if ("nepotpuna".equals(novi)) {
+            pitanje += "\n\nStudent dobija e-mail s napomenom i može dodati dokumente na webu."
+                    + "\nKad pošalje dopunu, prijava se vraća na pregled.";
+        } else if ("iseljen".equals(novi)) {
+            pitanje += "\n\nStudent više nije u domu. Iseljenje sa sobom radite u Sobama (dugme \"Iseli\").";
+        }
 
         Alert potvrda = new Alert(Alert.AlertType.CONFIRMATION, pitanje);
         potvrda.setHeaderText(null);
         if (potvrda.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
 
-        boolean saljeMail = ODOBRENO.equals(novi) || "odbijeno".equals(novi);
+        boolean saljeMail = java.util.Set.of(ODOBRENO, "odbijeno", "nepotpuna", NA_CEKANJU).contains(novi);
         int id = prijava.idPrijava();
         izvrsi(() -> PrijavaApi.promijeniStatus(id, new PromjenaStatusaDTO(novi, napomena)),
                 saljeMail ? "Status je promijenjen. Studentu je poslan e-mail." : "Status je promijenjen.");
@@ -393,7 +402,8 @@ public class DetaljiPrijaveController {
         String s = status.toLowerCase();
         if (s.contains("odob"))       lblStatus.getStyleClass().add("status-success");
         else if (s.contains("odbij")) lblStatus.getStyleClass().add("status-danger");
-        else if (s.contains("čekanju")) lblStatus.getStyleClass().add("status-warning");
+        else if (s.contains("čekanju") || s.contains("nepotpun")) lblStatus.getStyleClass().add("status-warning");
+        else if (s.contains("iselj")) lblStatus.getStyleClass().add("status-info");
         else if (s.contains("zaklj")) lblStatus.getStyleClass().add("status-warning");
         else                          lblStatus.getStyleClass().add("status-info");
     }

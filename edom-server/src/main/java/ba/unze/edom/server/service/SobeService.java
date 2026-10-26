@@ -271,12 +271,20 @@ public class SobeService {
     }
 
     /** Iseljenje; vraća koliko ključeva još fali (0 = sve vraćeno). */
+    /** Iseljenje: student više nije u domu → prijava "iseljen". Vraća koliko ključeva još fali. */
     @Transactional
     public int iseli(Integer idSmjestaja, int vraceno) {
         Smjestaj sm = smjestaj(idSmjestaja);
         sm.setStatus(Smjestaj.ISELJEN);
         sm.setDatumIseljenja(LocalDate.now());
         sm.setKljuceviVraceni(Math.max(0, vraceno));
+
+        // bez ovoga bi se iseljeni ponovo pojavio među "odobrenima bez sobe" i dobio sobu u prijedlogu
+        Prijava p = sm.getPrijava();
+        String status = p.getStatus() != null ? p.getStatus().getNaziv() : null;
+        if (Statusi.ODOBRENO.equals(status) || Statusi.ZAKLJUCENO.equals(status)) {
+            statusRepository.findByNaziv(Statusi.ISELJEN).ifPresent(p::setStatus);
+        }
         return Math.max(0, sm.getKljuceviPreuzeti() - sm.getKljuceviVraceni());
     }
 

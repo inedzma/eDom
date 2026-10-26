@@ -31,7 +31,8 @@ public final class UslovUpisa {
         if (Statusi.NA_CEKANJU.equals(status)) {
             return "Ne ispunjava – lista čekanja (čeka uvjerenje)";
         }
-        boolean odobrena = Statusi.ODOBRENO.equals(status) || Statusi.ZAKLJUCENO.equals(status);
+        boolean odobrena = Statusi.ODOBRENO.equals(status) || Statusi.ZAKLJUCENO.equals(status)
+                || Statusi.ISELJEN.equals(status);
         if (!odobrena) {
             return "Utvrđuje se pri odobravanju (odobreno = ispunjava, na čekanju = ne ispunjava)";
         }

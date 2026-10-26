@@ -242,7 +242,8 @@ public class PrijavaWebController {
         model.addAttribute("korak", 4);
         model.addAttribute("spisak", potrebniDokumentiService.zaPrijavu(id));
         model.addAttribute("uIzradi", "u izradi".equals(status));
-        model.addAttribute("mozeMijenjati", "u izradi".equals(status) || "na pregledu".equals(status));
+        model.addAttribute("mozeMijenjati",
+                "u izradi".equals(status) || "na pregledu".equals(status) || "nepotpuna".equals(status));
 
         return "student/prijava/dokumenti";
     }
@@ -296,5 +297,18 @@ public class PrijavaWebController {
                         "inline; filename=\"dokument-" + idDok + "\"")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(podaci);
+    }
+
+    @PostMapping("/{id}/dopuna")
+    public String posaljiDopunu(@PathVariable Integer id,
+                                @AuthenticationPrincipal KorisnikPrincipal k,
+                                RedirectAttributes ra) {
+        try {
+            prijavaService.posaljiDopunu(id, k.getIdStudenta());
+            ra.addFlashAttribute("uspjeh", "Dopuna je poslana. Administracija će ponovo pregledati prijavu.");
+        } catch (RuntimeException e) {
+            ra.addFlashAttribute("greska", e.getMessage());
+        }
+        return "redirect:/student/pocetna";
     }
 }

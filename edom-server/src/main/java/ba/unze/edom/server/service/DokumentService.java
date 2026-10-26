@@ -47,8 +47,9 @@ public class DokumentService {
             Set.of("image/jpeg", "image/png");
 
     /** Statusi u kojima se dokumenti jos smiju dodavati ili brisati. */
+    /** Statusi u kojima se dokumenti jos smiju dodavati ili brisati. */
     private static final Set<String> OTVORENI_STATUSI =
-            Set.of(Statusi.U_IZRADI, Statusi.NA_PREGLEDU);
+            Set.of(Statusi.U_IZRADI, Statusi.NA_PREGLEDU, Statusi.NEPOTPUNA);
 
     // ---------- CITANJE ----------
 

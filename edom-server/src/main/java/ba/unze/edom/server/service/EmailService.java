@@ -123,39 +123,66 @@ public class EmailService {
                                        String napomena, RezultatBodovanja r, String webUrl) {
 
         String akGod = godina + "/" + (godina + 1);
-        boolean odobreno = "odobreno".equals(status);
+        boolean imaNapomenu = napomena != null && !napomena.isBlank();
+        String uvod = "Poštovani/a " + ime + ",\n\nvaša prijava za smještaj u Studentskom centru "
+                + "Univerziteta u Zenici za akademsku " + akGod + ". godinu ";
 
-        StringBuilder t = new StringBuilder()
-                .append("Poštovani/a ").append(ime).append(",\n\n")
-                .append("vaša prijava za smještaj u Studentskom centru Univerziteta u Zenici za akademsku ")
-                .append(akGod).append(". godinu je ")
-                .append(odobreno ? "ODOBRENA" : "ODBIJENA").append(".\n\n");
+        StringBuilder t = new StringBuilder();
+        String naslov;
 
-        if (r != null && odobreno) {
-            t.append("Bodovano:\n");
-            r.stavke().stream().filter(StavkaBodovanja::verifikovan).forEach(s ->
-                    t.append("  • ").append(s.naziv()).append(": ")
-                            .append(String.format("%.2f", s.bodovi()))
-                            .append(s.obrazlozenje() != null ? " (" + s.obrazlozenje() + ")" : "")
-                            .append("\n"));
-            t.append(String.format("Ukupno: %.2f bodova%n%n", r.potvrdjeno()));
+        switch (status) {
+            case Statusi.ODOBRENO -> {
+                naslov = "prijava za smještaj odobrena";
+                t.append(uvod).append("je ODOBRENA.\n\n");
+                if (r != null) {
+                    t.append("Bodovano:\n");
+                    r.stavke().stream().filter(StavkaBodovanja::verifikovan).forEach(s ->
+                            t.append("  • ").append(s.naziv()).append(": ")
+                                    .append(String.format("%.2f", s.bodovi()))
+                                    .append(s.obrazlozenje() != null ? " (" + s.obrazlozenje() + ")" : "")
+                                    .append("\n"));
+                    t.append(String.format("Ukupno: %.2f bodova%n%n", r.potvrdjeno()));
 
-            var nebodovano = r.stavke().stream()
-                    .filter(s -> !s.verifikovan() && s.bodovi() > 0).toList();
-            if (!nebodovano.isEmpty()) {
-                t.append("Nije bodovano jer odgovarajući dokument nije dostavljen ili provjeren:\n");
-                nebodovano.forEach(s -> t.append("  • ").append(s.naziv())
-                        .append(String.format(" (%.2f)", s.bodovi())).append("\n"));
-                t.append("\n");
+                    var nebodovano = r.stavke().stream()
+                            .filter(s -> !s.verifikovan() && s.bodovi() > 0).toList();
+                    if (!nebodovano.isEmpty()) {
+                        t.append("Nije bodovano jer odgovarajući dokument nije dostavljen ili provjeren:\n");
+                        nebodovano.forEach(s -> t.append("  • ").append(s.naziv())
+                                .append(String.format(" (%.2f)", s.bodovi())).append("\n"));
+                        t.append("\n");
+                    }
+                }
+                if (imaNapomenu) t.append("Napomena: ").append(napomena).append("\n\n");
             }
-        }
-
-        if (napomena != null && !napomena.isBlank()) {
-            t.append(odobreno ? "Napomena: " : "Razlog: ").append(napomena).append("\n\n");
-        }
-
-        if (!odobreno) {
-            t.append("Ako naknadno dostavite tražene dokumente, obratite se administraciji doma.\n\n");
+            case Statusi.ODBIJENO -> {
+                naslov = "prijava za smještaj odbijena";
+                t.append(uvod).append("je ODBIJENA.\n\n");
+                if (imaNapomenu) t.append("Razlog: ").append(napomena).append("\n\n");
+                t.append("Ako naknadno dostavite tražene dokumente, obratite se administraciji doma.\n\n");
+            }
+            case Statusi.NEPOTPUNA -> {
+                naslov = "potrebna dopuna dokumentacije";
+                t.append(uvod).append("je pregledana, ali DOKUMENTACIJA NIJE POTPUNA.\n\n");
+                if (imaNapomenu) t.append("Šta treba dopuniti:\n").append(napomena).append("\n\n");
+                t.append("Prijavite se na ").append(webUrl).append(", na početnoj stranici kliknite ")
+                        .append("\"Dodaj dokumente\", priložite tražene dokumente, a zatim kliknite ")
+                        .append("\"Pošalji dopunu na pregled\".\n\n");
+            }
+            case Statusi.NA_CEKANJU -> {
+                naslov = "lista čekanja";
+                t.append(uvod).append("je pregledana i dokumentacija je uredna, ali još nije dostavljen ")
+                        .append("dokaz o ispunjavanju uslova za upis naredne godine studija.\n")
+                        .append("Zato se nalazite na LISTI ČEKANJA.\n\n")
+                        .append("Kada ispunite uslov, dostavite uvjerenje fakulteta u Studentski centar. ")
+                        .append("Pravo na smještaj tada ostvarujete prema poziciji na listi čekanja ")
+                        .append("i raspoloživim mjestima.\n\n");
+                if (imaNapomenu) t.append("Napomena: ").append(napomena).append("\n\n");
+            }
+            default -> {
+                naslov = "promjena statusa prijave";
+                t.append(uvod).append("ima novi status: ").append(status).append(".\n\n");
+                if (imaNapomenu) t.append("Napomena: ").append(napomena).append("\n\n");
+            }
         }
 
         t.append("Status prijave i rang listu možete pratiti na ").append(webUrl).append(".\n\n")
@@ -164,7 +191,7 @@ public class EmailService {
         SimpleMailMessage poruka = new SimpleMailMessage();
         poruka.setFrom(od);
         poruka.setTo(email);
-        poruka.setSubject("E-Dom: prijava za smještaj " + (odobreno ? "odobrena" : "odbijena"));
+        poruka.setSubject("E-Dom: " + naslov);
         poruka.setText(t.toString());
         mailSender.send(poruka);
     }

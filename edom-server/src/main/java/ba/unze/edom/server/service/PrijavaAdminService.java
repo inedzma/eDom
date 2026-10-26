@@ -31,12 +31,21 @@ public class PrijavaAdminService {
      * Dozvoljeni prelazi statusa — jedino mjesto gdje su zapisani.
      * "na čekanju" = viši student bez uslova za upis (lista čekanja); brucošima se ne nudi.
      */
+    /**
+     * Dozvoljeni prelazi statusa — jedino mjesto gdje su zapisani.
+     * "nepotpuna" = traži se dopuna; student je šalje i prijava se vraća na pregled.
+     * "na čekanju" = viši student bez uslova za upis; brucošima se ne nudi.
+     * "iseljen" = više nije u domu (postavlja se pri iseljenju u Sobama).
+     */
     private static final Map<String, List<String>> PRELAZI = Map.of(
-            Statusi.NA_PREGLEDU, List.of(Statusi.ODOBRENO, Statusi.NA_CEKANJU, Statusi.ODBIJENO),
+            Statusi.NA_PREGLEDU, List.of(Statusi.ODOBRENO, Statusi.NA_CEKANJU, Statusi.NEPOTPUNA, Statusi.ODBIJENO),
+            Statusi.NEPOTPUNA,   List.of(Statusi.NA_PREGLEDU, Statusi.ODBIJENO),
             Statusi.NA_CEKANJU,  List.of(Statusi.ODOBRENO, Statusi.NA_PREGLEDU, Statusi.ODBIJENO),
-            Statusi.ODOBRENO,    List.of(Statusi.ZAKLJUCENO, Statusi.NA_CEKANJU, Statusi.NA_PREGLEDU, Statusi.ODBIJENO),
+            Statusi.ODOBRENO,    List.of(Statusi.ZAKLJUCENO, Statusi.NA_CEKANJU, Statusi.NA_PREGLEDU,
+                    Statusi.ODBIJENO, Statusi.ISELJEN),
+            Statusi.ZAKLJUCENO,  List.of(Statusi.ISELJEN),
+            Statusi.ISELJEN,     List.of(Statusi.ZAKLJUCENO),   // samo za ispravku greške
             Statusi.ODBIJENO,    List.of(Statusi.NA_PREGLEDU),
-            Statusi.ZAKLJUCENO,  List.of(),
             Statusi.U_IZRADI,    List.of()
     );
 
@@ -121,8 +130,11 @@ public class PrijavaAdminService {
         }
 
         String napomena = z.napomena() != null ? z.napomena().trim() : null;
-        if (Statusi.ODBIJENO.equals(novi) && (napomena == null || napomena.isEmpty())) {
-            throw new PrijavaException("Unesite razlog odbijanja — student ga dobija na e-mail.");
+        boolean trebaNapomena = Statusi.ODBIJENO.equals(novi) || Statusi.NEPOTPUNA.equals(novi);
+        if (trebaNapomena && (napomena == null || napomena.isEmpty())) {
+            throw new PrijavaException(Statusi.NEPOTPUNA.equals(novi)
+                    ? "Upišite šta student treba dopuniti — dobija to na e-mail."
+                    : "Unesite razlog odbijanja — student ga dobija na e-mail.");
         }
 
         postaviUslov(p, trenutni, novi);
@@ -136,8 +148,7 @@ public class PrijavaAdminService {
         p.setNapomenaAdmina(napomena);
         if (r != null) p.setUkupniBodovi(r.potvrdjeno());
 
-        // TODO: mail za "na čekanju" (da student donese uvjerenje) — kad dodamo šablon
-        if (Statusi.ODOBRENO.equals(novi) || Statusi.ODBIJENO.equals(novi)) {
+        if (Set.of(Statusi.ODOBRENO, Statusi.ODBIJENO, Statusi.NEPOTPUNA, Statusi.NA_CEKANJU).contains(novi)) {
             dogadjaji.publishEvent(new StatusPromijenjenEvent(
                     p.getStudent().getEmail(), p.getStudent().getIme(),
                     p.getAkademskaGodina(), novi, napomena, r));
