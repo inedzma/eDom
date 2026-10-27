@@ -124,6 +124,25 @@
         </section>
     </div>
 
+    <!-- ======================= NAPOMENA ======================= -->
+    <section class="panel form-card pp-napomena">
+        <div class="form-card-head">
+            <span class="form-card-ic">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </span>
+            <div>
+                <h2>Napomena <span class="opt">(opcionalno)</span></h2>
+                <p class="muted">Ako želite nešto dodatno objasniti uz prijavu, napišite ovdje. Napomenu vidi administracija Studentskog centra.</p>
+            </div>
+        </div>
+
+        <!-- form="podnesiForm": šalje se zajedno s dugmetom "Podnesi prijavu" -->
+        <textarea id="napomena" name="napomena" form="podnesiForm" rows="4" maxlength="500"
+                  placeholder="npr. promjena adrese, dokument koji kasni, posebne okolnosti…"
+                  th:text="${prijava.napomena}"></textarea>
+        <div class="pp-brojac"><span id="napomenaBroj">0</span> / 500</div>
+    </section>
+
     <!-- ======================= PODNOŠENJE ======================= -->
     <section class="submit-card">
         <div class="submit-text">
@@ -160,6 +179,15 @@
 
 <script>
     (function () {
+        // brojač znakova za napomenu
+        const nap = document.getElementById('napomena');
+        const napBroj = document.getElementById('napomenaBroj');
+        if (nap && napBroj) {
+            const osvjezi = () => napBroj.textContent = nap.value.length;
+            nap.addEventListener('input', osvjezi);
+            osvjezi();
+        }
+
         // traka: koliko je od prijavljenih bodova već provjereno
         const pot = document.getElementById('totalPot');
         const potv = document.getElementById('totalPotv');

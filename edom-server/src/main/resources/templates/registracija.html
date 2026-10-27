@@ -53,12 +53,12 @@
                     <div class="grid-2">
                         <div class="field">
                             <label for="ime">Ime</label>
-                            <div class="input"><input type="text" th:field="*{ime}" th:errorclass="is-invalid" placeholder="npr. Nedžma" autocomplete="given-name"></div>
+                            <div class="input"><input type="text" th:field="*{ime}" th:errorclass="is-invalid" placeholder="npr. Nedžma" autocomplete="given-name" data-ime></div>
                             <span class="field-err" th:if="${#fields.hasErrors('ime')}" th:errors="*{ime}"></span>
                         </div>
                         <div class="field">
                             <label for="prezime">Prezime</label>
-                            <div class="input"><input type="text" th:field="*{prezime}" th:errorclass="is-invalid" placeholder="npr. Imamović" autocomplete="family-name"></div>
+                            <div class="input"><input type="text" th:field="*{prezime}" th:errorclass="is-invalid" placeholder="npr. Imamović" autocomplete="family-name" data-ime></div>
                             <span class="field-err" th:if="${#fields.hasErrors('prezime')}" th:errors="*{prezime}"></span>
                         </div>
                         <div class="field">
@@ -68,7 +68,7 @@
                         </div>
                         <div class="field">
                             <label for="imeRoditelja">Ime roditelja</label>
-                            <div class="input"><input type="text" th:field="*{imeRoditelja}" th:errorclass="is-invalid" placeholder="Ime oca ili majke"></div>
+                            <div class="input"><input type="text" th:field="*{imeRoditelja}" th:errorclass="is-invalid" placeholder="Ime oca ili majke" data-ime></div>
                             <span class="field-err" th:if="${#fields.hasErrors('imeRoditelja')}" th:errors="*{imeRoditelja}"></span>
                         </div>
                     </div>
@@ -93,7 +93,12 @@
                         </div>
                         <div class="field span-2">
                             <label for="fakultet">Fakultet</label>
-                            <div class="input"><input type="text" th:field="*{fakultet}" th:errorclass="is-invalid" placeholder="npr. Politehnički fakultet"></div>
+                            <div class="input select">
+                                <select th:field="*{fakultet}" th:errorclass="is-invalid">
+                                    <option value="">Odaberite fakultet</option>
+                                    <option th:each="f : ${fakulteti}" th:value="${f}" th:text="${f}">Politehnički fakultet UNZE</option>
+                                </select>
+                            </div>
                             <span class="field-err" th:if="${#fields.hasErrors('fakultet')}" th:errors="*{fakultet}"></span>
                         </div>
                     </div>
@@ -205,6 +210,15 @@
             btn.textContent = 'Registruj se';
         });
     })();
+</script>
+
+<script>
+    document.querySelectorAll('input[data-ime]').forEach(function (polje) {
+        polje.addEventListener('blur', function () {
+            polje.value = polje.value.trim().replace(/\s+/g, ' ').toLowerCase()
+                .replace(/(^|[\s\-'])(\S)/g, function (m, sep, slovo) { return sep + slovo.toUpperCase(); });
+        });
+    });
 </script>
 </body>
 

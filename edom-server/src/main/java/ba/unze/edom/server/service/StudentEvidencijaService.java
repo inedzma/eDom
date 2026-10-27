@@ -1,6 +1,8 @@
 package ba.unze.edom.server.service;
 
 import ba.unze.edom.common.dto.StudentUnosDTO;
+import ba.unze.edom.common.util.Fakulteti;
+import ba.unze.edom.common.util.Imena;
 import ba.unze.edom.common.util.Jmbg;
 import ba.unze.edom.server.entity.Student;
 import ba.unze.edom.server.exception.RegistracijaException;
@@ -41,11 +43,13 @@ public class StudentEvidencijaService {
             throw new RegistracijaException(
                     "Broj indeksa već postoji uz drugi JMBG. Provjerite podatke.");
         }
-
         // 3. potpuno nov student
+        if (!Fakulteti.postoji(z.fakultet())) {
+            throw new RegistracijaException("Odaberite fakultet iz liste.");
+        }
         Student s = new Student();
-        s.setIme(z.ime());
-        s.setPrezime(z.prezime());
+        s.setIme(Imena.formatiraj(z.ime()));
+        s.setPrezime(Imena.formatiraj(z.prezime()));
         s.setJmbg(z.jmbg());
         s.setBrojIndeksa(z.brojIndeksa());
         s.setEmail(z.email());
@@ -53,7 +57,7 @@ public class StudentEvidencijaService {
         s.setFakultet(z.fakultet());
         s.setGodinaStudija(z.godinaStudija());
         s.setAdresa(z.adresa());
-        s.setImeRoditelja(z.imeRoditelja());
+        s.setImeRoditelja(Imena.formatiraj(z.imeRoditelja()));
         if (z.idSocijalnogStatusa() != null) {
             socijalniStatusRepository.findById(z.idSocijalnogStatusa())
                     .ifPresent(s::setSocijalniStatus);

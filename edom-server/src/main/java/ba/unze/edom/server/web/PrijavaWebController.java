@@ -184,10 +184,11 @@ public class PrijavaWebController {
 
     @PostMapping("/{id}/podnesi")
     public String podnesi(@PathVariable Integer id,
+                          @RequestParam(required = false) String napomena,
                           @AuthenticationPrincipal KorisnikPrincipal k,
                           RedirectAttributes ra) {
         try {
-            prijavaService.podnesi(id, k.getIdStudenta());
+            prijavaService.podnesi(id, k.getIdStudenta(), napomena);
             ra.addFlashAttribute("uspjeh", "Prijava je uspješno podnesena.");
             return "redirect:/student/pocetna";
         } catch (RuntimeException e) {
@@ -196,7 +197,7 @@ public class PrijavaWebController {
         }
     }
 
-    // ---------- ODUSTAJANJE ----------
+
 
     @PostMapping("/{id}/odustani")
     public String odustani(@PathVariable Integer id,

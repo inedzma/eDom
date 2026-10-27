@@ -68,6 +68,26 @@
             <a class="btn-link" th:href="@{/upute}">Prvo pogledajte šta trebate pripremiti →</a>
         </div>
 
+        <!-- napomena: vidi se čim student ima prijavu -->
+        <div class="dostava-napomena" th:unless="${#lists.isEmpty(prijave)}">
+            <span class="dn-ikona">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>
+            </span>
+            <div>
+                <h3>Dokumente morate dostaviti poštom ili lično</h3>
+                <p>
+                    Dokumenti priloženi online služe samo za <b>prethodni pregled</b>: sekretar na osnovu njih provjerava
+                    ispunjava li prijava uslove i šta još nedostaje. Online prilaganje <b>ne zamjenjuje</b> predaju dokumenata.
+                </p>
+                <p>
+                    Sve dokumente sa spiska dostavite kao <b>original ili ovjerenu kopiju</b>, poštom ili lično.
+                    Bodovi se potvrđuju tek kada dokumenti stignu. Spisak dokumenata za svoju prijavu vidite klikom na
+                    <b>„Dokumenti“</b>.
+                </p>
+                <span class="dn-adresa">Studentski centar Zenica, Crkvice 50, 72000 Zenica</span>
+            </div>
+        </div>
+
         <!-- tabela prijava -->
         <div class="table-wrap" th:unless="${#lists.isEmpty(prijave)}">
             <table class="tbl">
@@ -103,6 +123,9 @@
                         </span>
                     </td>
                     <td class="actions">
+                        <a class="btn-link" th:href="@{/student/prijava/{id}/dokumenti(id=${p.idPrijava})}">
+                            Dokumenti
+                        </a>
                         <a class="btn-link" th:href="@{/student/prijava/{id}(id=${p.idPrijava})}">
                             Detalji
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
@@ -136,7 +159,7 @@
                 <li><span><b>Ko se može prijaviti:</b> redovni studenti fakulteta Univerziteta u Zenici čije je prebivalište najmanje 20 km od Zenice.</span></li>
                 <li><span><b>Broj mjesta:</b> 220, od čega do 35% za brucoše.</span></li>
                 <li><span><b>Prijava online:</b> popunite prijavu i priložite skenirane dokumente.</span></li>
-                <li><span><b>Originali:</b> dokumenti se boduju tek kad originali ili ovjerene kopije stignu u Studentski centar (Crkvice 50, Zenica).</span></li>
+                <li><span><b>Originali:</b> dokumenti se boduju tek kad originali ili ovjerene kopije stignu u Studentski centar (Crkvice 50, Zenica).</span></li>                <li><span><b>Dostava dokumenata:</b> skenovi priloženi online služe samo za prethodni pregled. Originale ili ovjerene kopije obavezno dostavite poštom ili lično u Studentski centar (Crkvice 50, 72000 Zenica). Bodovi se potvrđuju tek kad dokumenti stignu.</span></li>
                 <li><span><b>Rokovi:</b> konkurs traje 30 dana od objave; dokumenti ne smiju biti stariji od 6 mjeseci.</span></li>
             </ul>
 

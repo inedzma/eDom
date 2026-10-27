@@ -272,7 +272,7 @@ public class BodovanjeService {
 
     // ---------------- ZAJEDNICKO ----------------
 
-    private StavkaBodovanja stavkaZaKriterij(PrijavaKriterij k) {
+    public StavkaBodovanja stavkaZaKriterij(PrijavaKriterij k) {
 
         VrstaKriterija v = k.getVrsta();
 

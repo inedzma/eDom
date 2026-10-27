@@ -1,5 +1,7 @@
 package ba.unze.edom.server.service;
 
+import ba.unze.edom.common.dto.DokumentDTO;
+import ba.unze.edom.common.dto.DokumentiSpisakDTO;
 import ba.unze.edom.common.dto.SpisakUnosDTO;
 import ba.unze.edom.common.dto.SpisakUnosZahtjevDTO;
 import ba.unze.edom.server.dto.PrilozeniDokument;
@@ -120,6 +122,61 @@ public class PotrebniDokumentiService {
                 pr.bezDokaza().stream()
                         .map(v -> new SpisakUnosDTO.Kriterij(v.getSifra(), v.getNaziv()))
                         .toList());
+    }
+
+    // =====================================================================
+    //  DESKTOP: spisak za postojeću prijavu (admin označava dostavljene)
+    // =====================================================================
+
+    @Transactional(readOnly = true)
+    public DokumentiSpisakDTO zaAdmina(Integer idPrijave) {
+
+        Prijava p = prijavaRepository.zaDetalje(idPrijave)
+                .orElseThrow(() -> new PrijavaException("Prijava ne postoji."));
+
+        List<VrstaKriterija> kriteriji = p.getKriteriji().stream()
+                .map(PrijavaKriterij::getVrsta)
+                .filter(Objects::nonNull)
+                .toList();
+
+        Pravila pr = pravila(p.getGodinaStudija(), p.getBrojClanovaDomacinstva(), kriteriji);
+
+        Map<Integer, DokumentDTO> poId = new LinkedHashMap<>();
+        for (DokumentDTO d : dokumentRepository.pregledZaAdmina(idPrijave)) poId.putIfAbsent(d.idDokument(), d);
+
+        List<PrilozeniDokument> svi = dokumentRepository.prilozeniZaPrijavu(idPrijave);
+        Set<Integer> rasporedjeni = new HashSet<>();
+
+        List<DokumentiSpisakDTO.Zahtjev> obavezni = new ArrayList<>();
+        for (Sablon s : pr.obavezni()) obavezni.add(uAdminRed(s, svi, poId, rasporedjeni));
+
+        List<DokumentiSpisakDTO.Zahtjev> dodatni = new ArrayList<>();
+        for (Sablon s : pr.dodatni()) dodatni.add(uAdminRed(s, svi, poId, rasporedjeni));
+
+        List<DokumentDTO> ostali = poId.values().stream()
+                .filter(d -> !rasporedjeni.contains(d.idDokument()))
+                .toList();
+
+        return new DokumentiSpisakDTO(obavezni, dodatni,
+                pr.bezDokaza().stream().map(VrstaKriterija::getNaziv).toList(), ostali);
+    }
+
+    private DokumentiSpisakDTO.Zahtjev uAdminRed(Sablon s, List<PrilozeniDokument> svi,
+                                                 Map<Integer, DokumentDTO> poId, Set<Integer> rasporedjeni) {
+        Set<Integer> idVrsta = s.vrste().stream().map(VrstaDokumenta::getIdVrsta).collect(Collectors.toSet());
+
+        List<DokumentDTO> prilozeni = svi.stream()
+                .filter(d -> d.idVrste() != null && idVrsta.contains(d.idVrste()))
+                .filter(d -> !rasporedjeni.contains(d.idDokument()))
+                .map(d -> poId.get(d.idDokument()))
+                .filter(Objects::nonNull)
+                .toList();
+        prilozeni.forEach(d -> rasporedjeni.add(d.idDokument()));
+
+        return new DokumentiSpisakDTO.Zahtjev(s.kljuc(), s.naziv(), bezLinkova(s.opis()), s.obavezan(),
+                s.potrebno(), s.poClanu(),
+                s.vrste().stream().map(v -> new DokumentiSpisakDTO.Vrsta(v.getIdVrsta(), v.getNaziv())).toList(),
+                prilozeni);
     }
 
     // =====================================================================

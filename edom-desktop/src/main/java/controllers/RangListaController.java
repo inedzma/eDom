@@ -36,6 +36,11 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import java.util.stream.Stream;
 
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.collections.FXCollections;
+import java.time.LocalDate;
+
 public class RangListaController {
 
     @FXML private Label lblGodina;
@@ -287,24 +292,54 @@ public class RangListaController {
     private void objavi() {
         if (lista == null) return;
 
-        ChoiceDialog<String> izbor = new ChoiceDialog<>("Preliminarna", "Preliminarna", "Konačna");
-        izbor.setTitle("Objava rang liste");
-        izbor.setHeaderText("Koju listu objavljujete na webu?");
-        izbor.setContentText("Vrsta:");
-        Optional<String> odabrano = izbor.showAndWait();
-        if (odabrano.isEmpty()) return;
+        ComboBox<String> cbVrsta = new ComboBox<>(FXCollections.observableArrayList("Preliminarna", "Konačna"));
+        cbVrsta.getSelectionModel().selectFirst();
+        DatePicker dpOd = new DatePicker(LocalDate.now().plusDays(1));
+        DatePicker dpDo = new DatePicker(LocalDate.now().plusDays(9));
 
-        String vrsta = "Konačna".equals(odabrano.get()) ? "KONACNA" : "PRELIMINARNA";
+        Label napomena = new Label("Termin useljenja prikazuje se na web stranici rang liste.\n"
+                + "Ako termin još nije poznat, obrišite oba datuma.");
+        napomena.setWrapText(true);
+
+        GridPane g = new GridPane();
+        g.setHgap(10);
+        g.setVgap(10);
+        g.addRow(0, new Label("Vrsta liste:"), cbVrsta);
+        g.addRow(1, new Label("Useljenje od:"), dpOd);
+        g.addRow(2, new Label("Useljenje do:"), dpDo);
+        g.add(napomena, 0, 3, 2, 1);
+
+        Dialog<ButtonType> dijalog = new Dialog<>();
+        dijalog.setTitle("Objava rang liste");
+        dijalog.setHeaderText("Koju listu objavljujete na webu?");
+        dijalog.getDialogPane().setContent(g);
+        dijalog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        if (dijalog.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
+
+        LocalDate od = dpOd.getValue();
+        LocalDate doDatuma = dpDo.getValue();
+        if ((od == null) != (doDatuma == null) || (od != null && od.isAfter(doDatuma))) {
+            new Alert(Alert.AlertType.WARNING,
+                    "Unesite ispravan termin useljenja (od – do) ili obrišite oba datuma.").showAndWait();
+            return;
+        }
+
+        String naziv = cbVrsta.getValue();
+        String vrsta = "Konačna".equals(naziv) ? "KONACNA" : "PRELIMINARNA";
         boolean popuni = chkPopuniBrucosima.isSelected();
         long neispravnih = Stream.of(lista.brucosi(), lista.saUslovom(), lista.listaCekanja())
                 .flatMap(List::stream)
                 .filter(r -> r.greska() != null)
                 .count();
 
-        String poruka = "Objaviti " + odabrano.get().toLowerCase() + " rang listu za akademsku "
+        java.time.format.DateTimeFormatter df = java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy.");
+        String poruka = "Objaviti " + naziv.toLowerCase() + " rang listu za akademsku "
                 + lista.akademskaGodina() + "?\n\n"
                 + "Studenti će na webu vidjeti listu kakva je SADA (šifra i bodovi).\n"
-                + "Kasnije izmjene prijava neće se vidjeti na webu dok ne objavite ponovo."
+                + "Kasnije izmjene prijava neće se vidjeti na webu dok ne objavite ponovo.\n\n"
+                + (od != null
+                ? "Useljenje: " + od.format(df) + " – " + doDatuma.format(df)
+                : "Useljenje: termin će biti objavljen naknadno")
                 + (popuni ? "\n\nSlobodna mjesta su popunjena brucošima." : "")
                 + (neispravnih > 0
                 ? "\n\n" + neispravnih + " prijava s neispravnim podacima (⚠) neće biti objavljeno."
@@ -314,14 +349,13 @@ public class RangListaController {
         potvrda.setHeaderText("Objava rang liste");
         if (potvrda.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) return;
 
-        uPozadini(() -> RangListaApi.objavi(vrsta, popuni), o -> {
+        uPozadini(() -> RangListaApi.objavi(vrsta, popuni, od, doDatuma), o -> {
             new Alert(Alert.AlertType.INFORMATION,
                     nazivVrste(o.vrsta()) + " rang lista je objavljena (" + o.objavljeno() + ", "
                             + o.brojStudenata() + " studenata).", ButtonType.OK).showAndWait();
             ucitajObjavu();
         }, "Greška pri objavi rang liste.");
     }
-
     private String nazivVrste(String vrsta) {
         return "KONACNA".equals(vrsta) ? "Konačna" : "Preliminarna";
     }

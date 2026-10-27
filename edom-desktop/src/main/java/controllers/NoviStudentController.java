@@ -6,6 +6,8 @@ import ba.unze.edom.common.dto.SifarniciDTO;
 import ba.unze.edom.common.dto.SocijalniStatusDTO;
 import ba.unze.edom.common.dto.StudentPronadjenDTO;
 import ba.unze.edom.common.dto.StudentUnosDTO;
+import ba.unze.edom.common.util.Fakulteti;
+import ba.unze.edom.common.util.Imena;
 import ba.unze.edom.common.util.Jmbg;
 import ba.unze.edom.common.util.Opcine;
 import javafx.application.Platform;
@@ -86,7 +88,7 @@ public class NoviStudentController {
     public void initialize() {
         KoraciUnosa.popuni(stepper, traka, 1);
 
-        cmbFakultet.setItems(FXCollections.observableArrayList(FAKULTETI));
+        cmbFakultet.setItems(FXCollections.observableArrayList(Fakulteti.SVI));
         cmbGodina.setItems(FXCollections.observableArrayList(GODINE));
         cmbUpisPut.setItems(FXCollections.observableArrayList(UPIS));
         cmbUpisPut.getSelectionModel().selectFirst();
@@ -126,6 +128,12 @@ public class NoviStudentController {
             if (nacrt.sifarnici == null) ucitajSifarnike();
             else popuniStatuse();
         });
+
+        for (TextField t : List.of(txtIme, txtPrezime, txtRoditelj)) {
+            t.focusedProperty().addListener((obs, bio, jeste) -> {
+                if (!jeste && t.getText() != null) t.setText(Imena.formatiraj(t.getText()));
+            });
+        }
     }
 
     /** Povratak s koraka 2: popuni polja iz nacrta. */

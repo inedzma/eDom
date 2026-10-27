@@ -54,6 +54,15 @@ public class RangListaObjavaService {
                     "Vrsta liste mora biti PRELIMINARNA ili KONACNA.");
         }
 
+        if ((z.useljenjeOd() == null) != (z.useljenjeDo() == null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Unesite oba datuma useljenja ili nijedan.");
+        }
+        if (z.useljenjeOd() != null && z.useljenjeOd().isAfter(z.useljenjeDo())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Početak useljenja je poslije kraja useljenja.");
+        }
+
         RangListaAdminDTO l = rangListaService.zaAdmina(null, null, z.popuniBrucosima());
         if (l.godina() == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Nema prijava za objavu.");
@@ -68,7 +77,9 @@ public class RangListaObjavaService {
                 l.slobodno(),
                 stavke(l.brucosi()),
                 stavke(l.saUslovom()),
-                stavke(l.listaCekanja()));
+                stavke(l.listaCekanja()),
+                z.useljenjeOd(),
+                z.useljenjeDo());
 
         if (o.brojStudenata() == 0) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,

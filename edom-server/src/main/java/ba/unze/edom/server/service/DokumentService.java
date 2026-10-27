@@ -118,7 +118,7 @@ public class DokumentService {
                 ? naziv.trim() : vrsta.getNaziv());
         d.setVrstaDokumenta(vrsta);
         d.setDatumUpload(LocalDate.now());
-        d.setDostavljen(true);
+        d.setDostavljen(false);
         d.setBrojBodova(0);   // bodovi se vise ne drze na dokumentu
         d.setDokumentB64(Base64.getEncoder().encodeToString(podaci));
         d.setPrijava(p);

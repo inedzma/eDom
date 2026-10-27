@@ -195,9 +195,10 @@ public class PrijavaService {
     // ---------- PODNOSENJE ----------
 
     @Transactional
-    public void podnesi(Integer idPrijave, Integer idStudenta) {
+    public void podnesi(Integer idPrijave, Integer idStudenta, String napomena) {
 
         Prijava p = dohvatiZaIzmjenu(idPrijave, idStudenta);
+        p.setNapomena(NapomenaPrijaveService.ocisti(napomena));
 
         List<String> nedostaje = provjeriPotpunost(p);
         if (!nedostaje.isEmpty()) {

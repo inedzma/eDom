@@ -25,11 +25,11 @@ public final class RangListaApi {
         return ApiClient.post("/api/rang-lista/prijave/" + idPrijave + "/dokaz-uslova/ponisti", Map.of(), DokazUslovaDTO.class);
     }
 
-    public static RangObjavaDTO objavi(String vrsta, boolean popuniBrucosima) {
+    public static RangObjavaDTO objavi(String vrsta, boolean popuniBrucosima,
+                                       java.time.LocalDate useljenjeOd, java.time.LocalDate useljenjeDo) {
         return ApiClient.post("/api/rang-lista/objavi",
-                new ObjavaRangListeDTO(vrsta, popuniBrucosima), RangObjavaDTO.class);
+                new ObjavaRangListeDTO(vrsta, popuniBrucosima, useljenjeOd, useljenjeDo), RangObjavaDTO.class);
     }
-
     public static RangObjavaDTO zadnjaObjava() {
         return ApiClient.get("/api/rang-lista/objava", RangObjavaDTO.class);
     }

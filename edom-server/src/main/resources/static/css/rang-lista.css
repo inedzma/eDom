@@ -145,3 +145,48 @@
     .rang-tbl .c-status{width:96px}
     .rang-tbl .sifra{font-size:13px}
 }
+
+/* ---------- useljenje (traka gore) ---------- */
+.useljenje-traka{
+    display:flex;align-items:center;gap:14px;margin-top:14px;padding:14px 18px;
+    border-radius:14px;background:#fff7e8;border:1px solid #f6d9a8;color:var(--heading);
+}
+.ut-ikona{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;
+    background:#fff;color:#b86e00;flex:none}
+.ut-tekst{flex:1;font-size:15px;line-height:1.5}
+.ut-tekst > b:first-child{display:block;font-size:13px;text-transform:uppercase;
+    letter-spacing:.06em;color:#b86e00}
+.ut-link{font-weight:700;white-space:nowrap;color:var(--mint-dark)}
+
+/* ---------- važne informacije ---------- */
+.info-sekcija{scroll-margin-top:90px}
+.info-sekcija h2{margin:0 0 16px}
+.info-brojke{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ib{padding:14px 16px;border-radius:12px;background:var(--bg)}
+.ib b{display:block;font-size:26px;color:var(--heading);line-height:1.1}
+.ib span{font-size:13.5px;color:var(--muted)}
+.ib--slobodno{background:var(--mint-soft)}
+.ib--slobodno b{color:var(--mint-dark)}
+.info-uvod{margin:16px 0 18px;color:var(--muted);font-size:14.5px;line-height:1.6}
+
+.info-kartice{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.ik{padding:16px 18px;border-radius:14px;border:1px solid #e3e8ef;background:#fff}
+.ik h3{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:16px;color:var(--heading)}
+.ik h3 svg{color:var(--mint-dark)}
+.ik ul{margin:0;padding-left:18px;line-height:1.6;font-size:14.5px}
+.ik li + li{margin-top:6px}
+.ik ul.kontakt{list-style:none;padding-left:0}
+.ik a{color:var(--mint-dark);font-weight:600}
+
+.odluka{margin-top:16px;padding:12px 16px;border-radius:12px;background:var(--bg);font-size:14px;line-height:1.6}
+.odluka summary{cursor:pointer;font-weight:700;color:var(--heading)}
+.odluka p{margin:10px 0 0}
+
+@media (max-width:860px){
+    .info-brojke{grid-template-columns:repeat(2,1fr)}
+    .info-kartice{grid-template-columns:1fr}
+}
+@media (max-width:520px){
+    .useljenje-traka{flex-wrap:wrap}
+    .ut-link{width:100%}
+}

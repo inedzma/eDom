@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import service.PdfService;
@@ -19,6 +20,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class DetaljiPrijaveController {
@@ -73,10 +82,16 @@ public class DetaljiPrijaveController {
 
     private PrijavaDetaljiDTO prijava;
 
+    // novi izgled: bodovanje i dokumenti (prave ih paneli u kodu)
+    private final VBox bodovanjeMjesto = new VBox();
+    private final VBox dokumentiMjesto = new VBox();
+    private final VBox napomenaMjesto = new VBox();
+
     @FXML
     public void initialize() {
         inicijalizujTabelaBodovanja();
         inicijalizujTabelaDokumenata();
+        pripremiNoviIzgled();
     }
 
     // ---------- učitavanje ----------
@@ -126,6 +141,44 @@ public class DetaljiPrijaveController {
 
         popuniProvjeru(p);
         popuniStatus(p);
+        ucitajPanele(p.idPrijava());
+        prikaziNapomenu(p);
+    }
+
+    /** Napomena koju je student napisao pri predaji; admin je može ispraviti. */
+    private void prikaziNapomenu(PrijavaDetaljiDTO p) {
+        Label naslov = new Label("Napomena studenta");
+        naslov.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        Label opis = new Label("Student je upisuje pri predaji prijave. Administrator je može ispraviti ili dopuniti.");
+        opis.setStyle("-fx-text-fill: #6b7a90;");
+        opis.setWrapText(true);
+
+        TextArea ta = new TextArea(p.napomena() != null ? p.napomena() : "");
+        ta.setPromptText("Student nije ostavio napomenu.");
+        ta.setWrapText(true);
+        ta.setPrefRowCount(3);
+
+        Button sacuvaj = new Button("Sačuvaj napomenu");
+        sacuvaj.getStyleClass().add("btn-primary");
+        int id = p.idPrijava();
+        sacuvaj.setOnAction(e -> {
+            String tekst = ta.getText();
+            if (tekst != null && tekst.trim().length() > 500) {
+                info("Napomena može imati najviše 500 znakova.");
+                return;
+            }
+            uPozadini(() -> { PrijavaApi.sacuvajNapomenu(id, tekst); return true; },
+                    x -> info("Napomena je sačuvana."));
+        });
+
+        HBox dno = new HBox(sacuvaj);
+        dno.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+
+        VBox kartica = new VBox(8, naslov, opis, ta, dno);
+        kartica.setPadding(new Insets(16));
+        kartica.setStyle("-fx-background-color: white; -fx-background-radius: 14; "
+                + "-fx-border-color: #e3e8ef; -fx-border-radius: 14;");
+        napomenaMjesto.getChildren().setAll(kartica);
     }
 
     // ---------- provjera stavki ----------
@@ -433,5 +486,41 @@ public class DetaljiPrijaveController {
 
     private String nullSafe(String s) {
         return s == null ? "" : s;
+    }
+
+    /** Lijeva kartica: umjesto starih tabela dva panela; stara kartica "Provjera dokumenata" se sakrije. */
+    private void pripremiNoviIzgled() {
+        VBox lijevo = (VBox) tblBodovanje.getParent();
+        VBox sadrzaj = new VBox(18, napomenaMjesto, bodovanjeMjesto, dokumentiMjesto);
+        sadrzaj.setPadding(new Insets(2));
+        ScrollPane sp = new ScrollPane(sadrzaj);
+        sp.setFitToWidth(true);
+        VBox.setVgrow(sp, Priority.ALWAYS);
+        lijevo.getChildren().setAll(sp);
+
+        Node provjera = vboxProvjera.getParent();
+        provjera.setVisible(false);
+        provjera.setManaged(false);
+    }
+
+    private void ucitajPanele(int idPrijave) {
+        uPozadini(() -> PrijavaApi.bodovanje(idPrijave),
+                b -> bodovanjeMjesto.getChildren().setAll(new BodovanjePanel(b,
+                        () -> izvrsi(() -> PrijavaApi.detalji(idPrijave), null))));
+        uPozadini(() -> PrijavaApi.dokumentiSpisak(idPrijave),
+                s -> dokumentiMjesto.getChildren().setAll(new DokumentiPanel(idPrijave, s,
+                        () -> ucitajPanele(idPrijave))));
+    }
+
+    private <T> void uPozadini(Supplier<T> posao, Consumer<T> uspjeh) {
+        Task<T> task = new Task<>() {
+            @Override
+            protected T call() {
+                return posao.get();
+            }
+        };
+        task.setOnSucceeded(e -> uspjeh.accept(task.getValue()));
+        task.setOnFailed(e -> greska(task.getException(), "Greška pri učitavanju."));
+        pokreni(task);
     }
 }

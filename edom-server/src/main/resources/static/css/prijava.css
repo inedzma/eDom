@@ -296,3 +296,14 @@
     .detail-actions{width:100%}
     .detail-actions .btn{flex:1}
 }
+
+/* ---------- napomena na pregledu ---------- */
+.pp-napomena{margin-bottom:22px}
+.pp-napomena h2 .opt{font-size:14px;font-weight:500;color:var(--muted)}
+.pp-napomena textarea{
+    width:100%;box-sizing:border-box;padding:14px 16px;border-radius:12px;
+    border:1px solid #d9e0ea;background:#fff;color:var(--heading);
+    font:inherit;font-size:15px;line-height:1.5;resize:vertical;min-height:110px;
+}
+.pp-napomena textarea:focus{outline:none;border-color:var(--mint-dark);box-shadow:0 0 0 3px var(--mint-soft)}
+.pp-brojac{margin-top:6px;text-align:right;font-size:13px;color:var(--muted)}
