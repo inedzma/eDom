@@ -2,47 +2,75 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.SVGPath?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="controllers.RangListaController"
-            stylesheets="@../styles/rang-lista-style.css"
-            styleClass="rang-root">
+<AnchorPane styleClass="pr-root" stylesheets="@../styles/prijave.css"
+            xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.RangListaController">
 
-    <top>
-        <HBox spacing="12" alignment="CENTER_LEFT" styleClass="rang-header">
-            <VBox spacing="2">
-                <Label text="Rang lista studenata" styleClass="rang-title"/>
-                <Label fx:id="lblGodina" text=""/>
-            </VBox>
-            <Region HBox.hgrow="ALWAYS"/>
-        </HBox>
-    </top>
+    <VBox spacing="14" AnchorPane.topAnchor="24" AnchorPane.rightAnchor="28"
+          AnchorPane.bottomAnchor="24" AnchorPane.leftAnchor="28">
 
-    <center>
-        <VBox styleClass="rang-card" spacing="10">
+        <!-- ================= ZAGLAVLJE U BOJI ================= -->
+        <VBox styleClass="pr-hero" spacing="18">
 
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <ToggleButton fx:id="btnBrucosi" text="Brucoši"/>
-                <ToggleButton fx:id="btnSaUslovom" text="S uslovom"/>
-                <ToggleButton fx:id="btnCekanje" text="Lista čekanja"/>
-                <ToggleButton fx:id="btnSve" text="Sve"/>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <VBox spacing="2">
+                    <Label styleClass="pr-hero-eyebrow" text="STUDENTSKI CENTAR ZENICA"/>
+                    <Label styleClass="pr-hero-naslov" text="Rang lista"/>
+                    <Label fx:id="lblGodina" styleClass="pr-hero-podnaslov" text="Učitavanje…"/>
+                </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <CheckBox fx:id="chkPopuniBrucosima" text="Slobodna mjesta popuni brucošima"/>
-                <Button text="⟳" onAction="#onRefresh"/>
-                <MenuBar>
-                    <Menu fx:id="menuKolone" text="Prikaži kolone"/>
-                </MenuBar>
+                <CheckBox fx:id="chkPopuniBrucosima" styleClass="pr-hero-check" text="Popuni slobodna mjesta brucošima"/>
+                <Button onAction="#onRefresh" styleClass="pr-btn-glass" text="⟳">
+                    <tooltip><Tooltip text="Osvježi rang listu"/></tooltip>
+                </Button>
+                <Button onAction="#onExportHtmlPdf" styleClass="pr-btn-glass" text="Izvezi…"/>
+                <Button fx:id="btnObjavi" onAction="#objavi" styleClass="pr-btn-bijelo" text="Objavi na webu…"/>
             </HBox>
 
-            <Label fx:id="lblSazetak" styleClass="rang-sazetak" wrapText="true"/>
+            <!-- pločice sa statistikom (pravi kontroler) -->
+            <HBox fx:id="boxStatistika" spacing="12"/>
 
-            <!-- kolone pravi RangListaController.napraviKolone() -->
-            <TableView fx:id="tblRangLista" VBox.vgrow="ALWAYS" styleClass="rang-table"/>
-
-            <HBox spacing="10" alignment="CENTER_RIGHT">
-                <Button text="Export PDF…" onAction="#onExportHtmlPdf"/>
+            <HBox alignment="CENTER_LEFT">
+                <Label fx:id="lblObjava" styleClass="pr-hero-objava" text="Provjeravam objavu…"/>
             </HBox>
         </VBox>
-    </center>
-</BorderPane>
+
+        <!-- ================= GRUPE ================= -->
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <ToggleButton fx:id="btnBrucosi" styleClass="pr-chip" text="Brucoši"/>
+            <ToggleButton fx:id="btnSaUslovom" styleClass="pr-chip" text="S uslovom"/>
+            <ToggleButton fx:id="btnCekanje" styleClass="pr-chip" text="Lista čekanja"/>
+            <ToggleButton fx:id="btnSve" styleClass="pr-chip" text="Sve"/>
+        </HBox>
+
+        <!-- ================= KARTICA S TABELOM ================= -->
+        <VBox styleClass="pr-kartica" spacing="14" VBox.vgrow="ALWAYS">
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <HBox styleClass="pr-pretraga" alignment="CENTER_LEFT" spacing="8"
+                      HBox.hgrow="ALWAYS" maxWidth="380">
+                    <SVGPath styleClass="pr-pretraga-ikona"
+                             content="M10 2a8 8 0 1 0 4.9 14.3l5.4 5.4 1.4-1.4-5.4-5.4A8 8 0 0 0 10 2zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"/>
+                    <TextField fx:id="txtTrazi" styleClass="pr-pretraga-polje" HBox.hgrow="ALWAYS"
+                               promptText="Pronađi po šifri ili imenu (Enter = sljedeći)"/>
+                </HBox>
+                <MenuButton fx:id="btnKolone" styleClass="pr-meni" text="Kolone"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblSazetak" styleClass="pr-sitno"/>
+            </HBox>
+
+            <!-- kolone pravi RangListaController.napraviKolone() -->
+            <TableView fx:id="tblRangLista" styleClass="pr-tabela, pr-gusta" VBox.vgrow="ALWAYS"/>
+
+            <HBox alignment="CENTER_LEFT" spacing="16">
+                <Label styleClass="pr-leg-crta" text="━━  granica primljenih"/>
+                <Label styleClass="pr-leg-cekanje" text="■  lista čekanja"/>
+                <Label styleClass="pr-leg-greska" text="■  neispravni podaci (ne objavljuju se)"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label styleClass="pr-sitno" text="Dvoklik na red otvara detalje prijave"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</AnchorPane>

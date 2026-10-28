@@ -163,3 +163,151 @@
 .pr-tabela .scroll-bar .increment-button,
 .pr-tabela .scroll-bar .decrement-button { -fx-background-color: transparent; -fx-padding: 0; }
 .pr-tabela .corner { -fx-background-color: transparent; }
+
+/* ---------- dodaci za Rang listu ---------- */
+
+/* statistika */
+.pr-stat {
+    -fx-background-color: white; -fx-padding: 14 18;
+    -fx-background-radius: 14; -fx-border-radius: 14; -fx-border-color: #e3ecee;
+}
+.pr-stat-naslov { -fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #6b8290; }
+.pr-stat-broj   { -fx-font-size: 26px; -fx-font-weight: 800; -fx-text-fill: #0b3b47; }
+.pr-stat-opis   { -fx-font-size: 12px; -fx-text-fill: #7d939d; }
+.pr-stat.st-pregled    .pr-stat-broj { -fx-text-fill: #2457a6; }
+.pr-stat.st-odobreno   .pr-stat-broj { -fx-text-fill: #1e7a4f; }
+.pr-stat.st-zakljuceno .pr-stat-broj { -fx-text-fill: #0b4f5c; }
+.pr-stat.st-cekanje    .pr-stat-broj { -fx-text-fill: #b86e00; }
+
+/* traka objave */
+.pr-objava {
+    -fx-background-color: #eef3f4; -fx-text-fill: #4a6470;
+    -fx-font-size: 13px; -fx-padding: 9 14; -fx-background-radius: 10; -fx-wrap-text: true;
+}
+.pr-objava.pr-objava--da { -fx-background-color: #e2f6ef; -fx-text-fill: #1e7a4f; -fx-font-weight: 600; }
+
+/* kvačica u zaglavlju */
+.pr-check { -fx-text-fill: #31505c; -fx-font-size: 13px; -fx-cursor: hand; }
+.pr-check .box {
+    -fx-background-color: white; -fx-background-radius: 4;
+    -fx-border-color: #b8c8cd; -fx-border-radius: 4;
+}
+.pr-check:selected .box  { -fx-background-color: #00b696; -fx-border-color: #00b696; }
+.pr-check:selected .mark { -fx-background-color: white; }
+
+/* gušći redovi (rang lista ima mnogo redova) */
+.pr-tabela.pr-gusta .table-row-cell { -fx-cell-size: 44; }
+
+/* redovi rang liste */
+.pr-tabela .table-row-cell.red-ispod-crte .table-cell { -fx-text-fill: #93a6ae; }
+.pr-tabela .table-row-cell.red-cekanje { -fx-background-color: #fffaf0; }
+.pr-tabela .table-row-cell.red-greska  { -fx-background-color: #fdf1f0; }
+.pr-tabela .table-row-cell.red-crta    { -fx-border-color: #d64545; -fx-border-width: 0 0 2 0; }
+.pr-tabela .table-row-cell.red-cekanje:selected,
+.pr-tabela .table-row-cell.red-greska:selected { -fx-background-color: #e6f6f2; }
+.pr-tabela .table-cell.pr-bodovi { -fx-font-weight: 800; }
+
+/* mala dugmad u tabeli */
+.pr-mali-btn {
+    -fx-background-color: white; -fx-text-fill: #0b3b47;
+    -fx-font-size: 12px; -fx-font-weight: 600; -fx-padding: 4 10; -fx-cursor: hand;
+    -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #cfdde1;
+}
+.pr-mali-btn:hover { -fx-background-color: #f1f7f6; -fx-border-color: #00b696; }
+.pr-mali-btn.pr-mali-btn--zeleno { -fx-background-color: #22a06b; -fx-border-color: #22a06b; -fx-text-fill: white; }
+.pr-mali-btn.pr-mali-btn--zeleno:hover { -fx-background-color: #1b8a5b; }
+.pr-mali-btn.pr-mali-btn--crveno { -fx-text-fill: #b3261e; -fx-border-color: #f0c4c0; }
+.pr-mali-btn.pr-mali-btn--crveno:hover { -fx-background-color: #fdecea; }
+
+/* legenda */
+.pr-leg-crta    { -fx-text-fill: #d64545; -fx-font-size: 12px; -fx-font-weight: 700; }
+.pr-leg-cekanje { -fx-text-fill: #e0a43a; -fx-font-size: 12px; -fx-font-weight: 700; }
+.pr-leg-greska  { -fx-text-fill: #e58a82; -fx-font-size: 12px; -fx-font-weight: 700; }
+
+/* =========================================================
+   Zaglavlje u boji (Rang lista; može se koristiti i drugdje)
+   ========================================================= */
+.pr-hero {
+    -fx-background-color: linear-gradient(to bottom right, #0b4f5c 0%, #0b6b5c 55%, #00a386 100%);
+    -fx-background-radius: 18;
+    -fx-padding: 22 26 20 26;
+    -fx-effect: dropshadow(gaussian, rgba(11,79,92,0.25), 22, 0.2, 0, 8);
+}
+
+.pr-hero .pr-hero-eyebrow   { -fx-text-fill: rgba(255,255,255,0.65); -fx-font-size: 11px; -fx-font-weight: 700; }
+.pr-hero .pr-hero-naslov    { -fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: 800; }
+.pr-hero .pr-hero-podnaslov { -fx-text-fill: rgba(255,255,255,0.80); -fx-font-size: 13px; }
+
+/* kvačica na tamnoj podlozi */
+.pr-hero .pr-hero-check { -fx-text-fill: white; -fx-font-size: 13px; -fx-cursor: hand; }
+.pr-hero .pr-hero-check .box {
+    -fx-background-color: rgba(255,255,255,0.15); -fx-background-radius: 4;
+    -fx-border-color: rgba(255,255,255,0.55); -fx-border-radius: 4;
+}
+.pr-hero .pr-hero-check:selected .box  { -fx-background-color: white; -fx-border-color: white; }
+.pr-hero .pr-hero-check:selected .mark { -fx-background-color: #0b6b5c; }
+
+/* prozirna i bijela dugmad */
+.pr-hero .pr-btn-glass {
+    -fx-background-color: rgba(255,255,255,0.14); -fx-text-fill: white;
+    -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 9 16; -fx-cursor: hand;
+    -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: rgba(255,255,255,0.30);
+}
+.pr-hero .pr-btn-glass:hover { -fx-background-color: rgba(255,255,255,0.24); }
+
+.pr-hero .pr-btn-bijelo {
+    -fx-background-color: white; -fx-text-fill: #0b6b5c;
+    -fx-font-size: 13px; -fx-font-weight: 800; -fx-padding: 10 20; -fx-cursor: hand;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 3);
+}
+.pr-hero .pr-btn-bijelo:hover { -fx-background-color: #e9fbf6; }
+
+/* pločice */
+.pr-hero .pr-hero-stat {
+    -fx-background-color: rgba(255,255,255,0.11);
+    -fx-background-radius: 14; -fx-border-radius: 14; -fx-border-color: rgba(255,255,255,0.18);
+    -fx-padding: 14 18 16 18;
+}
+.pr-hero .pr-hero-stat-naslov { -fx-text-fill: rgba(255,255,255,0.70); -fx-font-size: 11px; -fx-font-weight: 700; }
+.pr-hero .pr-hero-stat-broj   { -fx-text-fill: white; -fx-font-size: 30px; -fx-font-weight: 800; }
+.pr-hero .pr-hero-stat-opis   { -fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 12px; }
+
+.pr-hero .pr-hero-traka        { -fx-pref-height: 6; -fx-max-height: 6; }
+.pr-hero .pr-hero-traka .track { -fx-background-color: rgba(255,255,255,0.20); -fx-background-radius: 3; -fx-background-insets: 0; }
+.pr-hero .pr-hero-traka .bar   { -fx-background-color: white; -fx-background-radius: 3; -fx-background-insets: 0; -fx-padding: 3; }
+
+/* status objave kao pilula */
+.pr-hero .pr-hero-objava {
+    -fx-background-color: rgba(255,255,255,0.14); -fx-text-fill: white;
+    -fx-font-size: 12.5px; -fx-font-weight: 600; -fx-padding: 6 14; -fx-background-radius: 999;
+}
+.pr-hero .pr-hero-objava.pr-hero-objava--da { -fx-background-color: #d9f7ec; -fx-text-fill: #0b4f3a; }
+
+/* ---------- dodaci za ekran Studenti ---------- */
+.pr-sifra   { -fx-font-family: "Consolas", "Menlo", monospace; -fx-font-weight: 700; -fx-text-fill: #0b3b47; }
+.pr-kvacica { -fx-text-fill: #22a06b; -fx-font-size: 15px; -fx-font-weight: 800; }
+
+.pr-combo {
+    -fx-background-color: white; -fx-font-size: 13px;
+    -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #dbe5e8;
+}
+.pr-combo:hover   { -fx-background-color: #f1f7f6; }
+.pr-combo:focused { -fx-border-color: #00b696; }
+.pr-combo .list-cell { -fx-text-fill: #0b3b47; -fx-font-weight: 600; }
+.pr-combo .arrow { -fx-background-color: #6b8290; }
+
+.pr-tabela .scroll-bar:horizontal .thumb { -fx-background-color: #cfdde1; -fx-background-radius: 6; }
+
+/* mala dugmad u tabeli – jače od globalnog app.css */
+.pr-tabela .button.pr-mali-btn {
+    -fx-background-color: white; -fx-text-fill: #0b3b47;
+    -fx-font-size: 12px; -fx-font-weight: 600; -fx-padding: 4 10; -fx-cursor: hand;
+    -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #cfdde1;
+    -fx-background-insets: 0; -fx-effect: null;
+}
+.pr-tabela .button.pr-mali-btn:hover { -fx-background-color: #f1f7f6; -fx-border-color: #00b696; }
+.pr-tabela .button.pr-mali-btn.pr-mali-btn--zeleno { -fx-background-color: #22a06b; -fx-border-color: #22a06b; -fx-text-fill: white; }
+.pr-tabela .button.pr-mali-btn.pr-mali-btn--zeleno:hover { -fx-background-color: #1b8a5b; }
+.pr-tabela .button.pr-mali-btn.pr-mali-btn--crveno { -fx-background-color: white; -fx-text-fill: #b3261e; -fx-border-color: #f0c4c0; }
+.pr-tabela .button.pr-mali-btn.pr-mali-btn--crveno:hover { -fx-background-color: #fdecea; }

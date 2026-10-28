@@ -2,87 +2,70 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.SVGPath?>
 
-<AnchorPane styleClass="anchor-pane" stylesheets="@../styles/studenti-style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.studentiController">
+<AnchorPane styleClass="pr-root" stylesheets="@../styles/prijave.css"
+            xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.studentiController">
 
-    <children>
-        <VBox spacing="18" styleClass="main-vbox" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20" VBox.vgrow="ALWAYS">
+    <VBox spacing="16" AnchorPane.topAnchor="24" AnchorPane.rightAnchor="28"
+          AnchorPane.bottomAnchor="24" AnchorPane.leftAnchor="28">
 
-            <BorderPane>
+        <!-- ================= ZAGLAVLJE ================= -->
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <VBox spacing="2">
+                <Label styleClass="pr-naslov" text="Studenti"/>
+                <Label fx:id="lblPodnaslov" styleClass="pr-podnaslov" text="Učitavanje…"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label styleClass="pr-sitno" text="Akademska godina"/>
+            <ComboBox fx:id="cmbGodina" styleClass="pr-combo" prefWidth="130"/>
+            <Button onAction="#onRefresh" styleClass="pr-btn-ikona" text="⟳">
+                <tooltip><Tooltip text="Osvježi podatke"/></tooltip>
+            </Button>
+        </HBox>
 
-                <left>
-                    <VBox spacing="10">
-                        <Label styleClass="header-title" text="Studenti" />
-                    </VBox>
-                </left>
+        <!-- ================= BRZI POGLEDI ================= -->
+        <FlowPane fx:id="boxPogledi" hgap="8" vgap="8"/>
 
-                <right>
-                    <HBox alignment="CENTER_RIGHT" spacing="14" />
-                </right>
+        <!-- ================= KARTICA ================= -->
+        <VBox styleClass="pr-kartica" spacing="14" VBox.vgrow="ALWAYS">
 
-            </BorderPane>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <HBox styleClass="pr-pretraga" alignment="CENTER_LEFT" spacing="8"
+                      HBox.hgrow="ALWAYS" maxWidth="440">
+                    <SVGPath styleClass="pr-pretraga-ikona"
+                             content="M10 2a8 8 0 1 0 4.9 14.3l5.4 5.4 1.4-1.4-5.4-5.4A8 8 0 0 0 10 2zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"/>
+                    <TextField fx:id="txtSearch" styleClass="pr-pretraga-polje" HBox.hgrow="ALWAYS"
+                               promptText="Pretraga: ime, prezime, šifra, indeks, JMBG, soba…"/>
+                </HBox>
 
-            <HBox alignment="CENTER_LEFT" spacing="14">
-
-                <TextField fx:id="txtSearch" prefWidth="420" promptText="Pretraga: ime, prezime, indeks, fakultet..." styleClass="search-input" />
-
-                <Region HBox.hgrow="ALWAYS" />
-
-                  <Button onAction="#onRefresh" styleClass="icon-refresh-btn">
-
-                      <tooltip>
-                          <Tooltip text="Osvježi podatke" />
-                      </tooltip>
-
-                      <graphic>
-                          <Label styleClass="refresh-icon" text="⟳" />
-                      </graphic>
-                  </Button>
-
-
-            <HBox alignment="CENTER_RIGHT" spacing="14">
-
-                <MenuButton fx:id="btnSortiraj" styleClass="menu-btn" text="Sortiraj">
+                <MenuButton fx:id="btnFiltriraj" styleClass="pr-meni" text="Filtriraj"/>
+                <MenuButton fx:id="btnKolone" styleClass="pr-meni" text="Kolone"/>
+                <MenuButton styleClass="pr-meni" text="Sortiraj">
                     <items>
-                        <MenuItem onAction="#sortImeAZ" text="Ime A–Z" />
-                        <MenuItem onAction="#sortImeZA" text="Ime Z–A" />
-                        <MenuItem onAction="#sortIdUzlazno" text="ID uzlazno" />
-                        <MenuItem onAction="#sortIdSilazno" text="ID silazno" />
-                        <MenuItem onAction="#sortProsjekAsc" text="Prosjek uzlazno" />
-                        <MenuItem onAction="#sortProsjekDesc" text="Prosjek silazno" />
+                        <MenuItem onAction="#sortPrezimeAZ" text="Prezime A–Z"/>
+                        <MenuItem onAction="#sortPrezimeZA" text="Prezime Z–A"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem onAction="#sortBodoviSilazno" text="Bodovi: najviše prvo"/>
+                        <MenuItem onAction="#sortBodoviUzlazno" text="Bodovi: najmanje prvo"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem onAction="#sortSifra" text="Šifra"/>
+                        <MenuItem onAction="#sortSoba" text="Soba"/>
                     </items>
                 </MenuButton>
 
-                <MenuButton fx:id="btnFiltriraj" styleClass="menu-btn" text="Filtriraj">
-                    <items>
-                        <Menu fx:id="menuFakulteti" text="Fakulteti" />
-                        <Menu fx:id="menuStatus" text="Status prijave" />
-                        <Menu fx:id="menuGodina" text="Godina studija" />
-                    </items>
-                </MenuButton>
-
-            </HBox>
+                <Button fx:id="btnOcisti" onAction="#onOcisti" styleClass="pr-link" text="Očisti filtere"/>
             </HBox>
 
-            <TableView fx:id="tblStudenti" styleClass="table-view" VBox.vgrow="ALWAYS">
+            <TableView fx:id="tblStudenti" styleClass="pr-tabela" VBox.vgrow="ALWAYS"/>
 
-                <columns>
-                    <TableColumn fx:id="colId" prefWidth="70" text="ID" styleClass="centered-cell"/>
-                    <TableColumn fx:id="colIme" prefWidth="140" text="Ime" />
-                    <TableColumn fx:id="colPrezime" prefWidth="160" text="Prezime" />
-                    <TableColumn fx:id="colIndeks" prefWidth="170" text="Broj indeksa" styleClass="centered-cell"/>
-                    <TableColumn fx:id="colFakultet" prefWidth="260" text="Fakultet" />
-                    <TableColumn fx:id="colGodina" prefWidth="110" text="Godina" styleClass="centered-cell"/>
-                    <TableColumn fx:id="colProsjek" prefWidth="120" text="Prosjek" styleClass="centered-cell"/>
-                    <TableColumn fx:id="colStatus" prefWidth="260" text="Soc. status" />
-                </columns>
-
-            </TableView>
-
-            <HBox alignment="CENTER_RIGHT">
-                <Button fx:id="btnExportHtmlPdf" onAction="#onExportHtmlPdf" text="Export PDF (HTML)" />
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <Label fx:id="lblBroj" styleClass="pr-sitno"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label styleClass="pr-sitno" text="Dvoklik na red otvara detalje studenta"/>
+                <Button onAction="#onExport" styleClass="pr-btn-sekundarno" text="Izvezi u Excel"/>
             </HBox>
-
         </VBox>
-    </children>
+    </VBox>
 </AnchorPane>

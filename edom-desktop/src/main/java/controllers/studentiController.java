@@ -4,6 +4,7 @@ import api.ApiException;
 import api.EvidencijaApi;
 import ba.unze.edom.common.dto.EvidencijaDTO;
 import ba.unze.edom.common.dto.EvidencijaRedDTO;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,7 +13,9 @@ import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import service.export.XlsxPisac;
 
@@ -21,67 +24,76 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-/** Centralna evidencija: sve prijave godine, filteri, kolone, Excel, detalji. */
+/** Centralna evidencija: brzi pogledi, filteri, kolone po izboru, Excel, detalji studenta. */
 public class studentiController {
 
     private static final DateTimeFormatter DATUM = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
 
     @FXML private TableView<EvidencijaRedDTO> tblStudenti;
     @FXML private TextField txtSearch;
-    @FXML private MenuButton btnSortiraj;
     @FXML private MenuButton btnFiltriraj;
-    @FXML private Button btnExportHtmlPdf;
-
-    private final ComboBox<Integer> cmbGodina = new ComboBox<>();
-    private final MenuButton btnKolone = new MenuButton("Kolone");
-    private final Label lblBroj = new Label();
+    @FXML private MenuButton btnKolone;
+    @FXML private ComboBox<Integer> cmbGodina;
+    @FXML private FlowPane boxPogledi;
+    @FXML private Label lblPodnaslov;
+    @FXML private Label lblBroj;
+    @FXML private Button btnOcisti;
 
     private final ObservableList<EvidencijaRedDTO> masterList = FXCollections.observableArrayList();
     private FilteredList<EvidencijaRedDTO> filteredList;
     private SortedList<EvidencijaRedDTO> sortedList;
     private Integer godina;
 
-    // ---------- kolone ----------
+    // =====================================================================
+    //  KOLONE
+    // =====================================================================
 
-    private record Kolona(String naslov, Function<EvidencijaRedDTO, Object> vrijednost, double sirina, boolean vidljiva) {}
+    /** Kako se vrijednost prikazuje u ćeliji (u Excel ide uvijek kao tekst/broj). */
+    private enum Prikaz { TEKST, SIFRA, STATUS, KATEGORIJA, DA_NE, KVACICA, KARTICA, BROJ }
+
+    private record Kolona(String naslov, Function<EvidencijaRedDTO, Object> vrijednost,
+                          double sirina, boolean vidljiva, Prikaz prikaz) {}
 
     private final List<Kolona> definicije = List.of(
-            new Kolona("Šifra", EvidencijaRedDTO::sifra, 110, true),
-            new Kolona("Prezime", EvidencijaRedDTO::prezime, 130, true),
-            new Kolona("Ime", EvidencijaRedDTO::ime, 110, true),
-            new Kolona("Ime roditelja", EvidencijaRedDTO::imeRoditelja, 110, false),
-            new Kolona("JMBG", EvidencijaRedDTO::jmbg, 130, false),
-            new Kolona("Lična karta", EvidencijaRedDTO::brojLicneKarte, 100, false),
-            new Kolona("Indeks", EvidencijaRedDTO::brojIndeksa, 90, true),
-            new Kolona("Fakultet", EvidencijaRedDTO::fakultet, 180, true),
-            new Kolona("Godina", EvidencijaRedDTO::godinaStudija, 65, true),
-            new Kolona("Kanton", EvidencijaRedDTO::kanton, 75, true),
-            new Kolona("Općina", EvidencijaRedDTO::opcina, 110, true),
-            new Kolona("Adresa", EvidencijaRedDTO::adresa, 170, false),
-            new Kolona("Spol", EvidencijaRedDTO::spol, 55, false),
-            new Kolona("E-mail", EvidencijaRedDTO::email, 190, false),
-            new Kolona("Telefon", EvidencijaRedDTO::telefon, 110, false),
-            new Kolona("Tel. roditelja", EvidencijaRedDTO::telefonRoditelja, 110, false),
-            new Kolona("Datum prijave", EvidencijaRedDTO::datumPrijave, 105, false),
-            new Kolona("Status", EvidencijaRedDTO::status, 100, true),
-            new Kolona("Kategorija", EvidencijaRedDTO::kategorija, 105, true),
-            new Kolona("Primljen", EvidencijaRedDTO::primljen, 75, true),
-            new Kolona("Bodovi", EvidencijaRedDTO::bodovi, 70, true),
-            new Kolona("Soba", EvidencijaRedDTO::soba, 60, true),
-            new Kolona("Useljen", EvidencijaRedDTO::datumUseljenja, 95, true),
-            new Kolona("Iseljen", EvidencijaRedDTO::datumIseljenja, 95, false),
-            new Kolona("Ključ", EvidencijaDetaljiDijalog::kljuc, 95, true),
-            new Kolona("Kartica", studentiController::kartica, 90, true),
-            new Kolona("Ljekarsko", r -> r.ljekarskoPredano() != null, 80, true),
-            new Kolona("Uvjerenje fak.", r -> r.uvjerenjeUzPrijavu() || r.uvjerenjeFakultetPredano() != null, 100, true),
-            new Kolona("Napomena", EvidencijaRedDTO::napomena, 200, false)
+            new Kolona("Šifra", EvidencijaRedDTO::sifra, 115, true, Prikaz.SIFRA),
+            new Kolona("Prezime", EvidencijaRedDTO::prezime, 130, true, Prikaz.TEKST),
+            new Kolona("Ime", EvidencijaRedDTO::ime, 110, true, Prikaz.TEKST),
+            new Kolona("Ime roditelja", EvidencijaRedDTO::imeRoditelja, 110, false, Prikaz.TEKST),
+            new Kolona("JMBG", EvidencijaRedDTO::jmbg, 130, false, Prikaz.TEKST),
+            new Kolona("Lična karta", EvidencijaRedDTO::brojLicneKarte, 100, false, Prikaz.TEKST),
+            new Kolona("Indeks", EvidencijaRedDTO::brojIndeksa, 90, true, Prikaz.TEKST),
+            new Kolona("Fakultet", r -> r.fakultet() == null ? null : r.fakultet().replace(" UNZE", ""), 170, true, Prikaz.TEKST),
+            new Kolona("Godina", EvidencijaRedDTO::godinaStudija, 70, true, Prikaz.BROJ),
+            new Kolona("Kanton", EvidencijaRedDTO::kanton, 75, false, Prikaz.TEKST),
+            new Kolona("Općina", EvidencijaRedDTO::opcina, 110, true, Prikaz.TEKST),
+            new Kolona("Adresa", EvidencijaRedDTO::adresa, 170, false, Prikaz.TEKST),
+            new Kolona("Spol", EvidencijaRedDTO::spol, 55, false, Prikaz.BROJ),
+            new Kolona("E-mail", EvidencijaRedDTO::email, 190, false, Prikaz.TEKST),
+            new Kolona("Telefon", EvidencijaRedDTO::telefon, 110, false, Prikaz.TEKST),
+            new Kolona("Tel. roditelja", EvidencijaRedDTO::telefonRoditelja, 110, false, Prikaz.TEKST),
+            new Kolona("Datum prijave", EvidencijaRedDTO::datumPrijave, 105, false, Prikaz.BROJ),
+            new Kolona("Status", EvidencijaRedDTO::status, 120, true, Prikaz.STATUS),
+            new Kolona("Kategorija", EvidencijaRedDTO::kategorija, 120, true, Prikaz.KATEGORIJA),
+            new Kolona("Primljen", EvidencijaRedDTO::primljen, 80, true, Prikaz.DA_NE),
+            new Kolona("Bodovi", EvidencijaRedDTO::bodovi, 75, true, Prikaz.BROJ),
+            new Kolona("Soba", EvidencijaRedDTO::soba, 60, true, Prikaz.BROJ),
+            new Kolona("Useljen", EvidencijaRedDTO::datumUseljenja, 95, true, Prikaz.BROJ),
+            new Kolona("Iseljen", EvidencijaRedDTO::datumIseljenja, 95, false, Prikaz.BROJ),
+            new Kolona("Ključ", EvidencijaDetaljiDijalog::kljuc, 100, true, Prikaz.TEKST),
+            new Kolona("Kartica", studentiController::kartica, 95, true, Prikaz.KARTICA),
+            new Kolona("Ljekarsko", r -> r.ljekarskoPredano() != null, 80, true, Prikaz.KVACICA),
+            new Kolona("Uvjerenje fak.", r -> r.uvjerenjeUzPrijavu() || r.uvjerenjeFakultetPredano() != null, 100, true, Prikaz.KVACICA),
+            new Kolona("Napomena", EvidencijaRedDTO::napomena, 200, false, Prikaz.TEKST)
     );
 
     private final Map<TableColumn<EvidencijaRedDTO, Object>, Kolona> kolone = new LinkedHashMap<>();
 
-    // ---------- filteri ----------
+    // =====================================================================
+    //  FILTERI I BRZI POGLEDI
+    // =====================================================================
 
     private record Filter(String naziv, Function<EvidencijaRedDTO, String> kljuc) {}
 
@@ -99,52 +111,80 @@ public class studentiController {
 
     private final Map<String, Set<String>> odabrano = new HashMap<>();
 
-    // ---------- početak ----------
+    private record Pogled(String naziv, String klasa, Predicate<EvidencijaRedDTO> uslov) {}
+
+    private final List<Pogled> pogledi = List.of(
+            new Pogled("Sve", null, r -> true),
+            new Pogled("Primljeni", "st-odobreno", EvidencijaRedDTO::primljen),
+            new Pogled("U domu", "st-zakljuceno", r -> "USELJEN".equals(r.statusSmjestaja())),
+            new Pogled("Čeka useljenje", "st-pregled",
+                    r -> "PREDLOZEN".equals(r.statusSmjestaja()) || "DODIJELJEN".equals(r.statusSmjestaja())),
+            new Pogled("Primljeni bez sobe", "st-nepotpuna", r -> r.primljen() && r.soba() == null),
+            new Pogled("Lista čekanja", "st-cekanje", r -> "Lista čekanja".equals(r.kategorija())),
+            new Pogled("Iseljeni", "st-iseljen",
+                    r -> "ISELJEN".equals(r.statusSmjestaja()) || "iseljen".equals(r.status()))
+    );
+
+    private Pogled odabraniPogled = pogledi.get(0);
+    private final ToggleGroup pogledGrupa = new ToggleGroup();
+
+    // =====================================================================
+    //  POČETAK
+    // =====================================================================
 
     @FXML
     public void initialize() {
         napraviKolone();
-        napraviTraku();
-        preimenujSortiranje();
-        btnExportHtmlPdf.setText("Izvoz u Excel");
 
         filteredList = new FilteredList<>(masterList, r -> true);
         sortedList = new SortedList<>(filteredList);
         sortedList.comparatorProperty().bind(tblStudenti.comparatorProperty());
         tblStudenti.setItems(sortedList);
+        tblStudenti.setPlaceholder(new Label("Nema studenata za odabrane filtere."));
 
-        txtSearch.setPromptText("Pretraga: ime, prezime, šifra, indeks, JMBG, soba…");
         txtSearch.textProperty().addListener((o, a, n) -> primijeniFiltere());
 
-        // dvoklik na red → detalji studenta
+        cmbGodina.setPromptText("Godina");
+        cmbGodina.setOnAction(e -> {
+            Integer g = cmbGodina.getValue();
+            if (g != null && !g.equals(godina)) ucitaj(g);
+        });
+
         tblStudenti.setRowFactory(tv -> {
             TableRow<EvidencijaRedDTO> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
-                if (e.getClickCount() == 2 && !row.isEmpty()) {
-                    new EvidencijaDetaljiDijalog(row.getItem(), () -> ucitaj(godina)).prikazi();
-                }
+                if (e.getClickCount() == 2 && !row.isEmpty()) otvoriDetalje(row.getItem());
             });
+            MenuItem detalji = new MenuItem("Detalji studenta");
+            detalji.setOnAction(e -> { if (!row.isEmpty()) otvoriDetalje(row.getItem()); });
+            row.contextMenuProperty().bind(Bindings.when(row.emptyProperty())
+                    .then((ContextMenu) null).otherwise(new ContextMenu(detalji)));
             return row;
+        });
+        tblStudenti.setOnKeyPressed(e -> {
+            EvidencijaRedDTO r = tblStudenti.getSelectionModel().getSelectedItem();
+            if (e.getCode() == KeyCode.ENTER && r != null) otvoriDetalje(r);
         });
 
         ucitaj(null);
     }
 
+    private void otvoriDetalje(EvidencijaRedDTO r) {
+        new EvidencijaDetaljiDijalog(r, () -> ucitaj(godina)).prikazi();
+    }
+
     private void napraviKolone() {
         tblStudenti.getColumns().clear();
         for (Kolona k : definicije) {
-            TableColumn<EvidencijaRedDTO, Object> col = new TableColumn<>(k.naslov());
+            TableColumn<EvidencijaRedDTO, Object> col = new TableColumn<>(k.naslov().toUpperCase());
             col.setPrefWidth(k.sirina());
             col.setVisible(k.vidljiva());
             col.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(k.vrijednost().apply(c.getValue())));
-            col.setCellFactory(tc -> new TableCell<>() {
-                @Override
-                protected void updateItem(Object v, boolean empty) {
-                    super.updateItem(v, empty);
-                    setText(empty ? null : tekst(v));
-                }
-            });
+            col.setCellFactory(tc -> celija(k.prikaz()));
             col.setComparator(studentiController::uporedi);
+            if (k.prikaz() == Prikaz.BROJ || k.prikaz() == Prikaz.KVACICA || k.prikaz() == Prikaz.DA_NE) {
+                col.setStyle("-fx-alignment: CENTER;");
+            }
             kolone.put(col, k);
             tblStudenti.getColumns().add(col);
         }
@@ -158,32 +198,65 @@ public class studentiController {
         });
     }
 
-    /** Akademska godina i broj redova u gornji red; "Kolone" pored "Filtriraj". */
-    private void napraviTraku() {
-        btnKolone.getStyleClass().add("menu-btn");
-        ((HBox) btnFiltriraj.getParent()).getChildren().add(0, btnKolone);
+    /** Ćelija prema vrsti prikaza: pilule za status/kategoriju, ✓ za predano itd. */
+    private TableCell<EvidencijaRedDTO, Object> celija(Prikaz prikaz) {
+        return new TableCell<>() {
+            private final Label oznaka = new Label();
 
-        cmbGodina.setPromptText("Godina");
-        cmbGodina.setOnAction(e -> {
-            Integer g = cmbGodina.getValue();
-            if (g != null && !g.equals(godina)) ucitaj(g);
-        });
+            @Override
+            protected void updateItem(Object v, boolean empty) {
+                super.updateItem(v, empty);
+                setText(null);
+                setGraphic(null);
+                if (empty) return;
 
-        HBox gornja = (HBox) txtSearch.getParent();
-        gornja.getChildren().add(1, new Label("Akademska godina:"));
-        gornja.getChildren().add(2, cmbGodina);
-        gornja.getChildren().add(3, lblBroj);
+                switch (prikaz) {
+                    case SIFRA -> {
+                        oznaka.setText(tekst(v));
+                        oznaka.getStyleClass().setAll("label", "pr-sifra");
+                        setGraphic(oznaka);
+                    }
+                    case STATUS -> pilula(v == null ? null : tekst(v),
+                            v == null ? null : prijaveController.statusKlasa(tekst(v)));
+                    case KATEGORIJA -> pilula(v == null || "—".equals(v) ? null : tekst(v), kategorijaKlasa(tekst(v)));
+                    case DA_NE -> pilula(Boolean.TRUE.equals(v) ? "Da" : "Ne",
+                            Boolean.TRUE.equals(v) ? "st-odobreno" : "st-iseljen");
+                    case KARTICA -> pilula(v == null ? null : tekst(v),
+                            "Preuzeta".equals(v) ? "st-odobreno" : "st-iseljen");
+                    case KVACICA -> {
+                        boolean da = Boolean.TRUE.equals(v);
+                        oznaka.setText(da ? "✓" : "—");
+                        oznaka.getStyleClass().setAll("label", da ? "pr-kvacica" : "pr-sitno");
+                        setGraphic(oznaka);
+                    }
+                    default -> setText(tekst(v));
+                }
+            }
+
+            private void pilula(String tekst, String klasa) {
+                if (tekst == null || tekst.isBlank()) {
+                    setText("—");
+                    return;
+                }
+                oznaka.setText(Character.toUpperCase(tekst.charAt(0)) + tekst.substring(1));
+                oznaka.getStyleClass().setAll("label", "pr-status", klasa != null ? klasa : "st-ostalo");
+                setGraphic(oznaka);
+            }
+        };
     }
 
-    private void preimenujSortiranje() {
-        List<String> nazivi = List.of("Prezime A–Z", "Prezime Z–A", "Šifra uzlazno",
-                "Šifra silazno", "Bodovi uzlazno", "Bodovi silazno");
-        for (int i = 0; i < Math.min(nazivi.size(), btnSortiraj.getItems().size()); i++) {
-            btnSortiraj.getItems().get(i).setText(nazivi.get(i));
-        }
+    private static String kategorijaKlasa(String k) {
+        return switch (k == null ? "" : k) {
+            case "Brucoš" -> "st-pregled";
+            case "S uslovom" -> "st-odobreno";
+            case "Lista čekanja" -> "st-cekanje";
+            default -> "st-ostalo";
+        };
     }
 
-    // ---------- učitavanje ----------
+    // =====================================================================
+    //  UČITAVANJE
+    // =====================================================================
 
     private void ucitaj(Integer g) {
         Task<EvidencijaDTO> task = new Task<>() {
@@ -198,10 +271,11 @@ public class studentiController {
             masterList.setAll(d.redovi());
             azurirajGodine();
             napuniFiltere();
+            napraviPoglede();
+            osvjeziPodnaslov();
             primijeniFiltere();
         });
         task.setOnFailed(e -> prikaziGresku(task.getException(), "Greška pri učitavanju evidencije."));
-
         Thread t = new Thread(task);
         t.setDaemon(true);
         t.start();
@@ -220,7 +294,49 @@ public class studentiController {
         cmbGodina.setValue(godina);
     }
 
-    // ---------- filteri ----------
+    private void osvjeziPodnaslov() {
+        long uDomu = masterList.stream().filter(r -> "USELJEN".equals(r.statusSmjestaja())).count();
+        List<String> d = new ArrayList<>();
+        d.add("Centralna evidencija");
+        if (godina != null) d.add(godina + "/" + (godina + 1));
+        d.add(masterList.size() + " " + studenata(masterList.size()));
+        if (uDomu > 0) d.add(uDomu + " u domu");
+        lblPodnaslov.setText(String.join("   ·   ", d));
+    }
+
+    // =====================================================================
+    //  POGLEDI (pilule)
+    // =====================================================================
+
+    private void napraviPoglede() {
+        boxPogledi.getChildren().clear();
+        pogledGrupa.getToggles().clear();
+
+        for (Pogled p : pogledi) {
+            long n = masterList.stream().filter(p.uslov()).count();
+            if (n == 0 && p != pogledi.get(0) && p != odabraniPogled) continue;
+
+            ToggleButton t = new ToggleButton(p.naziv() + "   " + n);
+            t.getStyleClass().add("pr-chip");
+            t.setToggleGroup(pogledGrupa);
+            if (p.klasa() != null) {
+                Circle tacka = new Circle(4);
+                tacka.getStyleClass().addAll("pr-tacka", p.klasa());
+                t.setGraphic(tacka);
+            }
+            t.setSelected(p == odabraniPogled);
+            t.setOnAction(e -> {
+                odabraniPogled = p;
+                t.setSelected(true);
+                primijeniFiltere();
+            });
+            boxPogledi.getChildren().add(t);
+        }
+    }
+
+    // =====================================================================
+    //  FILTERI
+    // =====================================================================
 
     private void napuniFiltere() {
         btnFiltriraj.getItems().clear();
@@ -243,14 +359,6 @@ public class studentiController {
             }
             btnFiltriraj.getItems().add(meni);
         }
-
-        MenuItem ponisti = new MenuItem("Poništi sve filtere");
-        ponisti.setOnAction(e -> {
-            odabrano.values().forEach(Set::clear);
-            napuniFiltere();
-            primijeniFiltere();
-        });
-        btnFiltriraj.getItems().addAll(new SeparatorMenuItem(), ponisti);
     }
 
     private String kljucFiltera(Filter f, EvidencijaRedDTO r) {
@@ -262,6 +370,7 @@ public class studentiController {
         String q = txtSearch.getText() == null ? "" : txtSearch.getText().trim().toLowerCase();
 
         filteredList.setPredicate(r -> {
+            if (!odabraniPogled.uslov().test(r)) return false;
             if (!q.isEmpty()) {
                 String sve = String.join(" ",
                         n(r.sifra()), n(r.ime()), n(r.prezime()), n(r.brojIndeksa()), n(r.jmbg()),
@@ -278,32 +387,54 @@ public class studentiController {
 
         long aktivnih = odabrano.values().stream().mapToLong(Set::size).sum();
         btnFiltriraj.setText(aktivnih > 0 ? "Filtriraj (" + aktivnih + ")" : "Filtriraj");
-        lblBroj.setText(filteredList.size() + " od " + masterList.size());
+
+        int n = filteredList.size();
+        lblBroj.setText(n == masterList.size()
+                ? n + " " + studenata(n)
+                : "Prikazano " + n + " od " + masterList.size() + " " + studenata(masterList.size()));
+
+        boolean aktivno = !q.isEmpty() || aktivnih > 0 || odabraniPogled != pogledi.get(0);
+        btnOcisti.setVisible(aktivno);
+        btnOcisti.setManaged(aktivno);
     }
-
-    // ---------- sortiranje (stavke iz FXML-a) ----------
-
-    @FXML private void sortImeAZ()       { sortiraj("Prezime", TableColumn.SortType.ASCENDING); }
-    @FXML private void sortImeZA()       { sortiraj("Prezime", TableColumn.SortType.DESCENDING); }
-    @FXML private void sortIdUzlazno()   { sortiraj("Šifra", TableColumn.SortType.ASCENDING); }
-    @FXML private void sortIdSilazno()   { sortiraj("Šifra", TableColumn.SortType.DESCENDING); }
-    @FXML private void sortProsjekAsc()  { sortiraj("Bodovi", TableColumn.SortType.ASCENDING); }
-    @FXML private void sortProsjekDesc() { sortiraj("Bodovi", TableColumn.SortType.DESCENDING); }
-
-    private void sortiraj(String naslov, TableColumn.SortType smjer) {
-        kolone.keySet().stream()
-                .filter(c -> c.getText().equals(naslov))
-                .findFirst()
-                .ifPresent(c -> {
-                    c.setSortType(smjer);
-                    tblStudenti.getSortOrder().setAll(c);
-                });
-    }
-
-    // ---------- izvoz u Excel (dugme iz FXML-a) ----------
 
     @FXML
-    private void onExportHtmlPdf() {
+    private void onOcisti() {
+        txtSearch.clear();
+        odabrano.values().forEach(Set::clear);
+        odabraniPogled = pogledi.get(0);
+        napuniFiltere();
+        napraviPoglede();
+        primijeniFiltere();
+    }
+
+    // =====================================================================
+    //  SORTIRANJE
+    // =====================================================================
+
+    @FXML private void sortPrezimeAZ()     { sortiraj("Prezime", TableColumn.SortType.ASCENDING); }
+    @FXML private void sortPrezimeZA()     { sortiraj("Prezime", TableColumn.SortType.DESCENDING); }
+    @FXML private void sortBodoviSilazno() { sortiraj("Bodovi", TableColumn.SortType.DESCENDING); }
+    @FXML private void sortBodoviUzlazno() { sortiraj("Bodovi", TableColumn.SortType.ASCENDING); }
+    @FXML private void sortSifra()         { sortiraj("Šifra", TableColumn.SortType.ASCENDING); }
+    @FXML private void sortSoba()          { sortiraj("Soba", TableColumn.SortType.ASCENDING); }
+
+    private void sortiraj(String naslov, TableColumn.SortType smjer) {
+        kolone.forEach((c, k) -> {
+            if (k.naslov().equals(naslov)) {
+                c.setVisible(true);
+                c.setSortType(smjer);
+                tblStudenti.getSortOrder().setAll(c);
+            }
+        });
+    }
+
+    // =====================================================================
+    //  IZVOZ U EXCEL
+    // =====================================================================
+
+    @FXML
+    private void onExport() {
         if (sortedList.isEmpty()) return;
 
         List<TableColumn<EvidencijaRedDTO, ?>> vidljive = tblStudenti.getColumns().stream()
@@ -311,7 +442,7 @@ public class studentiController {
                 .filter(kolone::containsKey)
                 .toList();
 
-        List<String> naslovi = vidljive.stream().map(TableColumn::getText).toList();
+        List<String> naslovi = vidljive.stream().map(c -> kolone.get(c).naslov()).toList();
         List<Integer> sirine = vidljive.stream().map(c -> (int) Math.max(8, c.getWidth() / 7)).toList();
 
         List<List<Object>> redovi = new ArrayList<>();
@@ -334,19 +465,30 @@ public class studentiController {
         try {
             String imeLista = "Studenti " + godina + "-" + String.format("%02d", (godina + 1) % 100);
             XlsxPisac.zapisi(file, List.of(new XlsxPisac.Tabela(imeLista, naslovi, sirine, redovi)));
-            new Alert(Alert.AlertType.INFORMATION, "Izvezeno " + redovi.size() + " studenata.", ButtonType.OK)
-                    .showAndWait();
+            Alert a = new Alert(Alert.AlertType.INFORMATION, "Izvezeno " + redovi.size() + " studenata.", ButtonType.OK);
+            a.setHeaderText(null);
+            a.showAndWait();
         } catch (RuntimeException ex) {
             prikaziGresku(ex, "Greška pri izvozu u Excel.");
         }
     }
 
-    // ---------- pomoćne ----------
+    // =====================================================================
+    //  POMOĆNE
+    // =====================================================================
 
     static String kartica(EvidencijaRedDTO r) {
         if (r.karticaRazduzena() != null) return "Razdužena";
         if (r.karticaPreuzeta() != null) return "Preuzeta";
         return null;
+    }
+
+    /** 1 student, 2–4 studenta, 5+ studenata (21 student, 22 studenta…). */
+    private static String studenata(long n) {
+        long d = n % 10, s = n % 100;
+        if (d == 1 && s != 11) return "student";
+        if (d >= 2 && d <= 4 && (s < 12 || s > 14)) return "studenta";
+        return "studenata";
     }
 
     private static String tekst(Object v) {
@@ -371,7 +513,8 @@ public class studentiController {
 
     private void prikaziGresku(Throwable ex, String opsta) {
         if (!(ex instanceof ApiException)) ex.printStackTrace();
-        String poruka = ex instanceof ApiException ? ex.getMessage() : opsta;
-        new Alert(Alert.AlertType.ERROR, poruka).showAndWait();
+        Alert a = new Alert(Alert.AlertType.ERROR, ex instanceof ApiException ? ex.getMessage() : opsta);
+        a.setHeaderText(null);
+        a.showAndWait();
     }
 }
