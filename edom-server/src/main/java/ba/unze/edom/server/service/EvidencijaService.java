@@ -113,7 +113,8 @@ public class EvidencijaService {
                 sm != null ? sm.getLjekarskoPredano() : null,
                 sm != null ? sm.getUvjerenjeFakultetPredano() : null,
                 uvjerenjeUzPrijavu,
-                s.getNapomena());
+                s.getNapomena(),
+                p.getNapomena());
     }
 
     private String kategorija(Prijava p, String status) {

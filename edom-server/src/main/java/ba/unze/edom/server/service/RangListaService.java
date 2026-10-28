@@ -30,6 +30,7 @@ public class RangListaService {
     private final PrijavaRepository prijavaRepository;
     private final BodovanjeService bodovanjeService;
     private final RangRaspodjela raspodjela;
+    private final PostavkeService postavke;
 
     @Value("${edom.rang.kapacitet:220}")
     private int kapacitetPoDefaultu;
@@ -59,7 +60,7 @@ public class RangListaService {
     /** Isti redoslijed kao na desktopu; viši: prvo s uslovom, pa lista čekanja. */
     @Transactional(readOnly = true)
     public RangListaDTO zaGodinu(Integer godina) {
-        RangListaAdminDTO a = izracunaj(godina, kapacitetPoDefaultu, false);
+        RangListaAdminDTO a = izracunaj(godina, postavke.kapacitet(), false);
         List<RangRedDTO> visi = new ArrayList<>(a.saUslovom());
         visi.addAll(a.listaCekanja());
         return new RangListaDTO(a.akademskaGodina(), javno(a.brucosi()), javno(visi));
@@ -70,9 +71,9 @@ public class RangListaService {
     @Transactional(readOnly = true)
     public RangListaAdminDTO zaAdmina(Integer godina, Integer kapacitet, boolean popuniBrucosima) {
         Integer g = godina != null ? godina : prijavaRepository.zadnjaAkademskaGodina();
-        int kap = kapacitet != null && kapacitet > 0 ? kapacitet : kapacitetPoDefaultu;
+        int kap = kapacitet != null && kapacitet > 0 ? kapacitet : postavke.kapacitet();
         if (g == null) {
-            return raspodjela.rasporedi(null, null, List.of(), kap, udioBrucosa, popuniBrucosima);
+            return raspodjela.rasporedi(null, null, List.of(), kap, postavke.udioBrucosa(), popuniBrucosima);
         }
         return izracunaj(g, kap, popuniBrucosima);
     }
@@ -85,7 +86,7 @@ public class RangListaService {
                 .map(this::boduj)
                 .map(this::uRed)
                 .toList();
-        return raspodjela.rasporedi(naziv(godina), godina, redovi, kapacitet, udioBrucosa, popuniBrucosima);
+        return raspodjela.rasporedi(naziv(godina), godina, redovi, kapacitet, postavke.udioBrucosa(), popuniBrucosima);
     }
 
     private Rangirana boduj(Prijava p) {

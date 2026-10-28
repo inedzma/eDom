@@ -74,7 +74,7 @@
                 <b>Useljenje</b>
                 <span th:if="${lista.useljenje() != null}">
                     od <b th:text="${lista.useljenje()}">27.10.2026. – 04.11.2026.</b>,
-                    svaki radni dan od 8:30 do 14:00 sati.
+                    svaki radni dan od <span th:text="${postavke.useljenjeRadnoVrijeme}">8:30 – 14:00</span> sati.
                 </span>
                 <span th:if="${lista.useljenje() == null}">Termin useljenja biće objavljen naknadno.</span>
             </div>
@@ -249,7 +249,7 @@
                         <li th:if="${lista.useljenje() != null}">
                             Useljenje sa ove rang liste vršit će se od
                             <b th:text="${lista.useljenje()}">27.10.2026. – 04.11.2026.</b>,
-                            svaki radni dan od <b>8:30 do 14:00</b> sati.
+                            svaki radni dan od <b th:text="${postavke.useljenjeRadnoVrijeme}">8:30 – 14:00</b> sati.
                         </li>
                         <li th:if="${lista.useljenje() == null}">Termin useljenja biće objavljen naknadno.</li>
                         <li>Student se može useliti <b>samo lično</b>.</li>
@@ -269,7 +269,7 @@
                             <i>„sposoban za kolektivni smještaj“</i>.</li>
                         <li><b>Dokaz o uplati</b> troškova smještaja i ishrane za
                             <span th:text="${lista.mjesecUplate()}">oktobar</span>
-                            u iznosu od <b>150,00 KM</b>.</li>
+                            u iznosu od <b th:text="${postavke.uplataPriUseljenju} + ' KM'">150,00 KM</b>.
                     </ul>
                 </article>
 
@@ -281,9 +281,9 @@
                     </h3>
                     <ul>
                         <li>Žalbe na rang listu podnose se <b>pismeno</b> Komisiji za žalbe najkasnije
-                            <b>7 dana od dana objave</b><span th:if="${lista.zalbeDo() != null}">
-                            (do <b th:text="${lista.zalbeDo()}">30.10.2026.</b>)</span>.</li>
-                        <li>Adresa: Studentski centar Zenica, Crkvice 50, 72000 Zenica.</li>
+                            <b th:text="${postavke.rokZalbeDana} + ' dana od dana objave'">7 dana od dana objave</b><span th:if="${lista.zalbeDo(postavke.rokZalbeDana) != null}">
+                            (do <b th:text="${lista.zalbeDo(postavke.rokZalbeDana)}">30.10.2026.</b>)</span>.</li>
+                        <li>Adresa: <span th:text="'Studentski centar Zenica, ' + ${postavke.adresa}">Studentski centar Zenica, Crkvice 50, 72000 Zenica</span>.</li>
                         <li>Poslije ovog roka žalbe se neće razmatrati.</li>
                     </ul>
                 </article>
@@ -295,9 +295,9 @@
                         Informacije o useljenju
                     </h3>
                     <ul class="kontakt">
-                        <li>Telefon: <a href="tel:+38732226604">032 226 604</a></li>
-                        <li>E-mail: <a href="mailto:tehnickisekretar.sc@unze.ba">tehnickisekretar.sc@unze.ba</a></li>
-                        <li>Adresa: Crkvice 50, 72000 Zenica</li>
+                        <li>Telefon: <a th:href="'tel:' + ${#strings.replace(postavke.telefon, ' ', '')}" th:text="${postavke.telefon}">032 226 604</a></li>
+                        <li>E-mail: <a th:href="'mailto:' + ${postavke.email}" th:text="${postavke.email}">tehnickisekretar.sc@unze.ba</a></li>
+                        <li>Adresa: <span th:text="${postavke.adresa}">Crkvice 50, 72000 Zenica</span></li>
                     </ul>
                 </article>
             </div>
@@ -314,10 +314,10 @@
                 </p>
                 <p>
                     Na osnovu Odluke o raspisanom Konkursu Upravnog odbora „JU Univerziteta u Zenici“ broj:
-                    01-01-1-1495/17 od 28.04.2017. godine, Odluke Upravnog odbora o usvajanju Kriterija za bodovanje
-                    aplikacija studenata za prijem na smještaj i ishranu u Studentski centar Univerziteta u Zenici
-                    broj: 01-01-1-1549/25 od 14.4.2025. godine i Odluke direktora Studentskog centra Univerziteta
-                    u Zenici o formiranju Komisije za prijem na smještaj i raspored soba, Komisija je nakon evaluacije
+                    <span th:text="${postavke.brojOdlukeKonkurs}">01-01-1-1495/17 od 28.04.2017.</span> godine, Odluke Upravnog odbora o usvajanju
+                    Kriterija za bodovanje aplikacija studenata za prijem na smještaj i ishranu u Studentski centar Univerziteta u Zenici
+                    broj: <span th:text="${postavke.brojOdlukeKriteriji}">01-01-1-1549/25 od 14.4.2025.</span> godine i Odluke direktora Studentskog centra
+                    Univerziteta u Zenici o formiranju Komisije za prijem na smještaj i raspored soba, Komisija je nakon evaluacije
                     zaprimljenih aplikacija konstatovala da su pravo na uslovan prijem na smještaj i ishranu
                     ostvarili studenti navedeni na ovoj listi.
                 </p>

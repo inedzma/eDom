@@ -1,6 +1,8 @@
 package service.export;
 
+import api.PostavkeApi;
 import ba.unze.edom.common.dto.KategorijaRanga;
+import ba.unze.edom.common.dto.PostavkeDTO;
 import ba.unze.edom.common.dto.RangListaAdminDTO;
 import ba.unze.edom.common.dto.RangRedDTO;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
@@ -16,12 +18,10 @@ import java.util.stream.Stream;
 
 public class RangListaHtmlExportService {
 
-    // TODO: mijenja se svake godine — kasnije iz postavki konkursa
-    private static final String ODLUKA_KONKURS = "01-01-1-1495/17 od 28.04.2017. godine";
-    private static final String ODLUKA_KRITERIJI = "01-01-1-1549/25 od 14.4.2025. godine";
-
     private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static final String FONT = "/fonts/DejaVuSans.ttf";
+    private static final String[] MJESECI = {"januar", "februar", "mart", "april", "maj", "juni",
+            "juli", "august", "septembar", "oktobar", "novembar", "decembar"};
 
     public static final List<RangKolona> JAVNE_KOLONE =
             List.of(RangKolona.REDNI_BROJ, RangKolona.SIFRA, RangKolona.UKUPNO);
@@ -49,7 +49,8 @@ public class RangListaHtmlExportService {
         if (getClass().getResource(FONT) == null) {
             throw new IllegalStateException("Font DejaVuSans.ttf nije pronađen.");
         }
-        String html = sastaviHtml(lista, o);
+        PostavkeDTO p = PostavkeApi.ucitaj();   // telefon, direktorica, odluke… iz Postavki
+        String html = sastaviHtml(lista, o, p);
 
         try (OutputStream os = new FileOutputStream(file)) {
             PdfRendererBuilder builder = new PdfRendererBuilder();
@@ -70,11 +71,12 @@ public class RangListaHtmlExportService {
 
     // ---------- HTML ----------
 
-    private String sastaviHtml(RangListaAdminDTO lista, ExportOpcije o) {
+    private String sastaviHtml(RangListaAdminDTO lista, ExportOpcije o, PostavkeDTO p) {
         List<RangKolona> kolone = o.kolone();
         String akGod = kratkaGodina(lista.akademskaGodina());
         String danas = LocalDate.now().format(DF);
         String vrsta = o.konacna() ? "KONAČNE" : "PRELIMINARNE";
+        String funkcija = n(p.direktorFunkcija(), "DIREKTORICA");
 
         StringBuilder html = new StringBuilder();
         html.append(head(kolone.size() > 6));
@@ -83,15 +85,15 @@ public class RangListaHtmlExportService {
                 <div class="header">
                     JU UNIVERZITET U ZENICI<br/>
                     OJ STUDENTSKI CENTAR ZENICA<br/>
-                    Broj: 09-130-020-_____/%02d<br/>
+                    Broj: %s-_____/%02d<br/>
                     Zenica, %s
                 </div>
-                """.formatted(LocalDate.now().getYear() % 100, danas));
+                """.formatted(esc(n(p.brojRangListe(), "09-130-020")), LocalDate.now().getYear() % 100, danas));
 
         html.append("""
                 <p class="center">
                 Na osnovu člana 161. stav (2) Statuta Univerziteta u Zenici,
-                direktorica Studentskog centra Univerziteta u Zenici, donosim
+                %s Studentskog centra Univerziteta u Zenici, donosim
                 </p>
                 <p class="center"><b>O D L U K U</b></p>
                 <p class="center italic">
@@ -100,17 +102,18 @@ public class RangListaHtmlExportService {
                 </p>
                 <p>
                 Na osnovu Odluke o raspisanom Konkursu Upravnog odbora
-                "JU Univerziteta u Zenici" broj: %s,
+                "JU Univerziteta u Zenici" broj: %s godine,
                 Odluke Upravnog odbora o usvajanju Kriterija za bodovanje aplikacija
                 studenata za prijem na smještaj i ishranu u Studentski centar
-                Univerziteta u Zenici u akademskoj %s. godini broj: %s,
+                Univerziteta u Zenici u akademskoj %s. godini broj: %s godine,
                 Odluke direktora Studentskog centra Univerziteta u Zenici o formiranju
                 Komisije za prijem na smještaj i raspored soba, predmetna Komisija je
                 nakon evaluacije zaprimljenih aplikacija konstatovala da su pravo na
                 %s na smještaj–ishranu u Studentskom centru Univerziteta u Zenici
                 ostvarili sljedeći studenti:
                 </p>
-                """.formatted(vrsta, esc(akGod), ODLUKA_KONKURS, esc(akGod), ODLUKA_KRITERIJI,
+                """.formatted(funkcija.toLowerCase(Locale.ROOT), vrsta, esc(akGod),
+                esc(n(p.brojOdlukeKonkurs(), "")), esc(akGod), esc(n(p.brojOdlukeKriteriji(), "")),
                 o.konacna() ? "prijem" : "uslovan prijem"));
 
         for (KategorijaRanga k : KategorijaRanga.values()) {
@@ -133,7 +136,7 @@ public class RangListaHtmlExportService {
             html.append(tabela(svi, saKategorijom, "objedinjeno-table"));
         }
 
-        html.append(podnozje(lista, o, akGod));
+        html.append(podnozje(lista, o, akGod, p));
         html.append("</body></html>");
         return html.toString();
     }
@@ -193,7 +196,8 @@ public class RangListaHtmlExportService {
         return sb.append("</tbody></table>").toString();
     }
 
-    private String podnozje(RangListaAdminDTO l, ExportOpcije o, String akGod) {
+    private String podnozje(RangListaAdminDTO l, ExportOpcije o, String akGod, PostavkeDTO p) {
+        String mjesec = MJESECI[o.useljenjeOd().getMonthValue() - 1];
         return """
                 <div class="footer">
                 <p>
@@ -206,7 +210,7 @@ public class RangListaHtmlExportService {
                 <p><b>
                 Useljenje u Studentski centar sa ove rang liste vršit će se od
                 <span style="color:red;">%s – %s</span>,
-                svaki radni dan u periodu od 8:30 do 14:00 sati.
+                svaki radni dan u periodu od %s sati.
                 </b></p>
                 <p>
                 Isteklom ovog roka student gubi pravo na smještaj u tekućoj akademskoj
@@ -215,13 +219,13 @@ public class RangListaHtmlExportService {
                 </p>
                 <p>
                 Žalbe na rang listu podnose se pismeno Komisiji za žalbe najkasnije
-                7 dana od dana objave. Žalbe slati na adresu:
-                Studentski centar Zenica, Crkvice 50, 72000 Zenica.
+                %d dana od dana objave. Žalbe slati na adresu:
+                Studentski centar Zenica, %s.
                 Poslije ovog roka žalbe se neće razmatrati.
                 </p>
                 <p>
                 Informacije vezano za useljenje možete dobiti na broj telefona
-                032 226 604 ili putem e-maila: <u>tehnickisekretar.sc@unze.ba</u>
+                %s ili putem e-maila: <u>%s</u>
                 </p>
                 <p>
                 Student u Studentski centar se može useliti samo lično, a prilikom
@@ -230,8 +234,8 @@ public class RangListaHtmlExportService {
                 <p>
                 <b>Ljekarsko uvjerenje</b> (ne starije od 6 mjeseci) sa naznakom
                 <i>sposoban za kolektivni smještaj</i>.<br/>
-                <b>Dokaz o uplati</b> troškova smještaja i ishrane za oktobar
-                u iznosu od <b>150,00 KM</b>.
+                <b>Dokaz o uplati</b> troškova smještaja i ishrane za %s
+                u iznosu od <b>%s KM</b>.
                 </p>
                 <p>Odluka stupa na snagu danom donošenja.</p>
 
@@ -241,13 +245,19 @@ public class RangListaHtmlExportService {
                       Dostavljeno:<br/>1x članovima komisije<br/>1x oglasna tabla<br/>1x a/a
                     </td>
                     <td style="width:50%%; text-align:right; vertical-align:top;">
-                      <b>DIREKTORICA</b><br/>mr.sc. Niždžara Halilović-Čustović
+                      <b>%s</b><br/>%s
                     </td>
                   </tr>
                 </table>
                 </div>
                 """.formatted(l.kapacitet(), l.primljenoBrucosa(), l.primljenoVisih(), l.slobodno(),
-                esc(akGod), o.useljenjeOd().format(DF), o.useljenjeDo().format(DF));
+                esc(akGod), o.useljenjeOd().format(DF), o.useljenjeDo().format(DF),
+                esc(n(p.useljenjeRadnoVrijeme(), "8:30 – 14:00")),
+                p.rokZalbeDana() != null ? p.rokZalbeDana() : 7,
+                esc(n(p.adresa(), "Crkvice 50, 72000 Zenica")),
+                esc(n(p.telefon(), "")), esc(n(p.email(), "")),
+                mjesec, esc(n(p.uplataPriUseljenju(), "150,00")),
+                esc(n(p.direktorFunkcija(), "DIREKTORICA")), esc(n(p.direktor(), "")));
     }
 
     // ---------- pomoćne ----------
@@ -275,6 +285,10 @@ public class RangListaHtmlExportService {
         if (ak == null) return "";
         String[] d = ak.split("/");
         return d.length == 2 && d[1].length() == 4 ? d[0] + "/" + d[1].substring(2) : ak;
+    }
+
+    private static String n(String s, String zamjena) {
+        return s == null || s.isBlank() ? zamjena : s;
     }
 
     private static String esc(String text) {

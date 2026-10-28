@@ -45,27 +45,18 @@ public class ObrasciService {
     private EntityManager em;
 
     private final PrijavaRepository prijavaRepository;
+    private final PostavkeService postavke;
     private final Path ugovorObrazac;
     private final Path reversObrazac;
-    private final String cijena;
-    private final String direktor;
-    private final String periodOd;
-    private final String periodDo;
 
     public ObrasciService(PrijavaRepository prijavaRepository,
+                          PostavkeService postavke,
                           @Value("${edom.obrasci.ugovor:data/obrasci/ugovor.docx}") String ugovor,
-                          @Value("${edom.obrasci.revers:data/obrasci/revers.docx}") String revers,
-                          @Value("${edom.ugovor.cijena:}") String cijena,
-                          @Value("${edom.ugovor.direktor:}") String direktor,
-                          @Value("${edom.ugovor.period-od:01.10.}") String periodOd,
-                          @Value("${edom.ugovor.period-do:15.07.}") String periodDo) {
+                          @Value("${edom.obrasci.revers:data/obrasci/revers.docx}") String revers) {
         this.prijavaRepository = prijavaRepository;
+        this.postavke = postavke;
         this.ugovorObrazac = Path.of(ugovor);
         this.reversObrazac = Path.of(revers);
-        this.cijena = cijena;
-        this.direktor = direktor;
-        this.periodOd = periodOd;
-        this.periodDo = periodDo;
     }
 
     @Transactional(readOnly = true)
@@ -107,10 +98,11 @@ public class ObrasciService {
         v.put("LICNA_KARTA", n(s.getBrojLicneKarte()));
         v.put("JMBG", n(s.getJmbg()));
         v.put("SOBA", sm.getSoba() != null ? String.valueOf(sm.getSoba().getBroj()) : "");
-        v.put("PERIOD_OD", periodOd + g + ".");
-        v.put("PERIOD_DO", periodDo + (g + 1) + ".");
-        v.put("CIJENA", cijena);
-        v.put("DIREKTOR", direktor);
+        var ps = postavke.trenutne();
+        v.put("PERIOD_OD", n(ps.ugovorPeriodOd()) + g + ".");
+        v.put("PERIOD_DO", n(ps.ugovorPeriodDo()) + (g + 1) + ".");
+        v.put("CIJENA", n(ps.cijenaSmjestaja()));
+        v.put("DIREKTOR", n(ps.direktor()));
         v.put("GODINA", String.valueOf(danas.getYear()));
         v.put("DANAS", danas.format(DATUM));
         v.put("AKADEMSKA_GODINA", g + "/" + (g + 1));

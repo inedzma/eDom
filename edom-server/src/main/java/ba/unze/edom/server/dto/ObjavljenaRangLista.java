@@ -56,10 +56,11 @@ public record ObjavljenaRangLista(
     }
 
     /** Posljednji dan za žalbu: 7 dana od objave. */
-    public String zalbeDo() {
+    /** Posljednji dan za žalbu: X dana od objave (X iz Postavki). */
+    public String zalbeDo(Integer dana) {
         try {
             LocalDate d = LocalDate.parse(objavljeno.substring(0, 10), DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-            return d.plusDays(7).format(D);
+            return d.plusDays(dana != null ? dana : 7).format(D);
         } catch (Exception e) {
             return null;
         }

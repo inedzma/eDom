@@ -18,6 +18,8 @@
             <span class="eyebrow">Studentski portal</span>
             <h1>Dobro došli, <span th:text="${ime}">korisnik</span></h1>
             <p>Ovdje možete podnijeti prijavu za smještaj, pratiti njen status i bodove.</p>
+            <span class="konkurs-status" th:classappend="${konkurs.otvoren} ? 'ks--da' : 'ks--ne'"
+                  th:text="'Konkurs ' + ${konkurs.godina} + ': ' + ${konkurs.status}">Prijave su otvorene.</span>
         </div>
         <a class="btn btn-primary btn-lg" th:href="@{/student/prijava/nova}">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -84,7 +86,7 @@
                     Bodovi se potvrđuju tek kada dokumenti stignu. Spisak dokumenata za svoju prijavu vidite klikom na
                     <b>„Dokumenti“</b>.
                 </p>
-                <span class="dn-adresa">Studentski centar Zenica, Crkvice 50, 72000 Zenica</span>
+                <span class="dn-adresa" th:text="'Studentski centar Zenica, ' + ${postavke.adresa}">Studentski centar Zenica, Crkvice 50, 72000 Zenica</span>
             </div>
         </div>
 
@@ -151,16 +153,16 @@
 
     <!-- ======================= UKRATKO O PRIJAVI ======================= -->
     <section class="up-kratko-blok">
-        <span class="up-eyebrow">Konkurs 2026/2027</span>
+        <span class="up-eyebrow" th:text="'Konkurs ' + ${konkurs.godina}">Konkurs 2026/2027</span>
         <h2>Ukratko o prijavi</h2>
 
         <div class="up-kratko">
             <ul class="up-kratko-list">
-                <li><span><b>Ko se može prijaviti:</b> redovni studenti fakulteta Univerziteta u Zenici čije je prebivalište najmanje 20 km od Zenice.</span></li>
-                <li><span><b>Broj mjesta:</b> 220, od čega do 35% za brucoše.</span></li>
+                <li><span><b>Ko se može prijaviti:</b> redovni studenti fakulteta Univerziteta u Zenici čije je prebivalište najmanje <th:block th:text="${postavke.minUdaljenostKm}">20</th:block> km od Zenice.</span></li>
+                <li><span><b>Broj mjesta:</b> <th:block th:text="${postavke.kapacitet}">220</th:block>, od čega do <th:block th:text="${postavke.udioBrucosaPosto}">35</th:block>% za brucoše.</span></li>
                 <li><span><b>Prijava online:</b> popunite prijavu i priložite skenirane dokumente.</span></li>
                 <li><span><b>Originali:</b> dokumenti se boduju tek kad originali ili ovjerene kopije stignu u Studentski centar (Crkvice 50, Zenica).</span></li>                <li><span><b>Dostava dokumenata:</b> skenovi priloženi online služe samo za prethodni pregled. Originale ili ovjerene kopije obavezno dostavite poštom ili lično u Studentski centar (Crkvice 50, 72000 Zenica). Bodovi se potvrđuju tek kad dokumenti stignu.</span></li>
-                <li><span><b>Rokovi:</b> konkurs traje 30 dana od objave; dokumenti ne smiju biti stariji od 6 mjeseci.</span></li>
+                <li><span><b>Rok za prijave:</b> <th:block th:text="${konkurs.status}">Prijave su otvorene.</th:block> Dokumenti ne smiju biti stariji od 6 mjeseci.</span></li>
             </ul>
 
             <div class="up-kratko-side">

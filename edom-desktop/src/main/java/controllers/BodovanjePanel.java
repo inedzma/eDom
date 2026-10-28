@@ -17,12 +17,7 @@ import java.util.function.Predicate;
 /** Tabela bodovanja sa svim kriterijima; admin mijenja podatke, kriterije i provjeru. */
 public class BodovanjePanel extends VBox {
 
-    private static final String P_BRUCOS = "brucoš: prosjek × 9 + 1";
-    private static final String P_USPJEH = "prosjek × 3,5 + ispiti × 1,8 + godina (2.=3, 3.=5, 4.=7, 5.=9, 6.=10)";
-    private static final String P_UPIS = "2. put i više: −3";
-    private static final String P_UDALJENOST = "<50 km 0 · <80 4 · <120 8 · <160 12 · više 15";
-    private static final String P_PRIMANJA = "po članu: <110 KM 20 · ≤150 15 · ≤200 8 · ≤300 4 · ≤400 2 · više 0";
-
+    private final String P_BRUCOS, P_USPJEH, P_UPIS, P_UDALJENOST, P_PRIMANJA;
     private final BodovanjeDetaljnoDTO d;
     private final Runnable nakonSnimanja;
 
@@ -34,8 +29,14 @@ public class BodovanjePanel extends VBox {
 
     private final List<KRed> redovi = new ArrayList<>();
 
-    public BodovanjePanel(BodovanjeDetaljnoDTO d, Runnable nakonSnimanja) {
+    public BodovanjePanel(BodovanjeDetaljnoDTO d, PostavkeDTO ps, Runnable nakonSnimanja) {
         super(12);
+        P_BRUCOS = "brucoš: prosjek × " + ps.brucosMnozilac() + " + " + ps.brucosDodatak();
+        P_USPJEH = "prosjek × " + ps.prosjekMnozilac() + " + ispiti × " + ps.ispitMnozilac()
+                + " + bonus za godinu (" + ps.bonusGodine() + ")";
+        P_UPIS = "2. put i više: " + ps.kaznaPonovniUpis();
+        P_UDALJENOST = ps.udaljenostBodovi();
+        P_PRIMANJA = "po članu (KM): " + ps.primanjaBodovi();
         this.d = d;
         this.nakonSnimanja = nakonSnimanja;
 

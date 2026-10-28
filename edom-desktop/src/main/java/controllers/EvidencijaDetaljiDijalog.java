@@ -2,6 +2,7 @@ package controllers;
 
 import api.ApiException;
 import api.EvidencijaApi;
+import api.PrijavaApi;
 import ba.unze.edom.common.dto.EvidencijaOznakeDTO;
 import ba.unze.edom.common.dto.EvidencijaRedDTO;
 import javafx.concurrent.Task;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Base64;
+import java.util.Objects;
 
 /** Detalji studenta iz centralne evidencije + oznake za useljenje. */
 public class EvidencijaDetaljiDijalog {
@@ -102,8 +104,23 @@ public class EvidencijaDetaljiDijalog {
             g.add(info, 0, red++, 2, 1);
         }
 
+        // napomena uz prijavu: piše je student pri predaji, admin je može mijenjati
+        sekcija(g, "Napomena uz prijavu");
+        TextArea taNapomena = new TextArea(r.napomenaPrijave() != null ? r.napomenaPrijave() : "");
+        taNapomena.setPromptText("Student nije ostavio napomenu.");
+        taNapomena.setWrapText(true);
+        taNapomena.setPrefRowCount(3);
+        taNapomena.setPrefWidth(460);
+        g.add(taNapomena, 0, red++, 2, 1);
+        Label napInfo = new Label("Piše je student pri predaji prijave. Administrator je može ispraviti ili dopuniti (najviše 500 znakova).");
+        napInfo.setStyle("-fx-text-fill: #6b7a90;");
+        napInfo.setWrapText(true);
+        napInfo.setMaxWidth(460);
+        g.add(napInfo, 0, red++, 2, 1);
+
+        // napomena koju je admin poslao studentu mailom (student.napomena) – samo za čitanje
         if (r.napomena() != null && !r.napomena().isBlank()) {
-            sekcija(g, "Napomena");
+            sekcija(g, "Napomena poslana studentu");
             Label n = new Label(r.napomena());
             n.setWrapText(true);
             n.setMaxWidth(460);
@@ -125,7 +142,7 @@ public class EvidencijaDetaljiDijalog {
         d.setHeaderText(r.ime() + " " + r.prezime() + "   ·   " + r.sifra());
         d.getDialogPane().setContent(sp);
         d.getDialogPane().getButtonTypes().add(btPrijava);
-        if (moze) d.getDialogPane().getButtonTypes().addAll(btUgovor, btRevers, btSacuvaj);
+        d.getDialogPane().getButtonTypes().add(btSacuvaj);
         d.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
 
         // ova dugmad ne zatvaraju dijalog
@@ -145,18 +162,30 @@ public class EvidencijaDetaljiDijalog {
         }
 
         if (d.showAndWait().orElse(ButtonType.CLOSE) == btSacuvaj) {
-            EvidencijaOznakeDTO z = new EvidencijaOznakeDTO(
+            EvidencijaOznakeDTO z = moze
+                    ? new EvidencijaOznakeDTO(
                     chkKartica.isSelected(), chkKarticaRaz.isSelected(),
-                    chkLjekarsko.isSelected(), chkUvjerenje.isSelected() && !r.uvjerenjeUzPrijavu());
-            sacuvaj(z);
+                    chkLjekarsko.isSelected(), chkUvjerenje.isSelected() && !r.uvjerenjeUzPrijavu())
+                    : null;
+
+            String nova = taNapomena.getText();
+            if (nova != null && nova.trim().length() > 500) {
+                new Alert(Alert.AlertType.WARNING, "Napomena može imati najviše 500 znakova.").showAndWait();
+                return;
+            }
+            boolean napomenaPromijenjena = !Objects.equals(ocisti(nova), ocisti(r.napomenaPrijave()));
+            sacuvaj(z, nova, napomenaPromijenjena);
         }
     }
 
-    private void sacuvaj(EvidencijaOznakeDTO z) {
+    private void sacuvaj(EvidencijaOznakeDTO z, String napomena, boolean napomenaPromijenjena) {
+        if (z == null && !napomenaPromijenjena) return;   // nema šta snimiti
+
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                EvidencijaApi.sacuvajOznake(r.idPrijava(), z);
+                if (z != null) EvidencijaApi.sacuvajOznake(r.idPrijava(), z);
+                if (napomenaPromijenjena) PrijavaApi.sacuvajNapomenu(r.idPrijava(), napomena);
                 return null;
             }
         };
@@ -165,11 +194,15 @@ public class EvidencijaDetaljiDijalog {
             Throwable ex = task.getException();
             if (!(ex instanceof ApiException)) ex.printStackTrace();
             new Alert(Alert.AlertType.ERROR,
-                    ex instanceof ApiException ? ex.getMessage() : "Oznake nisu sačuvane.").showAndWait();
+                    ex instanceof ApiException ? ex.getMessage() : "Promjene nisu sačuvane.").showAndWait();
         });
         Thread t = new Thread(task);
         t.setDaemon(true);
         t.start();
+    }
+
+    private static String ocisti(String s) {
+        return s == null || s.isBlank() ? null : s.trim();
     }
 
     private void otvoriPrijavu(Integer idPrijave) {

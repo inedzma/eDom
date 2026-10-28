@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="'Prijava na konkurs ' + ${o.akademskaGodina}">Prijava na konkurs</title>
+    <style>
+        @page { size: A4; margin: 16mm 16mm 14mm; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #eef3f2; font-family: "Times New Roman", Georgia, serif; color: #111; font-size: 12.5pt; }
+
+        /* traka s dugmadima – ne štampa se */
+        .alati { position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; align-items: center; justify-content: center;
+            flex-wrap: wrap; padding: 12px 16px; background: #0b4f5c; font-family: system-ui, sans-serif; }
+        .alati button, .alati a { font: 600 15px system-ui, sans-serif; padding: 10px 18px; border-radius: 10px;
+            border: 0; cursor: pointer; text-decoration: none; }
+        .alati button { background: #00bf9a; color: #fff; }
+        .alati a { background: rgba(255,255,255,.14); color: #fff; }
+        .alati span { color: #cfe7ea; font-size: 14px; width: 100%; text-align: center; }
+
+        .list { width: 210mm; min-height: 297mm; margin: 18px auto; padding: 16mm; background: #fff;
+            box-shadow: 0 6px 24px rgba(0,0,0,.08); }
+        .sifra { text-align: right; font-size: 10.5pt; color: #444; }
+
+        .podaci { display: grid; grid-template-columns: 1fr 1fr; column-gap: 12mm; row-gap: 3mm; margin: 4mm 0 8mm; }
+        .podatak .v { min-height: 7mm; border-bottom: 1px solid #000; padding: 0 1mm 1mm; font-weight: bold; }
+        .podatak .n { text-align: center; font-size: 9.5pt; font-style: italic; margin-top: 1mm; }
+
+        .zaglavlje { font-weight: bold; margin-bottom: 6mm; }
+        h1 { text-align: center; font-size: 15pt; letter-spacing: .25em; margin: 0; }
+        h2 { text-align: center; font-size: 12.5pt; margin: 1mm 0 6mm; }
+        ol { margin: 3mm 0 0; padding-left: 7mm; }
+        ol li { margin-bottom: 1.5mm; text-align: justify; }
+        p { text-align: justify; margin: 0 0 3mm; }
+
+        .potpis { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10mm; }
+        .potpis .crta { display: inline-block; width: 45mm; border-bottom: 1px solid #000; }
+        .potpis .desno { text-align: center; }
+        .potpis .desno .crta { width: 60mm; display: block; margin-bottom: 1mm; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 11pt; margin-top: 4mm; }
+        th, td { border: 1px solid #000; padding: 1.8mm 2mm; vertical-align: top; }
+        th { background: #f0f0f0; }
+        td.br { width: 8mm; text-align: center; }
+        td.odg { width: 62mm; font-weight: bold; }
+
+        /* polja koja student može ispraviti prije štampe (samo na ekranu) */
+        [contenteditable="true"] { outline: 1px dashed transparent; border-radius: 2px; cursor: text; transition: outline-color .15s, background .15s; }
+        [contenteditable="true"]:hover { outline-color: #00bf9a; background: #f2fffb; }
+        [contenteditable="true"]:focus { outline: 2px solid #00bf9a; background: #f2fffb; }
+
+        @media print {
+            body { background: #fff; }
+            .alati { display: none; }
+            .list { width: auto; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
+            .list + .list { break-before: page; }
+            [contenteditable="true"] { outline: none !important; background: none !important; }
+        }
+        @media (max-width: 820px) {
+            .list { width: auto; margin: 10px; padding: 18px; }
+            .podaci { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="alati">
+    <button type="button" onclick="window.print()">🖨 Odštampaj / Sačuvaj kao PDF</button>
+    <a th:href="@{/student/prijava/{id}/dokumenti(id=${idPrijave})}">Nazad na dokumente</a>
+    <span>Provjerite podatke. Ako nešto nije tačno (npr. prezime roditelja), kliknite na tekst i ispravite ga prije štampe.
+        Zatim upišite datum, potpišite i pošaljite zajedno s ostalim dokumentima.</span>
+</div>
+
+<!-- ======================= STRANA 1 ======================= -->
+<div class="list">
+    <div class="sifra">Šifra studenta: <b th:text="${o.sifra}">SC-00001/26</b></div>
+
+    <div class="podaci">
+        <div class="podatak"><div class="v" th:text="${o.imeOcaPrezime}">&nbsp;</div><div class="n">Ime (ime oca) i prezime</div></div>
+        <div class="podatak"><div class="v" th:text="${o.fakultetGodina}">&nbsp;</div><div class="n">Fakultet i godina koju upisujete</div></div>
+        <div class="podatak"><div class="v" th:text="${o.telefon}">&nbsp;</div><div class="n">Broj telefona</div></div>
+        <div class="podatak"><div class="v" th:text="${o.boraviste}">&nbsp;</div><div class="n">Stalno mjesto boravka</div></div>
+        <div class="podatak"><div class="v" th:text="${o.roditelj}">&nbsp;</div><div class="n">Ime i prezime roditelja i njihov broj telefona</div></div>
+        <div class="podatak"><div class="v" th:text="${o.email}">&nbsp;</div><div class="n">e-mail</div></div>
+        <div class="podatak" style="grid-column: 1 / -1"><div class="v" th:text="${o.jmbgLk}">&nbsp;</div><div class="n">JMBG i broj lične karte</div></div>
+    </div>
+
+    <div class="zaglavlje">''JU UNIVERZITET U ZENICI''<br>ORGANIZACIONA JEDINICA STUDENTSKI CENTAR ZENICA</div>
+
+    <h1>PRIJAVA NA KONKURS</h1>
+    <h2>ZA AKADEMSKU <span th:text="${o.akademskaGodina}">2026/2027</span>. GODINU</h2>
+
+    <p>Prijavljujem se na Konkurs za prijem na smještaj i ishranu u Studentski centar Zenica i uz prijavu prilažem sljedeća dokumenta:</p>
+    <ol>
+        <li>Uvjerenje od visokoškolske ustanove da je redovan student sa potvrdom o položenim ispitima iz prethodnih akademskih godina (ili ovjerena kopija indeksa sa ocjenama) – novoupisani studenti podnose ovjerenu kopiju svjedočanstva iz IV razreda,</li>
+        <li>Uvjerenje o zajedničkom domaćinstvu (kućna lista) i primanja po članu domaćinstva (materijalni cenzus) po osnovu: plaća, penzija i druge prinadležnosti (prosječno zadnja tri mjeseca); potvrda od Biroa za zapošljavanje o nezaposlenosti roditelja ili staratelja,</li>
+        <li>Potvrda o mjestu stalnog boravka i za strane državljane kopija pasoša,</li>
+        <li>Opću uplatnicu na iznos od <span th:text="${postavke.iznosObrade}">10,00</span> KM za troškove obrade podataka (uplata na JRT Zeničko-dobojskog kantona broj <span th:text="${postavke.racunUplate}">1340100000001672</span> otvoren kod ASA banke Zenica, budžetska organizacija <span th:text="${postavke.budzetskaOrganizacija}">2204010</span>, s pozivom na broj: <span th:text="${postavke.pozivNaBroj}">4810011448</span> i s naznakom vrste prihoda <span th:text="${postavke.vrstaPrihoda}">722659</span>),</li>
+        <li>Ovjerena garancija o preuzimanju obaveza koje nastaju po osnovu korištenja usluga Studentskog centra,</li>
+        <li>Potvrda-uvjerenje o osvojenim nagradama u nastavnim i sportskim takmičenjima (na kantonalnim, federalnim, državnim i međunarodnim takmičenjima),</li>
+        <li>Potvrda o stepenu invalidnosti (lične, roditelja i staratelja),</li>
+        <li>Potvrda o poginulim, nestalim i umrlim članovima uže porodice,</li>
+        <li>Potvrda o logoraškom statusu, ličnom ili roditelja, odnosno staratelja (izdata od Međunarodnog Crvenog krsta),</li>
+        <li>Potvrda o učešću u OS BiH roditelja (provedeno vrijeme),</li>
+        <li>Potvrda od nadležne institucije o izbjegličkom (raseljeničkom) statusu.</li>
+    </ol>
+
+    <div class="potpis">
+        <div>U Zenici, <span class="crta"></span> godine</div>
+        <div class="desno"><span class="crta"></span>podnosilac prijave</div>
+    </div>
+</div>
+
+<!-- ======================= STRANA 2 ======================= -->
+<div class="list">
+    <div class="sifra">Šifra studenta: <b th:text="${o.sifra}">SC-00001/26</b></div>
+    <p>U okviru Konkursa za prijem na smještaj i ishranu u Studentski centar Zenica, u nastavku Vam donosimo i dodatna pitanja,
+        a sve sa ciljem kako bismo bolje razumjeli vašu situaciju i potrebe. Molimo Vas da odgovorite na sva pitanja iskreno i tačno.</p>
+
+    <table>
+        <thead>
+        <tr><th>#</th><th>Pitanja</th><th>Odgovori</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="q : ${o.pitanja}">
+            <td class="br" th:text="${q.broj}">1</td>
+            <td th:text="${q.tekst}">Pitanje</td>
+            <td class="odg" th:text="${q.odgovor}">Odgovor</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="potpis">
+        <div>U Zenici, <span class="crta"></span> godine</div>
+        <div class="desno"><span class="crta"></span>podnosilac prijave</div>
+    </div>
+</div>
+<script>
+    // popunjena polja i odgovori mogu se ispraviti prije štampe (ne snima se u sistem)
+    document.querySelectorAll('.podatak .v, td.odg').forEach(function (el) {
+        el.setAttribute('contenteditable', 'true');
+        el.setAttribute('spellcheck', 'false');
+        el.title = 'Kliknite da ispravite';
+    });
+</script>
+</body>
+</html>

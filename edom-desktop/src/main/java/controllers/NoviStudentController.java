@@ -1,11 +1,9 @@
 package controllers;
 
 import api.ApiException;
+import api.PostavkeApi;
 import api.RucniUnosApi;
-import ba.unze.edom.common.dto.SifarniciDTO;
-import ba.unze.edom.common.dto.SocijalniStatusDTO;
-import ba.unze.edom.common.dto.StudentPronadjenDTO;
-import ba.unze.edom.common.dto.StudentUnosDTO;
+import ba.unze.edom.common.dto.*;
 import ba.unze.edom.common.util.Fakulteti;
 import ba.unze.edom.common.util.Imena;
 import ba.unze.edom.common.util.Jmbg;
@@ -134,6 +132,7 @@ public class NoviStudentController {
                 if (!jeste && t.getText() != null) t.setText(Imena.formatiraj(t.getText()));
             });
         }
+        ucitajKonkurs();
     }
 
     /** Povratak s koraka 2: popuni polja iz nacrta. */
@@ -398,5 +397,33 @@ public class NoviStudentController {
         Alert a = new Alert(Alert.AlertType.INFORMATION, poruka);
         a.setHeaderText(null);
         a.showAndWait();
+    }
+
+    /** Godina konkursa iz Postavki + upozorenje ako je unos van roka. */
+    private void ucitajKonkurs() {
+        Task<PostavkeDTO> t = new Task<>() {
+            @Override
+            protected PostavkeDTO call() {
+                return PostavkeApi.ucitaj();
+            }
+        };
+        t.setOnSucceeded(e -> {
+            PostavkeDTO p = t.getValue();
+            if (nacrt.akademskaGodina == null && p.akademskaGodina() != null) {
+                txtAkGod.setText(String.valueOf(p.akademskaGodina()));
+            }
+            LocalDate danas = LocalDate.now();
+            boolean prije = p.prijaveOd() != null && danas.isBefore(p.prijaveOd());
+            boolean poslije = p.prijaveDo() != null && danas.isAfter(p.prijaveDo());
+            if (nacrt.student == null && (prije || poslije)) {
+                java.time.format.DateTimeFormatter df = java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy.");
+                alert("Konkurs trenutno nije otvoren"
+                        + (poslije ? " (rok za prijave istekao je " + p.prijaveDo().format(df) + ")"
+                        : " (prijave počinju " + p.prijaveOd().format(df) + ")")
+                        + ".\nPrijavu možete unijeti, ali provjerite da li je Studentski centar prima.");
+            }
+        });
+        t.setOnFailed(e -> System.err.println("Postavke nisu učitane: " + t.getException().getMessage()));
+        pokreni(t);
     }
 }

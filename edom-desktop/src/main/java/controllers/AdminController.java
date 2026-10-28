@@ -72,6 +72,15 @@ public class AdminController {
         loadView("/views/rang-lista.fxml");
     }
 
+    @FXML
+    public void showPostavke(ActionEvent event) {
+        panelOtvoren = false;
+        PostavkePanel panel = new PostavkePanel();
+        var css = getClass().getResource("/css/app.css");
+        if (css != null) panel.getStylesheets().add(css.toExternalForm());
+        contentArea.getChildren().setAll(panel);
+    }
+
     public void loadViewPublic(String fxmlPath) {
         loadView(fxmlPath);
     }

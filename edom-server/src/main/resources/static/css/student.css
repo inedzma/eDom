@@ -248,3 +248,12 @@ body.app{display:flex;flex-direction:column;min-height:100vh}
 @media (max-width:560px){
     .dostava-napomena{flex-direction:column}
 }
+
+.dostava-napomena .dn-koraci{margin:10px 0 0;padding-left:20px;font-size:14.5px;line-height:1.6}
+.dostava-napomena .dn-koraci li + li{margin-top:4px}
+.dostava-napomena .dn-obrazac{margin-top:14px}
+.dostava-napomena .dn-obrazac .btn{display:inline-flex;align-items:center;gap:8px}
+
+.konkurs-status{display:inline-block;margin-top:10px;padding:6px 14px;border-radius:999px;font-weight:700;font-size:14px}
+.konkurs-status.ks--da{background:var(--mint-soft);color:var(--mint-dark)}
+.konkurs-status.ks--ne{background:#fdecea;color:#b3261e}

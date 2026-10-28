@@ -23,7 +23,7 @@
     <!-- ======================= HERO ======================= -->
     <section class="up-hero">
         <div class="section-inner">
-            <span class="eyebrow">Konkurs za akademsku 2026/2027. godinu</span>
+            <span class="eyebrow" th:text="'Konkurs za akademsku ' + ${konkurs.godina} + '. godinu'">Konkurs za akademsku 2026/2027. godinu</span>
             <h1>Kako se prijaviti za smještaj</h1>
             <p class="up-hero-lead">
                 Prijavu podnosite online kroz E-Dom, a originale ili ovjerene kopije dokumenata
@@ -32,18 +32,22 @@
 
             <ul class="up-facts">
                 <li>
-                    <b>220</b>
+                    <b th:text="${postavke.kapacitet}">220</b>
                     <span>mjesta za smještaj i ishranu</span>
                 </li>
                 <li>
-                    <b>do 35%</b>
+                    <b th:text="'do ' + ${postavke.udioBrucosaPosto} + '%'">do 35%</b>
                     <span>mjesta za brucoše</span>
                 </li>
                 <li>
-                    <b>20 km</b>
+                    <b th:text="${postavke.minUdaljenostKm} + ' km'">20 km</b>
                     <span>najmanja udaljenost prebivališta od Zenice</span>
                 </li>
-                <li>
+                <li th:if="${konkurs.rokDo != null}">
+                    <b th:text="${konkurs.rokDo}">15.09.2026.</b>
+                    <span>krajnji rok za prijave</span>
+                </li>
+                <li th:unless="${konkurs.rokDo != null}">
                     <b>30 dana</b>
                     <span>od objave konkursa traje prijava</span>
                 </li>
@@ -69,8 +73,8 @@
                     <span class="up-card-ic">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                     </span>
-                    <h3>Najmanje 20 km od Zenice</h3>
-                    <p>Mjesto prebivališta, odnosno boravišta, mora biti udaljeno od Zenice najmanje 20 km.</p>
+                    <h3 th:text="'Najmanje ' + ${postavke.minUdaljenostKm} + ' km od Zenice'">Najmanje 20 km od Zenice</h3>
+                    <p>Mjesto prebivališta, odnosno boravišta, mora biti udaljeno od Zenice najmanje <th:block th:text="${postavke.minUdaljenostKm}">20</th:block> km.</p>
                 </div>
                 <div class="up-card">
                     <span class="up-card-ic">
@@ -226,7 +230,7 @@
                         <label>
                             <input type="checkbox" data-key="uplatnica" data-obavezno>
                             <span>
-                                <b>Uplatnica na 10,00 KM</b>
+                                <b th:text="'Uplatnica na ' + ${postavke.iznosObrade} + ' KM'">Uplatnica na 10,00 KM</b>
                                 <small>Troškovi obrade podataka. Podaci za uplatu su <a href="#uplatnica">ispod</a>.</small>
                             </span>
                         </label>
@@ -317,7 +321,7 @@
         <div class="section-inner">
             <span class="eyebrow dark">Uplata</span>
             <h2>Podaci za uplatnicu</h2>
-            <p class="section-lead">Uplatnica za javne prihode na iznos od <b>10,00 KM</b> za troškove obrade podataka. Ovako izgleda popunjena:</p>
+            <p class="section-lead">Uplatnica za javne prihode na iznos od <b th:text="${postavke.iznosObrade} + ' KM'">10,00 KM</b> za troškove obrade podataka. Ovako izgleda popunjena:</p>
 
             <figure class="upl-slika">
                 <a th:href="@{/img/uplatnica-primjer.png}" target="_blank" rel="noopener" title="Otvori u punoj veličini">
@@ -344,7 +348,7 @@
                 <li><b>Nepotpuna i neblagovremeno dostavljena</b> dokumentacija se ne razmatra.</li>
                 <li>Skenirani dokumenti u E-Domu služe za pregled — <b>boduje se tek kad stigne original</b> ili ovjerena kopija.</li>
                 <li>Ako bude nedovoljno primljenih kandidata, početkom oktobra raspisuje se <b>naknadni konkurs</b>.</li>
-                <li>Prijava podnesena samo sa slikanim ili skeniranim dokumentima može biti <b>uslovno odobrena</b>. Da bi bila konačno odobrena, originale ili ovjerene kopije morate <b>poslati poštom ili donijeti lično</b> u Studentski centar (Ul. Crkvice br. 50, Zenica). O tome ćete dobiti obavijest na e-mail.</li>
+                <li>Prijava podnesena samo sa slikanim ili skeniranim dokumentima može biti <b>uslovno odobrena</b>. Da bi bila konačno odobrena, originale ili ovjerene kopije morate <b>poslati poštom ili donijeti lično</b> u Studentski centar (<th:block th:text="${postavke.adresa}">Crkvice 50, 72000 Zenica</th:block>). O tome ćete dobiti obavijest na e-mail.</li>
             </ul>
         </div>
     </section>

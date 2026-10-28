@@ -25,6 +25,7 @@ public class PrijavaService {
     private final BodovanjeService bodovanjeService;
     private final ApplicationEventPublisher dogadjaji;
     private final SifraStudenta sifraStudenta;
+    private final PostavkeService postavke;
 
     // ---------- KREIRANJE ----------
 
@@ -46,6 +47,10 @@ public class PrijavaService {
 
         Student student = studentRepository.findById(idStudenta)
                 .orElseThrow(() -> new PrijavaException("Student ne postoji."));
+
+        if (!postavke.prijaveOtvorene()) {
+            throw new PrijavaException(postavke.porukaZatvoreno());
+        }
 
         Prijava p = new Prijava();
         p.setStudent(student);
@@ -82,7 +87,6 @@ public class PrijavaService {
             throw new PrijavaException("Odaberite općinu iz liste za izabrani kanton.");
         }
 
-        p.setAkademskaGodina(dto.akademskaGodina());
         p.setGodinaStudija(dto.godinaStudija());
         p.setProsjek(dto.prosjek());
         p.setPolozeniIspiti(dto.polozeniIspiti());
@@ -103,6 +107,12 @@ public class PrijavaService {
     public void sacuvajDomacinstvo(Integer idPrijave, Integer idStudenta,
                                    DomacinstvoKorakDTO dto) {
         Prijava p = dohvatiZaIzmjenu(idPrijave, idStudenta);
+
+        Integer minKm = postavke.trenutne().minUdaljenostKm();
+        if (minKm != null && dto.udaljenostKm() != null && dto.udaljenostKm().doubleValue() < minKm) {
+            throw new PrijavaException("Prema uslovima konkursa pravo na smještaj imaju studenti čije je prebivalište "
+                    + "udaljeno najmanje " + minKm + " km od Zenice.");
+        }
 
         p.setBrojClanovaDomacinstva(dto.brojClanovaDomacinstva());
         p.setUkupnaPrimanja(dto.ukupnaPrimanja());
@@ -198,6 +208,10 @@ public class PrijavaService {
     public void podnesi(Integer idPrijave, Integer idStudenta, String napomena) {
 
         Prijava p = dohvatiZaIzmjenu(idPrijave, idStudenta);
+
+        if (!postavke.prijaveOtvorene()) {
+            throw new PrijavaException(postavke.porukaZatvoreno());
+        }
         p.setNapomena(NapomenaPrijaveService.ocisti(napomena));
 
         List<String> nedostaje = provjeriPotpunost(p);

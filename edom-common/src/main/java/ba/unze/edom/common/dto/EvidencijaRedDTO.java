@@ -44,5 +44,7 @@ public record EvidencijaRedDTO(
         LocalDate uvjerenjeFakultetPredano,
         boolean uvjerenjeUzPrijavu,
 
-        String napomena
+        String napomena,
+
+        String napomenaPrijave      // napomena uz prijavu (piše student, admin može ispraviti)
 ) {}

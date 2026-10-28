@@ -15,34 +15,27 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
- * Racuna bodove prijave prema Pravilniku Studentskog centra (2026/2027).
+ * Racuna bodove prijave prema Pravilniku Studentskog centra.
+ * Brojevi za uspjeh, udaljenost, primanja i ponovni upis dolaze iz Postavki (PravilaBodovanja);
+ * bodovi kriterija iz tabele vrsta_kriterija.
  *
- * Bodovi se NIKAD ne akumuliraju u bazi - uvijek se racunaju iznova.
- * Zbog toga je svaka ispravka podataka odmah vidljiva u rezultatu,
- * a rezultat je uvijek objasnjiv kroz listu stavki.
- *
- * Pregled pravila:
- *  - Uspjeh, brucos:        prosjek x 9 + 1
- *  - Uspjeh, ostali:        prosjek x 3,5 + polozeni ispiti x 1,8 + bonus za godinu
- *                           (2.=3, 3.=5, 4.=7, 5.=9, 6.=10, apsolvent=0, postdiplomac=10)
- *  - Ponovni upis godine:   -3 (drugi put i vise); treci put i vise = upozorenje za admina
- *  - Udaljenost:            <50 km 0, <80 4, <120 8, <160 12, ostalo 15
- *  - Primanja po clanu:     <110 KM 20, <=150 15, <=200 8, <=300 4, <=400 2, ostalo 0
- *  - Boracke/socijalne:     boduje se SAMO najvisa
- *  - Dodatni kriteriji:     sabiraju se (izbjeglica 3, brat/sestra 2, nagrade 3)
+ *  - Branioci/socijalni:    boduje se SAMO najvisa
+ *  - Dodatni kriteriji:     sabiraju se
  */
 @Service
 public class BodovanjeService {
 
-    /** Negativni bodovi za ponovni upis iste godine studija. */
+    /** Podrazumijevana kazna; stvarna vrijednost je u Postavkama. */
     static final double KAZNA_PONOVNI_UPIS = -3;
 
     private static final DateTimeFormatter DATUM = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
 
     private final PrijavaValidator validator;
+    private final PostavkeService postavke;
 
-    public BodovanjeService(PrijavaValidator validator) {
+    public BodovanjeService(PrijavaValidator validator, PostavkeService postavke) {
         this.validator = validator;
+        this.postavke = postavke;
     }
 
     public RezultatBodovanja izracunaj(Prijava p) {
@@ -52,21 +45,18 @@ public class BodovanjeService {
         }
 
         validator.provjeri(p);
+        PravilaBodovanja pr = postavke.pravila();
 
-        // --- osnovni kriteriji, svaki sa svojim flagom verifikacije ---
-        StavkaBodovanja uspjeh     = bodoviUspjeh(p);
-        StavkaBodovanja udaljenost = bodoviUdaljenost(p);
-        StavkaBodovanja primanja   = bodoviPrimanja(p);
-        Optional<StavkaBodovanja> ponovniUpis = kaznaPonovniUpis(p);
+        StavkaBodovanja uspjeh     = bodoviUspjeh(p, pr);
+        StavkaBodovanja udaljenost = bodoviUdaljenost(p, pr);
+        StavkaBodovanja primanja   = bodoviPrimanja(p, pr);
+        Optional<StavkaBodovanja> ponovniUpis = kaznaPonovniUpis(p, pr);
 
-        // --- branioci: najveci, odvojeno za potvrdjeno i potencijalno ---
         var braniociSvi        = najveciBranilac(p, false);
         var braniociPotvrdjeni = najveciBranilac(p, true);
 
-        // --- dodatni: zbrajaju se ---
         List<StavkaBodovanja> dodatni = dodatniKriteriji(p);
 
-        // --- prikaz ---
         List<StavkaBodovanja> stavke = new ArrayList<>();
         stavke.add(uspjeh);
         ponovniUpis.ifPresent(stavke::add);
@@ -75,7 +65,6 @@ public class BodovanjeService {
         braniociSvi.ifPresent(stavke::add);
         stavke.addAll(dodatni);
 
-        // --- zbirovi ---
         List<StavkaBodovanja> osnovni = new ArrayList<>(List.of(uspjeh, udaljenost, primanja));
         ponovniUpis.ifPresent(osnovni::add);
 
@@ -109,7 +98,6 @@ public class BodovanjeService {
 
     // ---------------- UPOZORENJA ----------------
 
-    /** Stvari koje ne blokiraju prijavu, ali ih administrator mora vidjeti. */
     private List<String> upozorenja(Prijava p) {
         List<String> u = new ArrayList<>();
         Integer put = p.getUpisGodinePut();
@@ -122,7 +110,7 @@ public class BodovanjeService {
 
     // ---------------- USPJEH ----------------
 
-    private StavkaBodovanja bodoviUspjeh(Prijava p) {
+    private StavkaBodovanja bodoviUspjeh(Prijava p, PravilaBodovanja pr) {
 
         Integer godina = p.getGodinaStudija();
         BigDecimal prosjek = p.getProsjek();
@@ -134,54 +122,40 @@ public class BodovanjeService {
                     KategorijaBodovanja.USPJEH);
         }
 
-        double pr = prosjek.doubleValue();
+        double prs = prosjek.doubleValue();
 
         if (godina == GodineStudija.PRVA) {
-            double b = pr * 9 + 1;
+            double b = prs * pr.brucosMnozilac() + pr.brucosDodatak();
             return new StavkaBodovanja("Uspjeh (brucoš)", zaokruzi(b),
-                    "Prosjek " + pr, ver,
+                    "Prosjek " + prs, ver,
                     KategorijaBodovanja.USPJEH);
         }
 
         int ispiti = p.getPolozeniIspiti() != null ? p.getPolozeniIspiti() : 0;
-        double b = pr * 3.5 + ispiti * 1.8 + bonusGodine(godina);
+        double b = prs * pr.prosjekMnozilac() + ispiti * pr.ispitMnozilac() + pr.bonus(godina);
 
         return new StavkaBodovanja("Uspjeh", zaokruzi(b),
-                "Prosjek " + pr + ", položenih ispita: " + ispiti
+                "Prosjek " + prs + ", položenih ispita: " + ispiti
                         + ", " + GodineStudija.naziv(godina), ver,
                 KategorijaBodovanja.USPJEH);
     }
 
-    /** Bonus za godinu studija. Apsolvent nema bonus. */
     double bonusGodine(int godina) {
-        return switch (godina) {
-            case 2 -> 3;
-            case 3 -> 5;
-            case 4 -> 7;
-            case 5 -> 9;
-            case 6 -> 10;
-            case GodineStudija.APSOLVENT -> 0;
-            case GodineStudija.POSTDIPLOMAC -> 10;
-            default -> 0;
-        };
+        return postavke.pravila().bonus(godina);
     }
 
-    /**
-     * Pitanje 1 obrasca: ako student istu godinu upisuje drugi put ili vise, -3 boda.
-     * Verifikuje se zajedno s uspjehom, jer se dokazuje istim uvjerenjem s fakulteta.
-     */
-    private Optional<StavkaBodovanja> kaznaPonovniUpis(Prijava p) {
+    private Optional<StavkaBodovanja> kaznaPonovniUpis(Prijava p, PravilaBodovanja pr) {
         Integer put = p.getUpisGodinePut();
-        if (put == null || put < 2) return Optional.empty();
+        if (put == null || put < 2 || pr.kaznaPonovniUpis() == 0) return Optional.empty();
 
-        return Optional.of(new StavkaBodovanja("Ponovni upis godine", KAZNA_PONOVNI_UPIS,
+        return Optional.of(new StavkaBodovanja("Ponovni upis godine", pr.kaznaPonovniUpis(),
                 "Tekuću godinu upisuje " + put + ". put", p.isUspjehVerifikovan(),
                 KategorijaBodovanja.USPJEH));
     }
 
     // ---------------- UDALJENOST ----------------
 
-    private StavkaBodovanja bodoviUdaljenost(Prijava p) {
+    private StavkaBodovanja bodoviUdaljenost(Prijava p, PravilaBodovanja pr) {
 
         boolean ver = p.isUdaljenostVerifikovana();
 
@@ -191,25 +165,14 @@ public class BodovanjeService {
         }
 
         double km = p.getUdaljenostKm().doubleValue();
-
-        double b = km < 50  ? 0
-                : km < 80  ? 4
-                : km < 120 ? 8
-                : km < 160 ? 12
-                : 15;
-
-        return new StavkaBodovanja("Udaljenost", b,
+        return new StavkaBodovanja("Udaljenost", pr.udaljenost().bodovi(km),
                 String.format("%.1f km", km), ver,
                 KategorijaBodovanja.UDALJENOST);
     }
 
     // ---------------- PRIMANJA ----------------
 
-    /**
-     * Ukupna primanja = zbir prosjecnih neto primanja svih clanova za zadnja 3 mjeseca.
-     * Dijeli se s brojem clanova, ukljucujuci studenta.
-     */
-    private StavkaBodovanja bodoviPrimanja(Prijava p) {
+    private StavkaBodovanja bodoviPrimanja(Prijava p, PravilaBodovanja pr) {
 
         boolean ver = p.isPrimanjaVerifikovana();
 
@@ -224,14 +187,7 @@ public class BodovanjeService {
 
         double poClanu = ukupno.doubleValue() / clanova;
 
-        double b = poClanu < 110   ? 20
-                : poClanu <= 150  ? 15
-                : poClanu <= 200  ? 8
-                : poClanu <= 300  ? 4
-                : poClanu <= 400  ? 2
-                : 0;
-
-        return new StavkaBodovanja("Primanja domaćinstva", b,
+        return new StavkaBodovanja("Primanja domaćinstva", pr.primanja().bodovi(poClanu),
                 String.format("%.2f KM po članu (%d članova)", poClanu, clanova),
                 ver,
                 KategorijaBodovanja.PRIMANJA);
@@ -239,8 +195,7 @@ public class BodovanjeService {
 
     // ---------------- BRANIOCI ----------------
 
-    private Optional<StavkaBodovanja> najveciBranilac(Prijava p,
-                                                      boolean samoVerifikovani) {
+    private Optional<StavkaBodovanja> najveciBranilac(Prijava p, boolean samoVerifikovani) {
         if (p.getKriteriji() == null) return Optional.empty();
 
         return p.getKriteriji().stream()
@@ -256,9 +211,7 @@ public class BodovanjeService {
     private List<StavkaBodovanja> dodatniKriteriji(Prijava p) {
         if (p.getKriteriji() == null) return List.of();
 
-        // po sifri - isti kriterij se broji samo jednom
         Map<String, PrijavaKriterij> jedinstveni = new LinkedHashMap<>();
-
         for (PrijavaKriterij k : p.getKriteriji()) {
             if (k.getVrsta() == null) continue;
             if (!GrupeKriterija.DODATNI.equals(k.getVrsta().getGrupa())) continue;
@@ -272,11 +225,11 @@ public class BodovanjeService {
 
     // ---------------- ZAJEDNICKO ----------------
 
+    /** Stavka za jedan kriterij. Koristi je i admin pregled (BodovanjeAdminService). */
     public StavkaBodovanja stavkaZaKriterij(PrijavaKriterij k) {
 
         VrstaKriterija v = k.getVrsta();
 
-        // fiksni bodovi (parametar se samo prikazuje, npr. broj ratnih priznanja)
         if (v.getBodovi() != null) {
             String obr = v.getNazivParametra() != null && k.getParametar() != null
                     ? v.getNazivParametra() + ": " + k.getParametar().stripTrailingZeros().toPlainString()
@@ -286,13 +239,11 @@ public class BodovanjeService {
                     v.getGrupa());
         }
 
-        // OS RBiH: period od-do, broje se samo puni mjeseci
         if ("DIJETE_OSRBIH".equals(v.getSifra())) {
             return stavkaOsRbih(k);
         }
 
-        double param = k.getParametar() != null
-                ? k.getParametar().doubleValue() : 0;
+        double param = k.getParametar() != null ? k.getParametar().doubleValue() : 0;
 
         double b = switch (v.getSifra()) {
             case "STUDENT_RVI"       -> param == 0 ? 0 : (param < 60 ? 15 : 20);
@@ -309,11 +260,6 @@ public class BodovanjeService {
                 v.getGrupa());
     }
 
-    /**
-     * 0,3 boda po punom mjesecu ucesca. Ostatak dana se ne racuna
-     * (6 mjeseci i 10 dana = 6 mjeseci; 8 mjeseci i 29 dana = 8 mjeseci).
-     * Stare prijave bez datuma koriste broj mjeseci iz parametra.
-     */
     private StavkaBodovanja stavkaOsRbih(PrijavaKriterij k) {
         VrstaKriterija v = k.getVrsta();
         long mjeseci;
@@ -332,7 +278,6 @@ public class BodovanjeService {
                 obr, k.isVerifikovan(), v.getGrupa());
     }
 
-    /** Broj punih mjeseci između dva datuma; započeti mjesec se ne računa. */
     static long punihMjeseci(LocalDate od, LocalDate doDatuma) {
         if (od == null || doDatuma == null || doDatuma.isBefore(od)) return 0;
         return Period.between(od, doDatuma).toTotalMonths();

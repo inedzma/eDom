@@ -31,6 +31,8 @@ public class PrijavaWebController {
     private final PrijavaService prijavaService;
     private final BodovanjeService bodovanjeService;
     private final PotrebniDokumentiService potrebniDokumentiService;
+    private final ba.unze.edom.server.service.ObrazacPrijaveService obrazacPrijaveService;
+    private final ba.unze.edom.server.service.PostavkeService postavkeService;
 
     // ---------- KREIRANJE ----------
 
@@ -38,7 +40,7 @@ public class PrijavaWebController {
     public String nova(@AuthenticationPrincipal KorisnikPrincipal k,
                        RedirectAttributes ra) {
         try {
-            int godina = LocalDate.now().getYear();
+            int godina = postavkeService.akademskaGodina();
             var p = prijavaService.kreirajIliNastavi(k.getIdStudenta(), godina);
             return "redirect:/student/prijava/" + p.getIdPrijava() + "/studij";
         } catch (PrijavaException e) {
@@ -249,6 +251,22 @@ public class PrijavaWebController {
         return "student/prijava/dokumenti";
     }
 
+    // ---------- PRIJAVNI OBRAZAC (štampa) ----------
+
+    @GetMapping("/{id}/obrazac")
+    public String obrazac(@PathVariable Integer id,
+                          @AuthenticationPrincipal KorisnikPrincipal k,
+                          Model model,
+                          RedirectAttributes ra) {
+        try {
+            model.addAttribute("o", obrazacPrijaveService.zaStudenta(id, k.getIdStudenta()));
+            model.addAttribute("idPrijave", id);
+            return "student/prijava/obrazac";
+        } catch (PrijavaException e) {
+            ra.addFlashAttribute("greska", e.getMessage());
+            return "redirect:/student/prijava/" + id + "/dokumenti";
+        }
+    }
     // ---------- DODAVANJE ----------
 
     @PostMapping("/{id}/dokumenti")

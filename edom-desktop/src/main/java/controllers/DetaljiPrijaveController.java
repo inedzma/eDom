@@ -504,8 +504,8 @@ public class DetaljiPrijaveController {
     }
 
     private void ucitajPanele(int idPrijave) {
-        uPozadini(() -> PrijavaApi.bodovanje(idPrijave),
-                b -> bodovanjeMjesto.getChildren().setAll(new BodovanjePanel(b,
+        uPozadini(() -> Map.entry(PrijavaApi.bodovanje(idPrijave), api.PostavkeApi.ucitaj()),
+                e -> bodovanjeMjesto.getChildren().setAll(new BodovanjePanel(e.getKey(), e.getValue(),
                         () -> izvrsi(() -> PrijavaApi.detalji(idPrijave), null))));
         uPozadini(() -> PrijavaApi.dokumentiSpisak(idPrijave),
                 s -> dokumentiMjesto.getChildren().setAll(new DokumentiPanel(idPrijave, s,

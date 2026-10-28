@@ -61,6 +61,12 @@
                           maxWidth="Infinity"
                           styleClass="nav-btn"/>
 
+            <ToggleButton text="Postavke"
+                          toggleGroup="$navGroup"
+                          onAction="#showPostavke"
+                          maxWidth="Infinity"
+                          styleClass="nav-btn"/>
+
             <ToggleButton text="Moj profil"
                           toggleGroup="$navGroup"
                           onAction="#onMojProfil"
