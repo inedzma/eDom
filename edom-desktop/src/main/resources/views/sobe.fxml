@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.SVGPath?>
 <?import javafx.geometry.Insets?>
 <?import java.net.URL?>
 
@@ -12,59 +13,76 @@
             fitToWidth="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED"
-            styleClass="scroll-pane">
+            styleClass="sobe-scroll">
 
     <stylesheets>
+        <URL value="@../styles/prijave.css"/>
         <URL value="@../styles/sobe.css"/>
     </stylesheets>
 
     <content>
-        <VBox styleClass="sobe-stranica" spacing="18">
+        <VBox styleClass="pr-root, sobe-stranica" spacing="16">
             <padding>
-                <Insets top="26" right="30" bottom="30" left="30"/>
+                <Insets top="24" right="28" bottom="28" left="28"/>
             </padding>
 
-            <!-- naslov i godina -->
-            <HBox alignment="CENTER_LEFT" spacing="16">
-                <VBox spacing="4">
-                    <Label text="Sobe i raspored" styleClass="sobe-naslov"/>
-                    <Label text="Pregled kapaciteta, prijedlog rasporeda po rang listi i ručne izmjene."
-                           styleClass="sobe-podnaslov"/>
+            <!-- ================= ZAGLAVLJE U BOJI ================= -->
+            <VBox styleClass="pr-hero" spacing="18">
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <VBox spacing="2">
+                        <Label styleClass="pr-hero-eyebrow" text="STUDENTSKI CENTAR ZENICA"/>
+                        <Label styleClass="pr-hero-naslov" text="Sobe i raspored"/>
+                        <Label styleClass="pr-hero-podnaslov"
+                               text="Pregled kapaciteta, prijedlog rasporeda po rang listi i ručne izmjene."/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label styleClass="pr-hero-podnaslov" text="Akademska godina"/>
+                    <ComboBox fx:id="cmbGodina" styleClass="pr-hero-combo"/>
+                    <Button fx:id="btnZahtjevi" text="Zahtjevi za promjenu sobe" onAction="#onZahtjevi"
+                            styleClass="pr-btn-glass"/>
+                </HBox>
+
+                <!-- brojevi (pravi kontroler) -->
+                <HBox fx:id="boxBrojevi" spacing="12"/>
+            </VBox>
+
+            <!-- ================= RASPORED ================= -->
+            <HBox styleClass="pr-kartica" alignment="CENTER_LEFT" spacing="10">
+                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                    <Label styleClass="pr-kartica-naslov" text="Raspored"/>
+                    <Label styleClass="pr-sitno" wrapText="true"
+                           text="Sistem predlaže raspored po rang listi. Pregledajte prijedlog, pa ga potvrdite ili poništite."/>
                 </VBox>
-                <Button fx:id="btnZahtjevi" text="Zahtjevi za promjenu sobe" onAction="#onZahtjevi"
-                        styleClass="sobe-btn"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label text="Akademska godina" styleClass="sobe-oznaka-polja"/>
-                <ComboBox fx:id="cmbGodina" styleClass="sobe-combo"/>
-            </HBox>
-
-            <!-- brojevi -->
-            <HBox fx:id="boxBrojevi" spacing="12"/>
-
-            <!-- raspored i filteri -->
-            <!-- raspored -->
-            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="sobe-traka">
                 <Button fx:id="btnPrijedlog" text="Napravi prijedlog rasporeda" onAction="#onPrijedlog"
-                        styleClass="sobe-btn-glavno"/>
-                <Button fx:id="btnPotvrdi" text="Potvrdi prijedlog" onAction="#onPotvrdi" styleClass="sobe-btn"/>
-                <Button fx:id="btnPonisti" text="Poništi prijedlog" onAction="#onPonisti" styleClass="sobe-btn-tiho"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Osvježi" onAction="#onOsvjezi" styleClass="sobe-btn-tiho"/>
+                        styleClass="pr-btn-primarno"/>
+                <Button fx:id="btnPotvrdi" text="Potvrdi prijedlog" onAction="#onPotvrdi"
+                        styleClass="sobe-btn-potvrdi"/>
+                <Button fx:id="btnPonisti" text="Poništi prijedlog" onAction="#onPonisti"
+                        styleClass="sobe-btn-ponisti"/>
+                <Button text="⟳" onAction="#onOsvjezi" styleClass="pr-btn-ikona">
+                    <tooltip><Tooltip text="Osvježi sobe"/></tooltip>
+                </Button>
             </HBox>
 
-            <!-- pretraga i filteri -->
-            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="sobe-traka">
-                <TextField fx:id="txtPretraga" promptText="Traži sobu ili studenta…"
-                           prefWidth="260" styleClass="sobe-pretraga"/>
-                <ComboBox fx:id="cmbSprat" styleClass="sobe-combo"/>
-                <ComboBox fx:id="cmbSpol" styleClass="sobe-combo"/>
-                <ComboBox fx:id="cmbRedoslijed" styleClass="sobe-combo"/>
-                <CheckBox fx:id="chkSlobodne" text="Samo sa slobodnim mjestima" styleClass="sobe-check"/>
+            <!-- ================= PRETRAGA I FILTERI ================= -->
+            <HBox styleClass="pr-kartica" alignment="CENTER_LEFT" spacing="10">
+                <HBox styleClass="pr-pretraga" alignment="CENTER_LEFT" spacing="8" prefWidth="300">
+                    <SVGPath styleClass="pr-pretraga-ikona"
+                             content="M10 2a8 8 0 1 0 4.9 14.3l5.4 5.4 1.4-1.4-5.4-5.4A8 8 0 0 0 10 2zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"/>
+                    <TextField fx:id="txtPretraga" promptText="Traži sobu ili studenta…"
+                               styleClass="pr-pretraga-polje" HBox.hgrow="ALWAYS"/>
+                </HBox>
+                <ComboBox fx:id="cmbSprat" styleClass="pr-combo"/>
+                <ComboBox fx:id="cmbSpol" styleClass="pr-combo"/>
+                <ComboBox fx:id="cmbRedoslijed" styleClass="pr-combo"/>
+                <CheckBox fx:id="chkSlobodne" text="Samo sa slobodnim mjestima" styleClass="pr-check"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="lblPogodaka" styleClass="sobe-podnaslov"/>
+                <Label fx:id="lblPogodaka" styleClass="pr-sitno"/>
             </HBox>
 
-            <HBox fx:id="boxLegenda" spacing="16" alignment="CENTER_LEFT"/>
+            <HBox fx:id="boxLegenda" spacing="16" alignment="CENTER_LEFT">
+                <padding><Insets left="4"/></padding>
+            </HBox>
 
             <Label fx:id="lblStatus" styleClass="sobe-podnaslov" wrapText="true"/>
 

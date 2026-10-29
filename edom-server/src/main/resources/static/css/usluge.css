@@ -1,0 +1,207 @@
+/* =========================================================
+   E-Dom – stranica Usluge (prefiks us-); osnova iz javna.css
+   ========================================================= */
+
+/* ---------- zaglavlje ---------- */
+.us-hero{
+    position:relative;overflow:hidden;color:#fff;
+    background:
+            radial-gradient(600px 360px at 90% 0%, rgba(240,138,36,.22), transparent 60%),
+            radial-gradient(700px 420px at 10% 120%, rgba(47,127,224,.25), transparent 60%),
+            linear-gradient(160deg,var(--teal-800) 0%,var(--teal-900) 100%);
+}
+.us-hero-in{padding-top:clamp(44px,7vh,76px);padding-bottom:110px}
+.us-eyebrow-svijetla{color:#5fd6b4}
+.us-hero h1{font-size:clamp(32px,4vw,50px);font-weight:800;line-height:1.1;letter-spacing:-.02em;max-width:720px}
+.us-hero p{font-size:clamp(16px,1.3vw,18px);line-height:1.65;color:#cfe3e7;max-width:640px;margin:18px 0 26px}
+.us-hero-chips{list-style:none;display:flex;flex-wrap:wrap;gap:10px}
+.us-hero-chips li{
+    display:inline-flex;align-items:baseline;gap:6px;padding:9px 16px;border-radius:999px;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);font-size:15px;color:#cfe3e7;
+}
+.us-hero-chips b{font-size:18px;color:#fff}
+.us-hero-chips li:nth-child(1) b{color:#5fd6b4}
+.us-hero-chips li:nth-child(2) b{color:#8dbcff}
+.us-hero-chips li:nth-child(3) b{color:#ffb469}
+.us-hero-chips li:nth-child(4) b{color:#ff9db6}
+
+/* ---------- karusel ---------- */
+.us-galerija-sekcija{position:relative;z-index:2;margin-top:-76px}
+.us-karusel{
+    position:relative;overflow:hidden;border-radius:26px;aspect-ratio:21/9;
+    background:#0b3c49;box-shadow:0 30px 70px -20px rgba(4,30,38,.45);outline:none;
+}
+.us-karusel:focus-visible{box-shadow:0 0 0 4px rgba(0,191,154,.5),0 30px 70px -20px rgba(4,30,38,.45)}
+.us-traka{display:flex;height:100%;transition:transform .6s cubic-bezier(.65,0,.35,1)}
+.us-slajd{position:relative;flex:0 0 100%;height:100%;margin:0}
+.us-slajd img{width:100%;height:100%;object-fit:cover;display:block}
+.us-slajd figcaption{
+    position:absolute;left:0;right:0;bottom:0;padding:60px 32px 54px;
+    background:linear-gradient(0deg,rgba(4,30,38,.75),transparent);color:#fff;
+}
+.us-slajd figcaption b{display:block;font-size:clamp(20px,2.4vw,30px);font-weight:800}
+.us-slajd figcaption span{display:block;color:#d9ecef;margin-top:4px;font-size:16px}
+
+/* primjer-slajdovi (dok nema fotografija) */
+.us-primjer{display:grid;place-items:center}
+.us-primjer::before{ /* blagi uzorak */
+    content:"";position:absolute;inset:0;opacity:.12;
+    background-image:radial-gradient(#fff 1.3px, transparent 1.5px);background-size:24px 24px;
+}
+.us-p1{background:linear-gradient(135deg,#00a884,#0b5d6b)}
+.us-p2{background:linear-gradient(135deg,#f08a24,#c2410c)}
+.us-p3{background:linear-gradient(135deg,#2f7fe0,#1e3a8a)}
+.us-p4{background:linear-gradient(135deg,#7a5af5,#be3a74)}
+.us-p-ic{
+    position:relative;width:clamp(90px,12vw,150px);height:clamp(90px,12vw,150px);border-radius:32px;
+    display:grid;place-items:center;color:#fff;margin-bottom:60px;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);
+}
+.us-p-ic svg{width:55%;height:55%}
+.us-primjer figcaption{text-align:center;background:none}
+.us-primjer-oznaka{
+    position:absolute;top:16px;left:16px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:800;
+    letter-spacing:.06em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.28);
+}
+
+.us-k-btn{
+    position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;
+    display:grid;place-items:center;border:0;cursor:pointer;color:var(--teal-900);
+    background:rgba(255,255,255,.9);box-shadow:0 8px 20px rgba(0,0,0,.2);transition:.15s;
+}
+.us-k-btn:hover{background:#fff;transform:translateY(-50%) scale(1.06)}
+.us-k-prev{left:16px}
+.us-k-next{right:16px}
+.us-tacke{position:absolute;left:0;right:0;bottom:18px;display:flex;justify-content:center;gap:8px}
+.us-tacke button{
+    width:10px;height:10px;border-radius:999px;border:0;padding:0;cursor:pointer;
+    background:rgba(255,255,255,.5);transition:width .25s, background .25s;
+}
+.us-tacke button.on{width:28px;background:#fff}
+.us-jedna .us-k-btn,.us-jedna .us-tacke{display:none}
+
+/* ---------- smještaj ---------- */
+.us-dvije{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.us-sobe{display:grid;gap:14px}
+.us-soba{
+    display:flex;align-items:center;gap:18px;padding:20px 22px;border-radius:20px;
+    background:#fff;border:1px solid var(--line);transition:transform .2s, box-shadow .2s;
+}
+.us-soba:hover{transform:translateX(4px);box-shadow:var(--shadow)}
+.us-soba-br{
+    flex:none;min-width:78px;height:64px;padding:0 10px;border-radius:16px;display:grid;place-items:center;
+    font-size:28px;font-weight:800;color:var(--a);background:var(--a-bg);
+}
+.us-soba > div{flex:1}
+.us-soba h3{font-size:18px;font-weight:800;color:var(--heading)}
+.us-soba p{color:var(--label);font-size:15px;margin-top:2px}
+.us-soba--a{--a:var(--jp-mint);--a-bg:var(--jp-mint-bg)}
+.us-soba--b{--a:var(--jp-plava);--a-bg:var(--jp-plava-bg)}
+.us-soba--c{--a:var(--jp-narandz);--a-bg:var(--jp-narandz-bg)}
+.us-kreveti{display:flex;gap:5px}
+.us-kreveti i{width:14px;height:24px;border-radius:4px;background:var(--a);opacity:.85}
+
+/* ---------- sadržaji: 4 kolone ---------- */
+.us-sadrzaji{grid-template-columns:repeat(4,1fr)}
+.us-sadrzaji .jp-usluga:nth-child(7){--a:var(--jp-mint);--a-bg:var(--jp-mint-bg)}
+.us-sadrzaji .jp-usluga:nth-child(8){--a:var(--jp-plava);--a-bg:var(--jp-plava-bg)}
+
+/* ---------- ishrana ---------- */
+.us-ishrana{display:grid;grid-template-columns:1fr 1.2fr;gap:28px;margin-top:32px;align-items:stretch}
+.us-obroci{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.us-obrok{position:relative;overflow:hidden;border-radius:22px;padding:26px;color:#fff;min-height:220px;display:flex;flex-direction:column;justify-content:flex-end}
+.us-obrok--rucak{background:linear-gradient(150deg,#f6b23e,#f08a24 60%,#d9611a)}
+.us-obrok--vecera{background:linear-gradient(150deg,#4a5bd6,#2b2f86 70%,#1d1f5e)}
+.us-obrok-ic{
+    position:absolute;top:22px;left:22px;width:54px;height:54px;border-radius:16px;display:grid;place-items:center;
+    background:rgba(255,255,255,.18);
+}
+.us-obrok h3{font-size:24px;font-weight:800}
+.us-obrok p{color:rgba(255,255,255,.88);margin-top:4px}
+.us-ish-tekst{display:grid;gap:16px}
+.us-ish-blok{padding:22px 24px;border-radius:20px;background:#fff;border:1px solid var(--line);border-left:4px solid var(--jp-narandz)}
+.us-ish-blok + .us-ish-blok{border-left-color:var(--jp-mint)}
+.us-ish-blok h3{font-size:18px;font-weight:800;color:var(--heading);margin-bottom:6px}
+.us-ish-blok p{color:var(--label);line-height:1.6}
+
+/* ---------- česta pitanja ---------- */
+.us-faq-wrap{display:grid;grid-template-columns:1fr 1.5fr;gap:40px;align-items:start}
+.us-faq{display:grid;gap:12px}
+.us-faq-stavka{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:box-shadow .2s, border-color .2s}
+.us-faq-stavka.otvoreno{border-color:var(--border);box-shadow:var(--shadow)}
+.us-faq-pitanje{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 22px;cursor:pointer;outline:none}
+.us-faq-pitanje:focus-visible{background:var(--mint-soft)}
+.us-faq-pitanje h3{font-size:17px;font-weight:800;color:var(--heading)}
+.us-faq-pitanje i{
+    flex:none;width:30px;height:30px;border-radius:50%;background:var(--mint-soft);position:relative;transition:transform .25s, background .25s;
+}
+.us-faq-pitanje i::before,.us-faq-pitanje i::after{
+    content:"";position:absolute;left:50%;top:50%;width:12px;height:2.4px;border-radius:2px;
+    background:var(--mint-dark);transform:translate(-50%,-50%);
+}
+.us-faq-pitanje i::after{transform:translate(-50%,-50%) rotate(90deg);transition:opacity .2s}
+.us-faq-stavka.otvoreno .us-faq-pitanje i{background:var(--mint-dark)}
+.us-faq-stavka.otvoreno .us-faq-pitanje i::before,.us-faq-stavka.otvoreno .us-faq-pitanje i::after{background:#fff}
+.us-faq-stavka.otvoreno .us-faq-pitanje i::after{opacity:0}
+.us-faq-odgovor{display:none;padding:0 22px 20px}
+.us-faq-stavka.otvoreno .us-faq-odgovor,
+body.uredjivanje .us-faq-odgovor{display:block}
+.us-faq-odgovor p{color:var(--label);line-height:1.65}
+
+/* ---------- CTA ---------- */
+.us-cta{grid-template-columns:1.3fr auto}
+.us-cta .jp-kontakt-tekst p{margin-bottom:0}
+.us-cta-dugmad{justify-content:flex-end}
+
+/* ---------- responsive ---------- */
+@media (max-width:1050px){
+    .us-sadrzaji{grid-template-columns:repeat(2,1fr)}
+    .us-dvije,.us-ishrana,.us-faq-wrap,.us-cta{grid-template-columns:1fr}
+    .us-cta-dugmad{justify-content:flex-start}
+}
+@media (max-width:700px){
+    .us-karusel{aspect-ratio:4/3;border-radius:20px}
+    .us-k-btn{width:40px;height:40px}
+    .us-slajd figcaption{padding:40px 20px 46px}
+    .us-p-ic{margin-bottom:70px}
+}
+@media (max-width:560px){
+    .us-sadrzaji,.us-obroci{grid-template-columns:1fr}
+    .us-soba{flex-wrap:wrap}
+    .us-kreveti{display:none}
+}
+
+/* ---------- upravljanje galerijom (admin) ---------- */
+.uag{
+    margin-top:18px;padding:20px 22px;border-radius:20px;background:#fff;
+    border:2px dashed rgba(240,138,36,.45);box-shadow:var(--shadow);
+}
+.uag--radi{opacity:.6;pointer-events:none}
+.uag-glava{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.uag-glava b{display:block;font-size:17px;color:var(--heading)}
+.uag-glava span{font-size:14px;color:var(--muted)}
+.uag-dodaj{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+
+.uag-zona{
+    margin-top:14px;padding:18px;border-radius:14px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center;
+    color:var(--label);background:var(--jp-narandz-bg);border:1.5px dashed rgba(240,138,36,.5);transition:.15s;
+}
+.uag-zona svg{color:var(--jp-narandz)}
+.uag-zona:hover,.uag-zona--iznad{background:#ffe3c4;border-color:var(--jp-narandz)}
+
+.uag-lista{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-top:16px}
+.uag-lista li{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#e8f0f2}
+.uag-lista img{width:100%;height:100%;object-fit:cover;display:block}
+.uag-br{
+    position:absolute;left:6px;top:6px;min-width:24px;height:24px;padding:0 6px;border-radius:999px;
+    display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;background:rgba(4,30,38,.65);
+}
+.uag-obrisi{
+    position:absolute;right:6px;top:6px;width:30px;height:30px;border-radius:50%;border:0;cursor:pointer;
+    display:grid;place-items:center;color:#fff;background:rgba(220,38,38,.85);transition:.15s;
+}
+.uag-obrisi:hover{background:#dc2626;transform:scale(1.08)}
+.uag-savjet{margin-top:12px;font-size:14px;color:var(--muted)}
+.uag-poruka{margin-top:10px;font-weight:700;color:var(--mint-dark)}
+.uag-poruka--greska{color:#dc2626}

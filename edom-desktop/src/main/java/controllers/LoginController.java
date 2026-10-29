@@ -78,6 +78,21 @@ public class LoginController {
                 chkRememberMe.setSelected(true);
             }
         }
+
+        // Enter u korisničkom imenu: ako lozinka još nije upisana, pređi na lozinku; inače prijava
+        txtUsername.setOnAction(e -> {
+            if (txtPassword.getText() == null || txtPassword.getText().isEmpty()) {
+                (passwordShown ? txtPasswordVisible : txtPassword).requestFocus();
+            } else {
+                onLoginClicked(e);
+            }
+        });
+
+        // ako je korisničko ime zapamćeno, kursor odmah ide u lozinku
+        Platform.runLater(() -> {
+            if (!txtUsername.getText().isBlank()) txtPassword.requestFocus();
+            else txtUsername.requestFocus();
+        });
     }
 
     @FXML
@@ -145,6 +160,7 @@ public class LoginController {
     @FXML
     private void onLoginClicked(ActionEvent event) {
 
+        if (loadingOverlay.isVisible()) return;   // prijava je već u toku (dupli Enter)
         String user = txtUsername.getText().trim();
         String pass = txtPassword.getText();          // lozinka se NE trimuje
 

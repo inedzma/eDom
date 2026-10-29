@@ -2,11 +2,13 @@ package ba.unze.edom.server.config;
 
 import ba.unze.edom.server.security.JwtFilter;
 import ba.unze.edom.server.security.PrijavaUspjeh;
+import ba.unze.edom.server.security.Uloge;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -60,7 +62,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a -> a
                         .requestMatchers("/", "/login", "/registracija", "/error", "/rang-lista",
                                 "/zaboravljena-lozinka", "/zaboravljena-lozinka/**",
-                                "/css/**", "/js/**", "/img/**", "/upute", "/upute/**").permitAll()
+                                "/css/**", "/js/**", "/img/**", "/upute", "/upute/**", "/dokumenti/**", "/usluge", "/galerija/**", "/kontakt").permitAll()
+                        .requestMatchers("/urednik/**").access((auth, ctx1) ->
+                                new AuthorizationDecision(Uloge.jeAdmin(auth.get())))
                         .requestMatchers("/student/**").hasRole("Student")
                         .anyRequest().authenticated()
                 )

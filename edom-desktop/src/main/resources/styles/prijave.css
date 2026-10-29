@@ -311,3 +311,135 @@
 .pr-tabela .button.pr-mali-btn.pr-mali-btn--zeleno:hover { -fx-background-color: #1b8a5b; }
 .pr-tabela .button.pr-mali-btn.pr-mali-btn--crveno { -fx-background-color: white; -fx-text-fill: #b3261e; -fx-border-color: #f0c4c0; }
 .pr-tabela .button.pr-mali-btn.pr-mali-btn--crveno:hover { -fx-background-color: #fdecea; }
+
+/* ---------- Detalji prijave ---------- */
+.pr-kartica-naslov { -fx-font-size: 16px; -fx-font-weight: 800; -fx-text-fill: #0b3b47; }
+.pr-polje-naslov   { -fx-font-size: 12px; -fx-font-weight: 700; -fx-text-fill: #4a6470; }
+.pr-vrijednost     { -fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #0b3b47; }
+
+/* pilula statusa u zaglavlju je malo veća */
+.pr-hero .pr-status { -fx-font-size: 13px; -fx-padding: 6 14; }
+
+/* prozirni klizni paneli (bez sivog okvira) */
+.pr-scroll,
+.pr-scroll > .viewport { -fx-background-color: transparent; -fx-background: #f4f8f8; }
+
+/* tekst u karticama uvijek taman (JavaFX boju teksta računa iz -fx-background) */
+.pr-kartica { -fx-background: white; }
+.pr-scroll { -fx-padding: 0; -fx-background-insets: 0; -fx-border-width: 0; }
+.pr-scroll .scroll-bar:vertical .thumb { -fx-background-color: #cfdde1; -fx-background-radius: 6; }
+.pr-scroll .scroll-bar:vertical .track,
+.pr-scroll .scroll-bar .increment-button,
+.pr-scroll .scroll-bar .decrement-button { -fx-background-color: transparent; -fx-padding: 0; }
+
+/* polje za tekst */
+.pr-textarea {
+    -fx-background-color: white; -fx-font-size: 13px;
+    -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #dbe5e8;
+}
+.pr-textarea .content { -fx-background-color: white; -fx-background-radius: 10; }
+.pr-textarea:focused  { -fx-border-color: #00b696; }
+
+/* dugmad iz panela (Sačuvaj bodovanje i sl.) u istom stilu */
+.pr-root .button.btn-primary {
+    -fx-background-color: #00b696; -fx-text-fill: white;
+    -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 20;
+    -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: null;
+}
+.pr-root .button.btn-primary:hover { -fx-background-color: #00a386; }
+
+/* naslovi i kvačice unutar panela */
+.pr-root .pr-kartica .check-box .box {
+    -fx-background-color: white; -fx-background-radius: 4;
+    -fx-border-color: #b8c8cd; -fx-border-radius: 4;
+}
+.pr-root .pr-kartica .check-box:selected .box  { -fx-background-color: #00b696; -fx-border-color: #00b696; }
+.pr-root .pr-kartica .check-box:selected .mark { -fx-background-color: white; }
+
+/* =========================================================
+   Pregled slike (DokumentPregled)
+   ========================================================= */
+.pr-hero.pr-pregled-traka { -fx-background-radius: 0; -fx-padding: 14 20; -fx-effect: null; }
+
+.pr-pregled-ikona {
+    -fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 10;
+    -fx-min-width: 42; -fx-min-height: 42; -fx-max-width: 42; -fx-max-height: 42;
+}
+.pr-pregled-ikona-svg { -fx-fill: white; }
+.pr-hero .pr-pregled-naslov { -fx-text-fill: white; -fx-font-size: 17px; -fx-font-weight: 800; }
+
+.pr-pregled-platno { -fx-background-color: #e9eff0; }
+.pr-pregled-scroll,
+.pr-pregled-scroll > .viewport { -fx-background-color: #e9eff0; -fx-background: #e9eff0; }
+.pr-pregled-scroll { -fx-padding: 0; -fx-background-insets: 0; -fx-border-width: 0; }
+.pr-pregled-scroll .scroll-bar .thumb { -fx-background-color: #b9c9ce; -fx-background-radius: 6; }
+.pr-pregled-scroll .scroll-bar .track,
+.pr-pregled-scroll .scroll-bar .increment-button,
+.pr-pregled-scroll .scroll-bar .decrement-button { -fx-background-color: transparent; -fx-padding: 0; }
+.pr-pregled-scroll .corner { -fx-background-color: transparent; }
+
+.pr-pregled-papir {
+    -fx-background-color: white; -fx-padding: 8; -fx-background-radius: 6; -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(11,59,71,0.22), 26, 0.15, 0, 8);
+}
+
+.pr-pregled-alati {
+    -fx-background: white; -fx-background-color: white; -fx-padding: 6 10;
+    -fx-background-radius: 999; -fx-border-radius: 999; -fx-border-color: #dbe5e8;
+    -fx-effect: dropshadow(gaussian, rgba(11,59,71,0.18), 18, 0.1, 0, 4);
+}
+.pr-pregled-alati .button {
+    -fx-background-color: transparent; -fx-text-fill: #0b3b47;
+    -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 6 14;
+    -fx-background-radius: 999; -fx-cursor: hand;
+}
+.pr-pregled-alati .button:hover   { -fx-background-color: #eef7f5; }
+.pr-pregled-alati .button:pressed { -fx-background-color: #dff3ee; }
+.pr-pregled-zoom {
+    -fx-text-fill: #0b3b47; -fx-font-size: 13px; -fx-font-weight: 800;
+    -fx-min-width: 60; -fx-alignment: center;
+}
+.pr-pregled-alati .separator:vertical .line { -fx-border-color: #e3ecee; }
+.pr-pregled-alati .separator:vertical { -fx-padding: 4 6; }
+
+/* ---------- Postavke ---------- */
+
+/* stanje konkursa u zaglavlju */
+.pr-hero .pr-hero-objava.pr-hero-objava--ne     { -fx-background-color: #fdecea; -fx-text-fill: #b3261e; }
+.pr-hero .pr-hero-objava.pr-hero-objava--uskoro { -fx-background-color: #fff1dc; -fx-text-fill: #8a5a12; }
+.pr-hero .pr-hero-izmjena { -fx-text-fill: #ffe39a; -fx-font-size: 13px; -fx-font-weight: 700; }
+.pr-hero .pr-btn-bijelo:disabled { -fx-opacity: 0.6; }
+
+/* polja za unos */
+.pr-polje {
+    -fx-background-color: white; -fx-text-fill: #0b3b47; -fx-font-size: 13px;
+    -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #dbe5e8;
+    -fx-background-insets: 0;
+}
+.text-field.pr-polje { -fx-padding: 8 12; }
+.pr-polje:focused { -fx-border-color: #00b696; }
+.date-picker.pr-polje > .text-field {
+    -fx-background-color: transparent; -fx-border-width: 0; -fx-padding: 8 12;
+}
+.date-picker.pr-polje > .arrow-button { -fx-background-color: transparent; -fx-padding: 0 10; }
+.date-picker.pr-polje > .arrow-button > .arrow { -fx-background-color: #6b8290; }
+
+/* narandžasti okvir s upozorenjem */
+.pr-upozorenje {
+    -fx-background-color: #fff7e8; -fx-text-fill: #8a5a12;
+    -fx-font-size: 12.5px; -fx-padding: 10 14;
+    -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #f6d9a8;
+}
+
+/* dugme za brisanje */
+.pr-btn-opasno {
+    -fx-background-color: white; -fx-text-fill: #b3261e;
+    -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 8 16; -fx-cursor: hand;
+    -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #f0c4c0;
+}
+.pr-btn-opasno:hover { -fx-background-color: #fdecea; }
+
+/* onemogućena dugmad */
+.pr-btn-primarno:disabled,
+.pr-btn-sekundarno:disabled,
+.pr-btn-opasno:disabled { -fx-opacity: 0.4; }

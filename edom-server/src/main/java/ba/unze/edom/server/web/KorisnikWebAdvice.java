@@ -18,6 +18,7 @@ public class KorisnikWebAdvice {
 
     private final ProfilService profilService;
 
+
     @ModelAttribute("ime")
     public String ime(@AuthenticationPrincipal KorisnikPrincipal k) {
         if (k == null || k.getIdStudenta() == null) return null;

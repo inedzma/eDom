@@ -132,6 +132,7 @@
                             <Button fx:id="btnLogin"
                                     text="Prijava"
                                     onAction="#onLoginClicked"
+                                    defaultButton="true"
                                     maxWidth="Infinity"
                                     styleClass="primary-btn"/>
 

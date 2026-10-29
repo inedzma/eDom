@@ -44,7 +44,7 @@
                 <div class="messages">
                     <div class="alert alert--error" role="alert" th:if="${param.error}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-                        <span>Neispravna e-mail adresa ili lozinka.</span>
+                        <span>Neispravni podaci za prijavu lozinka.</span>
                     </div>
 
                     <div class="alert alert--warning" role="alert" th:if="${param['samo-studenti']}">
@@ -71,11 +71,12 @@
                 <!-- ============ FORMA ============ -->
                 <form th:action="@{/login}" method="post" id="loginForm">
                     <div class="field">
-                        <label for="username">E-mail</label>
+                        <label for="username">E-mail ili korisničko ime</label>
                         <div class="input">
-                            <input type="email" id="username" name="username"
+                            <input type="text" id="username" name="username"
                                    placeholder="ime.prezime@primjer.ba"
-                                   autocomplete="username" required autofocus>
+                                   autocomplete="username" autocapitalize="none" spellcheck="false"
+                                   required autofocus>
                             <svg class="lead-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
                         </div>
                     </div>
@@ -157,4 +158,5 @@
 </body>
 
 <th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+<th:block th:replace="~{fragments/layout :: urednik}"></th:block>
 </html>

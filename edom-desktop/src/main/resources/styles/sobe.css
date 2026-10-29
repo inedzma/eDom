@@ -104,3 +104,76 @@
     -fx-font-weight: bold;
     -fx-padding: 0 3;
 }
+
+/* =========================================================
+   Novi izgled (zaglavlje u boji, kartice) – uz prijave.css
+   ========================================================= */
+
+/* pozadina cijele stranice i klizača */
+.sobe-scroll,
+.sobe-scroll > .viewport { -fx-background-color: #f4f8f8; -fx-background: #f4f8f8; }
+.sobe-scroll { -fx-padding: 0; -fx-background-insets: 0; -fx-border-width: 0; }
+.sobe-scroll .scroll-bar:vertical .thumb { -fx-background-color: #cfdde1; -fx-background-radius: 6; }
+.sobe-scroll .scroll-bar:vertical .track,
+.sobe-scroll .scroll-bar .increment-button,
+.sobe-scroll .scroll-bar .decrement-button { -fx-background-color: transparent; -fx-padding: 0; }
+.sobe-stranica { -fx-background-color: #f4f8f8; }
+
+/* brojevi u zaglavlju kao prozirne pločice */
+.pr-hero .broj-kartica {
+    -fx-background-color: rgba(255,255,255,0.11);
+    -fx-background-radius: 14; -fx-border-radius: 14; -fx-border-color: rgba(255,255,255,0.18);
+    -fx-padding: 14 18;
+}
+.pr-hero .broj-vrijednost { -fx-text-fill: white; -fx-font-size: 30px; -fx-font-weight: 800; }
+.pr-hero .broj-naziv      { -fx-text-fill: rgba(255,255,255,0.80); -fx-font-size: 12.5px; }
+
+/* "Odobreni bez sobe" ostaje istaknut */
+.pr-hero .broj-kartica.broj-upozorenje {
+    -fx-background-color: #fff4e0; -fx-border-color: #fff4e0; -fx-cursor: hand;
+}
+.pr-hero .broj-kartica.broj-upozorenje:hover { -fx-background-color: #ffeccc; }
+.pr-hero .broj-upozorenje .broj-vrijednost { -fx-text-fill: #c47f12; }
+.pr-hero .broj-upozorenje .broj-naziv      { -fx-text-fill: #8a5a12; -fx-font-weight: 700; }
+
+/* izbor godine na tamnoj podlozi */
+.pr-hero .pr-hero-combo {
+    -fx-background-color: rgba(255,255,255,0.14);
+    -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: rgba(255,255,255,0.30);
+    -fx-font-size: 13px; -fx-cursor: hand;
+}
+.pr-hero .pr-hero-combo:hover { -fx-background-color: rgba(255,255,255,0.24); }
+.pr-hero .pr-hero-combo .list-cell { -fx-text-fill: white; -fx-font-weight: 700; -fx-background-color: transparent; }
+.pr-hero .pr-hero-combo .arrow-button { -fx-background-color: transparent; }
+.pr-hero .pr-hero-combo .arrow { -fx-background-color: white; }
+
+/* padajuće liste u filterima */
+.pr-combo .arrow-button { -fx-background-color: transparent; }
+.pr-combo .list-cell    { -fx-background-color: transparent; -fx-padding: 4 8; }
+
+/* dugmad za raspored */
+.sobe-btn-potvrdi {
+    -fx-background-color: white; -fx-text-fill: #1e7a4f;
+    -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 9 16; -fx-cursor: hand;
+    -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #22a06b; -fx-border-width: 1.5;
+}
+.sobe-btn-potvrdi:hover { -fx-background-color: #e2f6ef; }
+
+.sobe-btn-ponisti {
+    -fx-background-color: white; -fx-text-fill: #b3261e;
+    -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 9 16; -fx-cursor: hand;
+    -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #f0c4c0;
+}
+.sobe-btn-ponisti:hover { -fx-background-color: #fdecea; }
+
+/* onemogućena dugmad: jasno blijeda, ne siva */
+.pr-btn-primarno:disabled,
+.sobe-btn-potvrdi:disabled,
+.sobe-btn-ponisti:disabled { -fx-opacity: 0.4; }
+
+/* spratovi u istom stilu kao kartice */
+.sprat-blok {
+    -fx-background-color: white; -fx-background-radius: 16;
+    -fx-border-radius: 16; -fx-border-color: #e3ecee;
+    -fx-effect: dropshadow(gaussian, rgba(11,59,71,0.05), 14, 0.2, 0, 3);
+}

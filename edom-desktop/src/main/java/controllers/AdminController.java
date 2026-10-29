@@ -189,8 +189,6 @@ public class AdminController {
         switch (o.vrsta()) {
             case "NOVA_PRIJAVA" -> otvoriDetalje(o.idPrijava());
             case "BEZ_SOBE", "ZAHTJEV_SOBA" -> loadView("/views/sobe.fxml");
-            case "PORUKA" -> new PorukaDijalog(o.kljuc().substring("PORUKA:".length()),
-                    this::osvjeziObavijesti).prikazi();
             default -> { if (o.idPrijava() != null) otvoriDetalje(o.idPrijava()); }
         }
     }

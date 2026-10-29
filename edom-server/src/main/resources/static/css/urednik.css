@@ -1,0 +1,41 @@
+/* Traka i izgled uređivanja javne stranice */
+[data-uredi-vise]{white-space:pre-line}
+
+body.ima-urednik-traku{padding-bottom:84px}
+
+.urednik-traka{
+    position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:1000;
+    width:min(1100px,calc(100% - 24px));
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    padding:12px 14px 12px 18px;border-radius:16px;
+    background:#0b3c49;color:#e6f4f1;
+    box-shadow:0 18px 50px rgba(4,30,38,.35);
+    font-size:14px;
+}
+.ut-oznaka{display:inline-flex;align-items:center;gap:8px;color:#5fd6b4}
+.ut-oznaka b{color:#fff}
+.ut-poruka{flex:1;min-width:200px;color:#b9d6dc}
+.ut-dugmad{display:flex;gap:8px;align-items:center}
+.ut-odjava{margin:0}
+.ut-btn{
+    height:38px;padding:0 16px;border-radius:10px;border:1px solid rgba(255,255,255,.25);
+    background:transparent;color:#fff;font:inherit;font-weight:700;cursor:pointer;
+}
+.ut-btn:hover{background:rgba(255,255,255,.08)}
+.ut-btn--glavno{background:#00bf9a;border-color:#00bf9a;color:#04303a}
+.ut-btn--glavno:hover{background:#19d3ad}
+.ut-btn--tiho{border-color:transparent;color:#9fc2c9}
+.ut-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* elementi koji se mogu mijenjati, dok je uključeno uređivanje */
+body.uredjivanje [data-uredi]{
+    outline:2px dashed rgba(0,191,154,.7);outline-offset:4px;border-radius:4px;
+    cursor:text;transition:outline-color .15s, background .15s;
+}
+body.uredjivanje [data-uredi]:hover{outline-color:#00bf9a;background:rgba(0,191,154,.06)}
+body.uredjivanje [data-uredi]:focus{outline:2px solid #00bf9a;background:rgba(0,191,154,.1)}
+body.uredjivanje [data-uredi]:empty::before{content:"(prazno = original)";opacity:.5}
+
+@media (max-width:640px){
+    .ut-poruka{order:3;flex-basis:100%}
+}

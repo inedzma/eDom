@@ -29,18 +29,134 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/edom.css}">
     <link rel="stylesheet" th:href="@{/css/toast.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
 </th:block>
 
 <!-- ============ FOOTER ============ -->
-<footer th:fragment="footer(minimal)" class="footer" th:classappend="${minimal} ? 'footer--minimal'">
-    <div class="footer-inner">
+<footer th:fragment="footer(minimal)" class="footer" th:classappend="${minimal} ? 'footer--minimal' : 'ft-puni'">
+
+    <!-- mali footer: login, registracija -->
+    <div class="footer-inner" th:if="${minimal}">
         <span>© <span th:text="${#dates.year(#dates.createNow())}">2026</span> Studentski centar Univerziteta u Zenici</span>
         <ul class="footer-links">
-            <li><a th:href="@{/pomoc}">Pomoć</a></li>
+            <li><a th:href="@{/}">Početna</a></li>
+            <li><a th:href="@{/upute}">Kako se prijaviti</a></li>
             <li><a th:href="@{/kontakt}">Kontakt</a></li>
-            <li><a th:href="@{/privatnost}">Privatnost</a></li>
         </ul>
     </div>
+
+    <!-- puni footer -->
+    <th:block th:unless="${minimal}">
+        <div class="ft-traka"></div>
+        <div class="ft-wrap ft-grid"
+             th:with="adresa=${postavke?.adresa} ?: 'Crkvice 50, 72000 Zenica',
+                      tel=${t?.get('pocetna.kontakt.telefon')} ?: '032 226 604',
+                      mail=${t?.get('pocetna.kontakt.email')} ?: 'tehnickisekretar.sc@unze.ba',
+                      fb=${t?.get('footer.facebook')} ?: 'https://www.facebook.com/profile.php?id=61555698492659',
+                      ig=${t?.get('footer.instagram')}">
+
+            <!-- O domu -->
+            <div class="ft-o">
+                <a class="ft-brand" th:href="@{/}">
+                    <img th:src="@{/img/studentski-centar-logo.png}" alt="">
+                    <span><b>Studentski centar</b><small>Univerziteta u Zenici</small></span>
+                </a>
+                <p data-uredi="footer.opis" data-uredi-vise
+                   th:text="${t?.get('footer.opis')} ?: _">Smještaj i ishrana za studente Univerziteta u Zenici. Sobe s kupatilom, restoran, čitaonica i sve što ti treba tokom studija — na jednom mjestu.</p>
+
+                <div class="ft-drustvene">
+                    <a th:if="${fb != null and #strings.startsWith(fb, 'https://') and #strings.length(fb) > 12}"
+                       th:href="${fb}" target="_blank" rel="noopener" aria-label="Facebook" class="ft-soc ft-soc--fb">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8h3V4h-3a5 5 0 0 0-5 5v3H6v4h3v8h4v-8h3l1-4h-4V9a1 1 0 0 1 1-1z"/></svg>
+                    </a>
+                    <a th:if="${ig != null and #strings.startsWith(ig, 'https://') and #strings.length(ig) > 12}"
+                       th:href="${ig}" target="_blank" rel="noopener" aria-label="Instagram" class="ft-soc ft-soc--ig">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+                    </a>
+                    <a href="https://unze.ba" target="_blank" rel="noopener" aria-label="Univerzitet u Zenici" class="ft-soc ft-soc--web">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+                    </a>
+                    <a th:href="'mailto:' + ${mail}" aria-label="E-mail" class="ft-soc ft-soc--mail">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>
+                    </a>
+                </div>
+
+                <!-- samo urednik: linkovi društvenih mreža (vidljivo pri uređivanju) -->
+                <div class="ft-uredi-linkove" th:if="${urednik}">
+                    <div><small>Facebook link:</small>
+                        <span data-uredi="footer.facebook" th:text="${fb} ?: 'https://'">https://</span></div>
+                    <div><small>Instagram link:</small>
+                        <span data-uredi="footer.instagram" th:text="${ig} ?: 'https://'">https://</span></div>
+                </div>
+            </div>
+
+            <!-- Brzi pristup -->
+            <nav class="ft-kol" aria-label="Brzi pristup">
+                <h4>Brzi pristup</h4>
+                <ul>
+                    <li><a th:href="@{/}">Početna</a></li>
+                    <li><a th:href="@{/upute}">Kako se prijaviti</a></li>
+                    <li><a th:href="@{/rang-lista}">Rang lista</a></li>
+                    <li><a th:href="@{/usluge}">Usluge i život u domu</a></li>
+                    <li><a th:href="@{/}+'#aktuelno'">Obavještenja</a></li>
+                    <li><a th:href="@{/}+'#lokacija'">Lokacija</a></li>
+                </ul>
+            </nav>
+
+            <!-- Za studente -->
+            <nav class="ft-kol" aria-label="Za studente">
+                <h4>Za studente</h4>
+                <ul>
+                    <li><a th:href="@{/registracija}">Registracija</a></li>
+                    <li><a th:href="@{/login}">Prijava u E-Dom</a></li>
+                    <li><a th:href="@{/student/pocetna}">Moje prijave</a></li>
+                    <li><a th:href="@{/student/pocetna}">Prijavni obrazac <small>(nakon prijave)</small></a></li>
+                    <li><a th:href="@{/zaboravljena-lozinka}">Zaboravljena lozinka</a></li>
+                </ul>
+                <h4 class="ft-h4-razmak">Dokumenti</h4>
+                <ul class="ft-dok">
+                    <!-- PROVJERI: nazivi fajlova u static/dokumenti/ -->
+                    <li><a th:href="@{/dokumenti/konkurs.pdf}" target="_blank">Konkurs za smještaj</a></li>
+                    <li><a th:href="@{/dokumenti/pravilnik.pdf}" target="_blank">Pravilnik o unutrašnjem životu</a></li>
+                    <li><a th:href="@{/dokumenti/uputa-za-uplatu.pdf}" target="_blank">Uputa za uplatu</a></li>
+                </ul>
+            </nav>
+
+            <!-- Kontakt -->
+            <div class="ft-kol ft-kontakt">
+                <h4>Kontakt</h4>
+                <ul>
+                    <li>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <span th:text="${adresa}">Crkvice 50, 72000 Zenica</span>
+                    </li>
+                    <li>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
+                        <a th:href="'tel:' + ${#strings.replace(tel, ' ', '')}"><span data-uredi="pocetna.kontakt.telefon" th:text="${tel}">032 226 604</span></a>
+                    </li>
+                    <li>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>
+                        <a th:href="'mailto:' + ${mail}"><span data-uredi="pocetna.kontakt.email" th:text="${mail}">tehnickisekretar.sc@unze.ba</span></a>
+                    </li>
+                    <li>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        <span data-uredi="footer.radnoVrijeme" th:text="${t?.get('footer.radnoVrijeme')} ?: _">Radnim danima</span>
+                    </li>
+                </ul>
+                <a class="ft-cta" th:href="@{/registracija}">Prijavi se na konkurs →</a>
+            </div>
+        </div>
+
+        <div class="ft-dno">
+            <div class="ft-wrap ft-dno-in">
+                <span>© <span th:text="${#dates.year(#dates.createNow())}">2026</span> Studentski centar Univerziteta u Zenici · E-Dom</span>
+                <a href="#" class="ft-vrh" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+                    Na vrh
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+                </a>
+            </div>
+        </div>
+    </th:block>
 </footer>
 
 <!-- ============ NAVBAR ZA POSJETIOCE (nisu prijavljeni) ============ -->
@@ -55,12 +171,26 @@
         </a>
         <nav class="pub-links">
             <a th:href="@{/}" th:classappend="${aktivna == 'pocetna'} ? 'active'">Početna</a>
+            <a th:href="@{/usluge}" th:classappend="${aktivna == 'usluge'} ? 'active'">Usluge</a>
             <a th:href="@{/upute}" th:classappend="${aktivna == 'upute'} ? 'active'">Kako se prijaviti</a>
             <a th:href="@{/rang-lista}" th:classappend="${aktivna == 'rang'} ? 'active'">Rang lista</a>
+            <a th:href="@{/kontakt}" th:classappend="${aktivna == 'kontakt'} ? 'active'">Kontakt</a>
         </nav>
-        <div class="pub-actions">
+        <div class="pub-actions" th:unless="${urednik}">
             <a class="btn btn-ghost btn-sm" th:href="@{/login}">Prijavi se</a>
             <a class="btn btn-primary btn-sm" th:href="@{/registracija}">Registruj se</a>
+        </div>
+        <div class="pub-actions pub-admin" th:if="${urednik}">
+            <span class="admin-chip">
+                <span class="admin-av">A</span>
+                <span><b>Admin</b><small>uređivanje stranice</small></span>
+            </span>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-ghost btn-sm">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                    Odjava
+                </button>
+            </form>
         </div>
     </div>
 </header>
@@ -80,7 +210,7 @@
             <li><a th:href="@{/upute}" th:classappend="${aktivna == 'upute'} ? 'active'">Kako se prijaviti</a></li>
             <li><a th:href="@{/rang-lista}" th:classappend="${aktivna == 'rang'} ? 'active'">Rang lista</a></li>
             <li><a th:href="@{/student/smjestaj}" th:classappend="${aktivna == 'smjestaj'} ? 'active'">Moj smještaj</a></li>
-            <li><a th:href="@{/student/kontakt}" th:classappend="${aktivno == 'kontakt'} ? 'active'">Kontakt</a></li>
+            <li><a th:href="@{/kontakt}" th:classappend="${aktivna == 'kontakt'} ? 'active'">Kontakt</a></li>
             <li><a th:href="@{/student/profil}" th:classappend="${aktivna == 'profil'} ? 'active'">Moj profil</a></li>
         </ul>
 
@@ -166,6 +296,33 @@
         </div>
     </div>
     <script th:src="@{/js/toast.js}"></script>
+</th:block>
+
+<!-- ============ TRAKA ZA UREĐIVANJE (samo urednik/admin) ============ -->
+<th:block th:fragment="urednik">
+    <th:block th:if="${urednik}">
+        <meta name="_csrf" th:content="${_csrf != null} ? ${_csrf.token} : ''">
+        <meta name="_csrf_header" th:content="${_csrf != null} ? ${_csrf.headerName} : ''">
+        <link rel="stylesheet" th:href="@{/css/urednik.css}">
+
+        <div class="urednik-traka" id="urednikTraka" th:data-url="@{/urednik/tekstovi}">
+            <span class="ut-oznaka">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+                <b>Uređivanje stranice</b>
+            </span>
+            <span class="ut-poruka" id="utPoruka">Kliknite "Uredi" pa direktno mijenjajte tekst na stranici.</span>
+            <div class="ut-dugmad">
+                <button type="button" class="ut-btn ut-btn--glavno" id="utUredi">Uredi stranicu</button>
+                <button type="button" class="ut-btn" id="utOdustani" hidden>Odustani</button>
+                <button type="button" class="ut-btn ut-btn--glavno" id="utSacuvaj" hidden>Sačuvaj</button>
+                <form th:action="@{/logout}" method="post" class="ut-odjava">
+                    <button type="submit" class="ut-btn ut-btn--tiho">Odjava</button>
+                </form>
+            </div>
+        </div>
+
+        <script th:src="@{/js/urednik.js}"></script>
+    </th:block>
 </th:block>
 
 </body>

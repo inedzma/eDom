@@ -1,100 +1,81 @@
 package controllers;
 
 import api.ApiException;
+import api.PostavkeApi;
 import api.PrijavaApi;
 import ba.unze.edom.common.dto.*;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import service.PdfService;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+
+import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/** Detalji prijave: zaglavlje sa sažetkom, bodovanje i dokumenti lijevo, status i podaci desno. */
 public class DetaljiPrijaveController {
 
     private static final DateTimeFormatter DATUM = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
     private static final String ODOBRENO = "odobreno";
-
     private static final String NA_CEKANJU = "na čekanju";
+
+    /** Šta se desi kad se izabere status — prikazuje se ispod padajuće liste. */
+    private static final Map<String, String> POMOC_STATUS = Map.of(
+            "odobreno", "Prijava ulazi na rang listu. Student dobija e-mail.",
+            "na čekanju", "Student nema dokaz o uslovu za upis – ide na listu čekanja i dobija e-mail.",
+            "nepotpuna", "Upišite u napomenu šta fali. Student dobija e-mail i može dopuniti prijavu na webu.",
+            "odbijeno", "Upišite razlog odbijanja. Student ga dobija na e-mail.",
+            "na pregledu", "Prijava se vraća na pregled.",
+            "zaključeno", "Student je uselio u dom.",
+            "iseljen", "Student više nije u domu. Iseljenje sa sobom radite u Sobama (dugme „Iseli“).");
 
     // zaglavlje
     @FXML private Label lblNaslov;
     @FXML private Label lblInfo;
     @FXML private Label lblPrijavaId;
     @FXML private Label lblStatus;
+    @FXML private HBox boxStatistika;
 
-    // bodovanje
-    @FXML private Label lblKompletiranostText;
-    @FXML private ProgressBar pbKompletiranost;
-    @FXML private TableView<StavkaBodovanja> tblBodovanje;
-    @FXML private TableColumn<StavkaBodovanja, String> colStavka;
-    @FXML private TableColumn<StavkaBodovanja, String> colObrazlozenje;
-    @FXML private TableColumn<StavkaBodovanja, Double> colStavkaBodovi;
-    @FXML private TableColumn<StavkaBodovanja, Boolean> colVerifikovan;
+    // lijevo
+    @FXML private VBox lijevaKolona;
 
-    // dokumenti
-    @FXML private TableView<DokumentDTO> tblDokumenti;
-    @FXML private TableColumn<DokumentDTO, String> colNaziv;
-    @FXML private TableColumn<DokumentDTO, String> colVrsta;
-    @FXML private TableColumn<DokumentDTO, LocalDate> colDatum;
-    @FXML private TableColumn<DokumentDTO, Boolean> colDostavljen;
-    @FXML private TableColumn<DokumentDTO, Void> colPregled;
-    @FXML private VBox emptyState;
-
-    // desni panel
-    @FXML private Label lblUkupniBodoviValue;
-    @FXML private Label lblDostavljeniCount;
-    @FXML private Label lblStatusObrade;
-    @FXML private Label lblPodaci;
-
-    // provjera
-    @FXML private VBox vboxProvjera;
-    @FXML private Button btnSacuvajProvjeru;
-    private CheckBox chkUspjeh;
-    private CheckBox chkUdaljenost;
-    private CheckBox chkPrimanja;
-    private final Map<Integer, CheckBox> kriterijChk = new LinkedHashMap<>();
-
-    // status
+    // desno
     @FXML private ComboBox<String> cmbStatusPrijave;
+    @FXML private Label lblStatusPomoc;
     @FXML private TextArea txtNapomenaAdmina;
     @FXML private Button btnSacuvajStatus;
+    @FXML private VBox napomenaMjesto;
+    @FXML private GridPane gridPodaci;
+
+    private final VBox bodovanjeMjesto = new VBox();
+    private final VBox dokumentiMjesto = new VBox();
 
     private PrijavaDetaljiDTO prijava;
 
-    // novi izgled: bodovanje i dokumenti (prave ih paneli u kodu)
-    private final VBox bodovanjeMjesto = new VBox();
-    private final VBox dokumentiMjesto = new VBox();
-    private final VBox napomenaMjesto = new VBox();
-
     @FXML
     public void initialize() {
-        inicijalizujTabelaBodovanja();
-        inicijalizujTabelaDokumenata();
-        pripremiNoviIzgled();
+        lijevaKolona.getChildren().setAll(bodovanjeMjesto, dokumentiMjesto);
+
+        cmbStatusPrijave.setCellFactory(l -> statusCelija());
+        cmbStatusPrijave.setButtonCell(statusCelija());
+        cmbStatusPrijave.valueProperty().addListener((o, a, n) -> {
+            String pomoc = n == null ? null : POMOC_STATUS.get(n);
+            lblStatusPomoc.setText(pomoc == null ? "" : pomoc);
+            lblStatusPomoc.setVisible(pomoc != null);
+            lblStatusPomoc.setManaged(pomoc != null);
+        });
     }
 
-    // ---------- učitavanje ----------
+    // =====================================================================
+    //  UČITAVANJE I PRIKAZ
+    // =====================================================================
 
     public void ucitaj(int idPrijave) {
         lblNaslov.setText("Učitavanje prijave #" + idPrijave + "…");
@@ -104,62 +85,126 @@ public class DetaljiPrijaveController {
     private void prikazi(PrijavaDetaljiDTO p) {
         this.prijava = p;
 
-        lblNaslov.setText("Detalji prijave – " + nullSafe(p.ime()) + " " + nullSafe(p.prezime()));
-        lblInfo.setText("Akademska godina: " + p.akademskaGodina()
-                + (p.datumPrijave() != null ? "   ·   podnesena " + p.datumPrijave().format(DATUM) : ""));
-        lblPrijavaId.setText("Prijava #" + p.idPrijava());
+        // zaglavlje
+        Integer g = p.akademskaGodina();
+        lblPrijavaId.setText("PRIJAVA #" + p.idPrijava() + (g != null ? "   ·   " + g + "/" + (g + 1) : ""));
+        lblNaslov.setText(nullSafe(p.ime()) + " " + nullSafe(p.prezime()));
+        lblInfo.setText(spoji("   ·   ",
+                p.brojIndeksa(),
+                p.fakultet() != null ? p.fakultet().replace(" UNZE", "") : null,
+                godinaTekst(p.godinaStudija()),
+                p.datumPrijave() != null ? "podnesena " + p.datumPrijave().format(DATUM) : null));
 
         String status = p.status() != null ? p.status() : "nepoznat";
-        lblStatus.setText(status);
-        lblStatusObrade.setText(status);
-        setStatusPillStyle(status);
+        lblStatus.setText(velikoPrvo(status));
+        lblStatus.getStyleClass().setAll("label", "pr-status", prijaveController.statusKlasa(status));
 
-        lblPodaci.setText(podaciTekst(p));
+        prikaziStatistiku(p);
+        popuniStatus(p);
+        prikaziNapomenu(p);
+        prikaziPodatke(p);
+        ucitajPanele(p.idPrijava());
+    }
 
-        // bodovanje
+    private void prikaziStatistiku(PrijavaDetaljiDTO p) {
         RezultatBodovanja r = p.bodovanje();
+        List<DokumentDTO> docs = p.dokumenti() != null ? p.dokumenti() : List.of();
+        long dostavljeno = docs.stream().filter(d -> Boolean.TRUE.equals(d.dostavljen())).count();
+
+        VBox bodovi;
+        VBox provjereno;
         if (r == null) {
-            lblUkupniBodoviValue.setText("—");
-            tblBodovanje.getItems().clear();
-            pbKompletiranost.setProgress(0);
-            lblKompletiranostText.setText(p.greska() != null ? "⚠ " + p.greska() : "");
+            bodovi = stat("BODOVI", "—", "⚠ neispravni podaci", -1);
+            if (p.greska() != null) Tooltip.install(bodovi, new Tooltip(p.greska()));
+            provjereno = stat("PROVJERENO", "—", "", -1);
         } else {
-            lblUkupniBodoviValue.setText(String.format("%.2f / %.2f", r.potvrdjeno(), r.potencijalno()));
-            tblBodovanje.setItems(FXCollections.observableArrayList(r.stavke()));
-            long provjereno = r.stavke().stream().filter(StavkaBodovanja::verifikovan).count();
-            int ukupno = r.stavke().size();
-            pbKompletiranost.setProgress(ukupno == 0 ? 0 : (double) provjereno / ukupno);
-            lblKompletiranostText.setText("Provjereno: " + provjereno + " / " + ukupno + " stavki");
+            bodovi = stat("BODOVI", String.format("%.2f", r.potvrdjeno()),
+                    String.format("potvrđeno od mogućih %.2f", r.potencijalno()),
+                    r.potencijalno() > 0 ? r.potvrdjeno() / r.potencijalno() : 0);
+            long ok = r.stavke().stream().filter(StavkaBodovanja::verifikovan).count();
+            int n = r.stavke().size();
+            provjereno = stat("PROVJERENO", ok + " / " + n, "stavki bodovanja", n == 0 ? 0 : (double) ok / n);
         }
 
-        // dokumenti
-        List<DokumentDTO> docs = p.dokumenti() != null ? p.dokumenti() : List.of();
-        tblDokumenti.setItems(FXCollections.observableArrayList(docs));
-        lblDostavljeniCount.setText(String.valueOf(docs.size()));
-        emptyState.setVisible(docs.isEmpty());
-        emptyState.setManaged(docs.isEmpty());
+        VBox dokumenti = stat("DOKUMENTI", dostavljeno + " / " + docs.size(),
+                "dostavljeno od priloženih online", docs.isEmpty() ? -1 : (double) dostavljeno / docs.size());
+        VBox prosjek = stat("PROSJEK", p.prosjek() != null ? broj(p.prosjek()) : "—",
+                p.polozeniIspiti() != null ? p.polozeniIspiti() + " položenih ispita" : "", -1);
 
-        popuniProvjeru(p);
-        popuniStatus(p);
-        ucitajPanele(p.idPrijava());
-        prikaziNapomenu(p);
+        boxStatistika.getChildren().setAll(bodovi, provjereno, dokumenti, prosjek);
     }
+
+    /** Pločica u zaglavlju: naslov, veliki broj, opis i (ako ima) traka. */
+    private VBox stat(String naslov, String vrijednost, String opis, double popunjeno) {
+        Label n = new Label(naslov);
+        n.getStyleClass().add("pr-hero-stat-naslov");
+        Label b = new Label(vrijednost);
+        b.getStyleClass().add("pr-hero-stat-broj");
+        Label o = new Label(opis);
+        o.getStyleClass().add("pr-hero-stat-opis");
+
+        VBox v = new VBox(2, n, b, o);
+        if (popunjeno >= 0) {
+            ProgressBar traka = new ProgressBar(Math.min(1, popunjeno));
+            traka.getStyleClass().add("pr-hero-traka");
+            traka.setMaxWidth(Double.MAX_VALUE);
+            VBox.setMargin(traka, new Insets(8, 0, 0, 0));
+            v.getChildren().add(traka);
+        }
+        v.getStyleClass().add("pr-hero-stat");
+        v.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(v, Priority.ALWAYS);
+        return v;
+    }
+
+    private void prikaziPodatke(PrijavaDetaljiDTO p) {
+        gridPodaci.getChildren().clear();
+        int red = 0;
+        red = podatak(red, "Broj indeksa", p.brojIndeksa());
+        red = podatak(red, "Fakultet", p.fakultet());
+        red = podatak(red, "Godina studija", godinaTekst(p.godinaStudija()));
+        if (p.trebaUslov()) red = podatak(red, "Uslov za upis", p.uslovUpisa());
+        red = podatak(red, "Prosjek", p.prosjek() != null ? broj(p.prosjek()) : null);
+        red = podatak(red, "Položeni ispiti", p.polozeniIspiti() != null ? p.polozeniIspiti().toString() : null);
+        red = podatak(red, "Članova domaćinstva",
+                p.brojClanovaDomacinstva() != null ? p.brojClanovaDomacinstva().toString() : null);
+        red = podatak(red, "Ukupna primanja", p.ukupnaPrimanja() != null ? broj(p.ukupnaPrimanja()) + " KM" : null);
+        red = podatak(red, "Udaljenost", p.udaljenostKm() != null ? broj(p.udaljenostKm()) + " km" : null);
+        red = podatak(red, "E-mail", p.email());
+        podatak(red, "Telefon", p.telefon());
+    }
+
+    private int podatak(int red, String naziv, String vrijednost) {
+        Label n = new Label(naziv);
+        n.getStyleClass().add("pr-sitno");
+        Label v = new Label(vrijednost == null || vrijednost.isBlank() ? "—" : vrijednost);
+        v.getStyleClass().add("pr-vrijednost");
+        v.setWrapText(true);
+        gridPodaci.add(n, 0, red);
+        gridPodaci.add(v, 1, red);
+        return red + 1;
+    }
+
+    // =====================================================================
+    //  NAPOMENA STUDENTA
+    // =====================================================================
 
     /** Napomena koju je student napisao pri predaji; admin je može ispraviti. */
     private void prikaziNapomenu(PrijavaDetaljiDTO p) {
         Label naslov = new Label("Napomena studenta");
-        naslov.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        naslov.getStyleClass().add("pr-kartica-naslov");
         Label opis = new Label("Student je upisuje pri predaji prijave. Administrator je može ispraviti ili dopuniti.");
-        opis.setStyle("-fx-text-fill: #6b7a90;");
+        opis.getStyleClass().add("pr-sitno");
         opis.setWrapText(true);
 
         TextArea ta = new TextArea(p.napomena() != null ? p.napomena() : "");
+        ta.getStyleClass().add("pr-textarea");
         ta.setPromptText("Student nije ostavio napomenu.");
         ta.setWrapText(true);
         ta.setPrefRowCount(3);
 
         Button sacuvaj = new Button("Sačuvaj napomenu");
-        sacuvaj.getStyleClass().add("btn-primary");
+        sacuvaj.getStyleClass().add("pr-btn-sekundarno");
         int id = p.idPrijava();
         sacuvaj.setOnAction(e -> {
             String tekst = ta.getText();
@@ -172,72 +217,16 @@ public class DetaljiPrijaveController {
         });
 
         HBox dno = new HBox(sacuvaj);
-        dno.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+        dno.setAlignment(Pos.CENTER_RIGHT);
 
-        VBox kartica = new VBox(8, naslov, opis, ta, dno);
-        kartica.setPadding(new Insets(16));
-        kartica.setStyle("-fx-background-color: white; -fx-background-radius: 14; "
-                + "-fx-border-color: #e3e8ef; -fx-border-radius: 14;");
+        VBox kartica = new VBox(10, naslov, opis, ta, dno);
+        kartica.getStyleClass().add("pr-kartica");
         napomenaMjesto.getChildren().setAll(kartica);
     }
 
-    // ---------- provjera stavki ----------
-
-    private void popuniProvjeru(PrijavaDetaljiDTO p) {
-        vboxProvjera.getChildren().clear();
-        kriterijChk.clear();
-
-        boolean moze = p.mozeProvjeravati();
-
-        chkUspjeh     = provjeraChk("Uspjeh (prosjek i položeni ispiti)", p.uspjehVerifikovan(), moze);
-        chkUdaljenost = provjeraChk("Udaljenost (CIPS)", p.udaljenostVerifikovana(), moze);
-        chkPrimanja   = provjeraChk("Primanja domaćinstva (kućna lista i dokumenti članova)",
-                p.primanjaVerifikovana(), moze);
-        vboxProvjera.getChildren().addAll(chkUspjeh, chkUdaljenost, chkPrimanja);
-
-        if (p.kriteriji() != null) {
-            for (KriterijStanjeDTO k : p.kriteriji()) {
-                String tekst = k.naziv() + (k.parametar() != null
-                        ? " (" + k.nazivParametra() + ": " + k.parametar().stripTrailingZeros().toPlainString() + ")"
-                        : "");
-                CheckBox c = provjeraChk(tekst, k.verifikovan(), moze);
-                kriterijChk.put(k.idPrijavaKriterij(), c);
-                vboxProvjera.getChildren().add(c);
-            }
-        }
-
-        btnSacuvajProvjeru.setDisable(!moze);
-        if (!moze) {
-            Label info = new Label("Provjera je moguća samo dok je prijava na pregledu.");
-            info.setWrapText(true);
-            info.getStyleClass().add("muted");
-            vboxProvjera.getChildren().add(info);
-        }
-    }
-
-    private CheckBox provjeraChk(String tekst, boolean oznaceno, boolean omoguceno) {
-        CheckBox c = new CheckBox(tekst);
-        c.setWrapText(true);
-        c.setSelected(oznaceno);
-        c.setDisable(!omoguceno);
-        return c;
-    }
-
-    @FXML
-    private void onSacuvajProvjeru() {
-        if (prijava == null) return;
-
-        List<KriterijVerifikacijaDTO> kriteriji = new ArrayList<>();
-        kriterijChk.forEach((id, chk) -> kriteriji.add(new KriterijVerifikacijaDTO(id, chk.isSelected())));
-
-        VerifikacijaDTO z = new VerifikacijaDTO(
-                chkUspjeh.isSelected(), chkUdaljenost.isSelected(), chkPrimanja.isSelected(), kriteriji);
-
-        int id = prijava.idPrijava();
-        izvrsi(() -> PrijavaApi.verifikuj(id, z), "Provjera je sačuvana.");
-    }
-
-
+    // =====================================================================
+    //  STATUS
+    // =====================================================================
 
     private void popuniStatus(PrijavaDetaljiDTO p) {
         List<String> dozvoljeni = p.dozvoljeniStatusi() != null ? p.dozvoljeniStatusi() : List.of();
@@ -295,106 +284,33 @@ public class DetaljiPrijaveController {
         potvrda.setHeaderText(null);
         if (potvrda.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
 
-        boolean saljeMail = java.util.Set.of(ODOBRENO, "odbijeno", "nepotpuna", NA_CEKANJU).contains(novi);
+        boolean saljeMail = Set.of(ODOBRENO, "odbijeno", "nepotpuna", NA_CEKANJU).contains(novi);
         int id = prijava.idPrijava();
         izvrsi(() -> PrijavaApi.promijeniStatus(id, new PromjenaStatusaDTO(novi, napomena)),
                 saljeMail ? "Status je promijenjen. Studentu je poslan e-mail." : "Status je promijenjen.");
     }
 
-    // ---------- tabele ----------
-
-    private void inicijalizujTabelaBodovanja() {
-        colStavka.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().naziv()));
-        colObrazlozenje.setCellValueFactory(c -> new SimpleStringProperty(nullSafe(c.getValue().obrazlozenje())));
-
-        colStavkaBodovi.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().bodovi()));
-        colStavkaBodovi.setCellFactory(col -> new TableCell<>() {
+    private ListCell<String> statusCelija() {
+        return new ListCell<>() {
             @Override
-            protected void updateItem(Double v, boolean empty) {
-                super.updateItem(v, empty);
-                setText(empty || v == null ? null : String.format("%.2f", v));
-            }
-        });
-
-        colVerifikovan.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().verifikovan()));
-        colVerifikovan.setCellFactory(col -> badgeCell());
-    }
-
-    private void inicijalizujTabelaDokumenata() {
-        colNaziv.setCellValueFactory(c -> new SimpleStringProperty(nullSafe(c.getValue().naziv())));
-        colVrsta.setCellValueFactory(c -> new SimpleStringProperty(nullSafe(c.getValue().vrsta())));
-
-        colDatum.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().datumUpload()));
-        colDatum.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(LocalDate d, boolean empty) {
-                super.updateItem(d, empty);
-                setText(empty || d == null ? null : d.format(DATUM));
-            }
-        });
-
-        colDostavljen.setCellValueFactory(c -> new SimpleObjectProperty<>(
-                Boolean.TRUE.equals(c.getValue().dostavljen())));
-        colDostavljen.setCellFactory(col -> badgeCell());
-
-        colPregled.setCellFactory(col -> new TableCell<>() {
-            private final Button btn = new Button("Pregledaj");
-            {
-                btn.getStyleClass().add("btn-action");
-                btn.setOnAction(e -> {
-                    DokumentDTO d = getTableRow() != null ? getTableRow().getItem() : null;
-                    if (d != null) otvoriDokument(d);
-                });
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                DokumentDTO d = (empty || getTableRow() == null) ? null : getTableRow().getItem();
-                if (d == null) {
-                    setGraphic(null);
-                    return;
-                }
-                btn.setDisable(!d.imaSadrzaj());
-                btn.getStyleClass().remove("btn-action-disabled");
-                if (!d.imaSadrzaj()) btn.getStyleClass().add("btn-action-disabled");
-                setGraphic(btn);
-            }
-        });
-    }
-
-    private <S> TableCell<S, Boolean> badgeCell() {
-        return new TableCell<>() {
-            private final Label badge = new Label();
-            { badge.getStyleClass().add("badge"); }
-
-            @Override
-            protected void updateItem(Boolean v, boolean empty) {
-                super.updateItem(v, empty);
-                if (empty || v == null) {
-                    setGraphic(null);
-                    return;
-                }
-                badge.setText(v ? "DA" : "NE");
-                badge.getStyleClass().removeAll("badge-yes", "badge-no");
-                badge.getStyleClass().add(v ? "badge-yes" : "badge-no");
-                setGraphic(badge);
+            protected void updateItem(String s, boolean empty) {
+                super.updateItem(s, empty);
+                setText(empty || s == null ? null : velikoPrvo(s));
             }
         };
     }
 
-    // ---------- dokument ----------
+    // =====================================================================
+    //  PANELI (bodovanje, dokumenti)
+    // =====================================================================
 
-    private void otvoriDokument(DokumentDTO d) {
-        Task<String> task = new Task<>() {
-            @Override
-            protected String call() {
-                return PrijavaApi.sadrzajDokumenta(prijava.idPrijava(), d.idDokument());
-            }
-        };
-        task.setOnSucceeded(e -> PdfService.prikaziPdf(task.getValue(), d.naziv()));
-        task.setOnFailed(e -> greska(task.getException(), "Greška pri otvaranju dokumenta."));
-        pokreni(task);
+    private void ucitajPanele(int idPrijave) {
+        uPozadini(() -> Map.entry(PrijavaApi.bodovanje(idPrijave), PostavkeApi.ucitaj()),
+                e -> bodovanjeMjesto.getChildren().setAll(new BodovanjePanel(e.getKey(), e.getValue(),
+                        () -> izvrsi(() -> PrijavaApi.detalji(idPrijave), null))));
+        uPozadini(() -> PrijavaApi.dokumentiSpisak(idPrijave),
+                s -> dokumentiMjesto.getChildren().setAll(new DokumentiPanel(idPrijave, s,
+                        () -> izvrsi(() -> PrijavaApi.detalji(idPrijave), null))));
     }
 
     @FXML
@@ -402,13 +318,13 @@ public class DetaljiPrijaveController {
         ((Stage) lblNaslov.getScene().getWindow()).close();
     }
 
-    // ---------- pomoćne ----------
+    // =====================================================================
+    //  POMOĆNE
+    // =====================================================================
 
     /** Pozove server u pozadini, prikaže novo stanje prijave i (opcionalno) poruku. */
     private void izvrsi(Supplier<PrijavaDetaljiDTO> poziv, String porukaUspjeha) {
-        btnSacuvajProvjeru.setDisable(true);
         btnSacuvajStatus.setDisable(true);
-
         Task<PrijavaDetaljiDTO> task = new Task<>() {
             @Override
             protected PrijavaDetaljiDTO call() {
@@ -426,39 +342,16 @@ public class DetaljiPrijaveController {
         pokreni(task);
     }
 
-    private String podaciTekst(PrijavaDetaljiDTO p) {
-        List<String> redovi = new ArrayList<>(List.of(
-                "Indeks: " + str(p.brojIndeksa()),
-                "Fakultet: " + str(p.fakultet()),
-                "Godina studija: " + str(p.godinaStudija())
-        ));
-        if (p.trebaUslov()) {
-            redovi.add("Uslov za upis: " + str(p.uslovUpisa()));
-        }
-        redovi.addAll(List.of(
-                "Prosjek: " + str(p.prosjek()),
-                "Položeni ispiti: " + str(p.polozeniIspiti()),
-                "Članova domaćinstva: " + str(p.brojClanovaDomacinstva()),
-                "Ukupna primanja: " + (p.ukupnaPrimanja() != null ? p.ukupnaPrimanja() + " KM" : "—"),
-                "Udaljenost: " + (p.udaljenostKm() != null ? p.udaljenostKm() + " km" : "—"),
-                "Email: " + str(p.email()),
-                "Telefon: " + str(p.telefon())
-        ));
-        if (p.napomena() != null && !p.napomena().isBlank()) {
-            redovi.add("Napomena studenta: " + p.napomena());
-        }
-        return String.join("\n", redovi);
-    }
-
-    private void setStatusPillStyle(String status) {
-        lblStatus.getStyleClass().removeAll("status-info", "status-success", "status-warning", "status-danger");
-        String s = status.toLowerCase();
-        if (s.contains("odob"))       lblStatus.getStyleClass().add("status-success");
-        else if (s.contains("odbij")) lblStatus.getStyleClass().add("status-danger");
-        else if (s.contains("čekanju") || s.contains("nepotpun")) lblStatus.getStyleClass().add("status-warning");
-        else if (s.contains("iselj")) lblStatus.getStyleClass().add("status-info");
-        else if (s.contains("zaklj")) lblStatus.getStyleClass().add("status-warning");
-        else                          lblStatus.getStyleClass().add("status-info");
+    private <T> void uPozadini(Supplier<T> posao, Consumer<T> uspjeh) {
+        Task<T> task = new Task<>() {
+            @Override
+            protected T call() {
+                return posao.get();
+            }
+        };
+        task.setOnSucceeded(e -> uspjeh.accept(task.getValue()));
+        task.setOnFailed(e -> greska(task.getException(), "Greška pri učitavanju."));
+        pokreni(task);
     }
 
     private void pokreni(Task<?> task) {
@@ -480,47 +373,30 @@ public class DetaljiPrijaveController {
         a.showAndWait();
     }
 
-    private String str(Object o) {
-        return o == null ? "—" : o.toString();
-    }
-
-    private String nullSafe(String s) {
-        return s == null ? "" : s;
-    }
-
-    /** Lijeva kartica: umjesto starih tabela dva panela; stara kartica "Provjera dokumenata" se sakrije. */
-    private void pripremiNoviIzgled() {
-        VBox lijevo = (VBox) tblBodovanje.getParent();
-        VBox sadrzaj = new VBox(18, napomenaMjesto, bodovanjeMjesto, dokumentiMjesto);
-        sadrzaj.setPadding(new Insets(2));
-        ScrollPane sp = new ScrollPane(sadrzaj);
-        sp.setFitToWidth(true);
-        VBox.setVgrow(sp, Priority.ALWAYS);
-        lijevo.getChildren().setAll(sp);
-
-        Node provjera = vboxProvjera.getParent();
-        provjera.setVisible(false);
-        provjera.setManaged(false);
-    }
-
-    private void ucitajPanele(int idPrijave) {
-        uPozadini(() -> Map.entry(PrijavaApi.bodovanje(idPrijave), api.PostavkeApi.ucitaj()),
-                e -> bodovanjeMjesto.getChildren().setAll(new BodovanjePanel(e.getKey(), e.getValue(),
-                        () -> izvrsi(() -> PrijavaApi.detalji(idPrijave), null))));
-        uPozadini(() -> PrijavaApi.dokumentiSpisak(idPrijave),
-                s -> dokumentiMjesto.getChildren().setAll(new DokumentiPanel(idPrijave, s,
-                        () -> ucitajPanele(idPrijave))));
-    }
-
-    private <T> void uPozadini(Supplier<T> posao, Consumer<T> uspjeh) {
-        Task<T> task = new Task<>() {
-            @Override
-            protected T call() {
-                return posao.get();
-            }
+    private static String godinaTekst(Integer g) {
+        if (g == null) return null;
+        return switch (g) {
+            case 7 -> "Apsolvent";
+            case 8 -> "Postdiplomac";
+            default -> g + ". godina";
         };
-        task.setOnSucceeded(e -> uspjeh.accept(task.getValue()));
-        task.setOnFailed(e -> greska(task.getException(), "Greška pri učitavanju."));
-        pokreni(task);
+    }
+
+    private static String broj(BigDecimal b) {
+        return b.stripTrailingZeros().toPlainString();
+    }
+
+    private static String velikoPrvo(String s) {
+        return s == null || s.isEmpty() ? "" : Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+
+    private static String spoji(String sep, String... dijelovi) {
+        StringJoiner j = new StringJoiner(sep);
+        for (String d : dijelovi) if (d != null && !d.isBlank()) j.add(d);
+        return j.toString();
+    }
+
+    private static String nullSafe(String s) {
+        return s == null ? "" : s;
     }
 }

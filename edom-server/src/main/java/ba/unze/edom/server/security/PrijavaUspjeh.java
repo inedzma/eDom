@@ -19,6 +19,11 @@ public class PrijavaUspjeh implements AuthenticationSuccessHandler {
                                         Authentication auth)
             throws IOException, ServletException {
 
+        if (Uloge.jeAdmin(auth)) {
+            odgovor.sendRedirect(zahtjev.getContextPath() + "/");
+            return;
+        }
+
         boolean student = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equalsIgnoreCase("ROLE_STUDENT"));
 

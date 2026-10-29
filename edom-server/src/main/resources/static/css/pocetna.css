@@ -114,3 +114,16 @@ body.landing main{flex:1}
     .hero-cta .btn{flex:1;padding:0 14px;font-size:16px;white-space:nowrap}
     .cta-card{padding:28px 22px}
 }
+
+/* ---------- admin u javnom navbaru ---------- */
+.pub-admin{align-items:center}
+.pub-admin form{margin:0}
+.pub-admin .btn{display:inline-flex;align-items:center;gap:6px}
+.admin-chip{display:inline-flex;align-items:center;gap:10px;padding:4px 14px 4px 4px;border-radius:999px;background:var(--mint-soft)}
+.admin-av{
+    width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    background:linear-gradient(135deg,#f08a24,#e8547a);color:#fff;font-weight:800;
+}
+.admin-chip b{display:block;font-size:14px;color:var(--heading);line-height:1.1}
+.admin-chip small{font-size:12px;color:var(--muted)}
+@media (max-width:560px){ .admin-chip small{display:none} }

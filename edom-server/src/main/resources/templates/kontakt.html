@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
+    <title>Kontakt — Studentski centar Zenica</title>
+    <meta name="description" content="Kontakt Studentskog centra Univerziteta u Zenici: adresa, telefon, e-mail i uprava doma.">
+    <link rel="stylesheet" th:href="@{/css/pocetna.css}">
+    <link rel="stylesheet" th:href="@{/css/javna.css}">
+    <link rel="stylesheet" th:href="@{/css/kontakt.css}">
+</head>
+<body class="landing">
+
+<!-- prijavljeni student vidi svoj navbar, ostali javni -->
+<header th:replace="${ime != null} ? ~{fragments/layout :: navbarStudent('kontakt')} : ~{fragments/layout :: navbarJavni('kontakt')}"></header>
+
+<main th:with="adresa=${postavke?.adresa} ?: 'Crkvice 50, 72000 Zenica',
+               tel=${t['pocetna.kontakt.telefon']} ?: '032 226 604',
+               mail=${t['pocetna.kontakt.email']} ?: 'tehnickisekretar.sc@unze.ba',
+               fb=${t['footer.facebook']} ?: 'https://www.facebook.com/profile.php?id=61555698492659'">
+
+    <!-- ======================= ZAGLAVLJE ======================= -->
+    <section class="kt-hero">
+        <div class="jp-wrap kt-hero-in">
+            <span class="jp-eyebrow kt-eyebrow">Kontakt</span>
+            <h1 data-uredi="kontakt.hero.naslov" th:text="${t['kontakt.hero.naslov']} ?: _">Tu smo za tvoja pitanja</h1>
+            <p data-uredi="kontakt.hero.opis" data-uredi-vise th:text="${t['kontakt.hero.opis']} ?: _">Bilo da te zanima konkurs, dokumenti, useljenje ili ishrana — javi nam se telefonom, e-mailom ili dođi lično u Studentski centar.</p>
+        </div>
+    </section>
+
+    <!-- ======================= BRZI KONTAKT ======================= -->
+    <section class="kt-brzo">
+        <div class="jp-wrap kt-brzo-grid">
+            <a class="kt-kanal kt-kanal--tel" th:href="'tel:' + ${#strings.replace(tel, ' ', '')}">
+                <span class="kt-kanal-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></span>
+                <small>Telefon / fax</small>
+                <b data-uredi="pocetna.kontakt.telefon" th:text="${tel}">032 226 604</b>
+                <span class="kt-kanal-akcija">Pozovi →</span>
+            </a>
+            <a class="kt-kanal kt-kanal--mail" th:href="@{/kontakt}+'#poruka'">
+                <span class="kt-kanal-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></span>
+                <small>E-mail</small>
+                <b data-uredi="pocetna.kontakt.email" th:text="${mail}">tehnickisekretar.sc@unze.ba</b>
+                <span class="kt-kanal-akcija">Pošalji poruku →</span>
+            </a>
+            <a class="kt-kanal kt-kanal--adresa" target="_blank" rel="noopener"
+               th:href="|https://www.google.com/maps/search/?api=1&query=${#uris.escapeQueryParam('Studentski centar Zenica, ' + adresa)}|">
+                <span class="kt-kanal-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+                <small>Adresa</small>
+                <b th:text="${adresa}">Crkvice 50, 72000 Zenica</b>
+                <span class="kt-kanal-akcija">Otvori mapu →</span>
+            </a>
+            <a class="kt-kanal kt-kanal--fb" target="_blank" rel="noopener"
+               th:href="${#strings.startsWith(fb, 'https://')} ? ${fb} : '#'">
+                <span class="kt-kanal-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8h3V4h-3a5 5 0 0 0-5 5v3H6v4h3v8h4v-8h3l1-4h-4V9a1 1 0 0 1 1-1z"/></svg></span>
+                <small>Facebook</small>
+                <b>Studentski centar Zenica</b>
+                <span class="kt-kanal-akcija">Prati novosti →</span>
+            </a>
+        </div>
+        <div class="jp-wrap kt-fb-uredi" th:if="${urednik}">
+            <small>Facebook link (vidljivo samo adminu):</small>
+            <span data-uredi="footer.facebook" th:text="${fb}">https://</span>
+        </div>
+    </section>
+
+    <!-- ======================= FORMA ======================= -->
+    <section class="jp-sekcija" id="poruka">
+        <div class="jp-wrap kt-forma-wrap">
+            <div class="kt-forma-uvod">
+                <span class="jp-eyebrow">Pošalji poruku</span>
+                <h2 data-uredi="kontakt.forma.naslov" th:text="${t['kontakt.forma.naslov']} ?: _">Piši nam direktno odavde</h2>
+                <p class="jp-lead" data-uredi="kontakt.forma.opis" data-uredi-vise th:text="${t['kontakt.forma.opis']} ?: _">Poruka stiže e-mailom u Studentski centar, a odgovor dobijaš na adresu koju upišeš. Odgovaramo radnim danima, obično u roku od dva do tri dana.</p>
+                <ul class="kt-forma-savjeti">
+                    <li data-uredi="kontakt.forma.s1" th:text="${t['kontakt.forma.s1']} ?: _">Ako već imaš prijavu, navedi svoju šifru.</li>
+                    <li data-uredi="kontakt.forma.s2" th:text="${t['kontakt.forma.s2']} ?: _">Ne šalji dokumente ovdje — originali idu poštom ili lično.</li>
+                    <li data-uredi="kontakt.forma.s3" th:text="${t['kontakt.forma.s3']} ?: _">Za hitne stvari radije pozovi telefonom.</li>
+                </ul>
+            </div>
+
+            <div class="kt-forma-kartica">
+                <!-- uspjeh -->
+                <div class="kt-forma-poslano" th:if="${kontaktPoslano}">
+                    <span class="kt-forma-kvacica"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+                    <h3>Poruka je poslana!</h3>
+                    <p>Hvala što si nam se javio/la. Odgovor stiže na e-mail koji si upisao/la.</p>
+                    <a class="btn btn-ghost" th:href="@{/kontakt}+'#poruka'">Pošalji novu poruku</a>
+                </div>
+
+                <!-- forma -->
+                <form th:unless="${kontaktPoslano}" th:action="@{/kontakt}" method="post" class="kt-forma" id="kontaktForma" novalidate>
+                    <div class="kt-forma-greska" th:if="${kontaktGreska}" role="alert">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                        <span th:text="${kontaktGreska}">Greška</span>
+                    </div>
+
+                    <div class="kt-polja-2">
+                        <label class="kt-polje">
+                            <span>Ime i prezime</span>
+                            <input type="text" name="ime" maxlength="80" required autocomplete="name"
+                                   placeholder="npr. Amra Hadžić" th:value="${forma?.ime}">
+                        </label>
+                        <label class="kt-polje">
+                            <span>E-mail za odgovor</span>
+                            <input type="email" name="email" maxlength="100" required autocomplete="email"
+                                   placeholder="ime.prezime@primjer.ba" th:value="${forma?.email}">
+                        </label>
+                    </div>
+
+                    <div class="kt-polje">
+                        <span>Tema</span>
+                        <div class="kt-teme-izbor">
+                            <label th:each="tm, st : ${@kontaktPorukaService.teme()}">
+                                <input type="radio" name="tema" th:value="${tm}"
+                                       th:checked="${forma != null and forma.tema != null} ? ${forma.tema == tm} : ${st.first}">
+                                <span th:text="${tm}">Konkurs i prijava</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <label class="kt-polje">
+                        <span>Poruka <small id="ktBrojac">0 / 2000</small></span>
+                        <textarea name="poruka" rows="6" minlength="10" maxlength="2000" required
+                                  placeholder="Napiši pitanje što jasnije…" th:text="${forma?.poruka}"></textarea>
+                    </label>
+
+                    <!-- zamka za botove: ljudi ovo polje ne vide -->
+                    <div class="kt-zamka" aria-hidden="true">
+                        <label>Web stranica <input type="text" name="web" tabindex="-1" autocomplete="off"></label>
+                    </div>
+
+                    <div class="kt-forma-dno">
+                        <small>Podatke koristimo samo da bismo ti odgovorili.</small>
+                        <button type="submit" class="btn btn-primary btn-lg" id="ktPosalji">
+                            Pošalji poruku
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= UPRAVA ======================= -->
+    <section class="jp-sekcija jp-sekcija--tonirana" id="uprava">
+        <div class="jp-wrap">
+            <span class="jp-eyebrow">Uprava doma</span>
+            <h2 data-uredi="kontakt.uprava.naslov" th:text="${t['kontakt.uprava.naslov']} ?: _">Ljudi koji brinu o domu</h2>
+
+            <div class="kt-osobe">
+                <!-- direktor/ica -->
+                <article class="kt-osoba kt-osoba--a" th:with="dIme=${t['kontakt.direktor.ime']}, dMail=${t['kontakt.direktor.email']}">
+                    <span class="kt-avatar">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </span>
+                    <div class="kt-osoba-tekst">
+                        <span class="kt-uloga" data-uredi="kontakt.direktor.uloga" th:text="${t['kontakt.direktor.uloga']} ?: _">Direktor/ica</span>
+                        <h3 data-uredi="kontakt.direktor.ime" th:classappend="${dIme == null} ? 'kt-uskoro'"
+                            th:text="${dIme} ?: _">Ime će biti objavljeno uskoro</h3>
+                        <ul class="kt-osoba-kontakt">
+                            <li th:if="${urednik or (dMail != null and #strings.contains(dMail, '@'))}">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>
+                                <a th:href="${dMail != null} ? 'mailto:' + ${dMail} : '#'"><span data-uredi="kontakt.direktor.email" th:text="${dMail} ?: 'e-mail (upišite)'">e-mail</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- tehnički sekretar -->
+                <article class="kt-osoba kt-osoba--b">
+                    <span class="kt-avatar">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </span>
+                    <div class="kt-osoba-tekst">
+                        <span class="kt-uloga" data-uredi="kontakt.sekretar.uloga" th:text="${t['kontakt.sekretar.uloga']} ?: _">Tehnički sekretar</span>
+                        <h3 data-uredi="kontakt.sekretar.ime" th:text="${t['kontakt.sekretar.ime']} ?: _">Benina Grahić</h3>
+                        <ul class="kt-osoba-kontakt">
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>
+                                <a th:href="'mailto:' + ${mail}" th:text="${mail}">tehnickisekretar.sc@unze.ba</a>
+                            </li>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
+                                <a th:href="'tel:' + ${#strings.replace(tel, ' ', '')}" th:text="${tel}">032 226 604</a>
+                            </li>
+                        </ul>
+                        <p class="kt-osoba-napomena" data-uredi="kontakt.sekretar.napomena" th:text="${t['kontakt.sekretar.napomena']} ?: _">Prvi kontakt za konkurs, dokumente i useljenje.</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= S KIM RAZGOVARATI ======================= -->
+    <section class="jp-sekcija" id="teme">
+        <div class="jp-wrap">
+            <span class="jp-eyebrow">Prije nego što pišeš</span>
+            <h2 data-uredi="kontakt.teme.naslov" th:text="${t['kontakt.teme.naslov']} ?: _">Možda je odgovor već ovdje</h2>
+            <p class="jp-lead" data-uredi="kontakt.teme.opis" data-uredi-vise th:text="${t['kontakt.teme.opis']} ?: _">Najčešća pitanja studenata i gdje na stranici pronaći odgovor.</p>
+
+            <div class="kt-teme">
+                <a class="kt-tema" th:href="@{/upute}">
+                    <span class="jp-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15h6M9 11h2"/></svg></span>
+                    <h3 data-uredi="kontakt.t1.naslov" th:text="${t['kontakt.t1.naslov']} ?: _">Konkurs i prijava</h3>
+                    <p data-uredi="kontakt.t1.opis" th:text="${t['kontakt.t1.opis']} ?: _">Ko se može prijaviti, rokovi i postupak korak po korak.</p>
+                    <span class="kt-tema-link">Kako se prijaviti →</span>
+                </a>
+                <a class="kt-tema" th:href="@{/upute}">
+                    <span class="jp-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></span>
+                    <h3 data-uredi="kontakt.t2.naslov" th:text="${t['kontakt.t2.naslov']} ?: _">Dokumenti</h3>
+                    <p data-uredi="kontakt.t2.opis" th:text="${t['kontakt.t2.opis']} ?: _">Spisak dokumenata i kako ih dostaviti poštom ili lično.</p>
+                    <span class="kt-tema-link">Spisak dokumenata →</span>
+                </a>
+                <a class="kt-tema" th:href="@{/rang-lista}">
+                    <span class="jp-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></span>
+                    <h3 data-uredi="kontakt.t3.naslov" th:text="${t['kontakt.t3.naslov']} ?: _">Rang lista i useljenje</h3>
+                    <p data-uredi="kontakt.t3.opis" th:text="${t['kontakt.t3.opis']} ?: _">Provjeri svoje mjesto po šifri i termin useljenja.</p>
+                    <span class="kt-tema-link">Otvori rang listu →</span>
+                </a>
+                <a class="kt-tema" th:href="@{/usluge}+'#pitanja'">
+                    <span class="jp-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg></span>
+                    <h3 data-uredi="kontakt.t4.naslov" th:text="${t['kontakt.t4.naslov']} ?: _">Smještaj i ishrana</h3>
+                    <p data-uredi="kontakt.t4.opis" th:text="${t['kontakt.t4.opis']} ?: _">Sobe, obroci, plaćanje i česta pitanja.</p>
+                    <span class="kt-tema-link">Česta pitanja →</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= KAKO DO NAS ======================= -->
+    <section class="jp-sekcija jp-sekcija--tonirana" id="lokacija">
+        <div class="jp-wrap kt-lokacija">
+            <div class="kt-lok-tekst">
+                <span class="jp-eyebrow">Kako do nas</span>
+                <h2 data-uredi="kontakt.lok.naslov" th:text="${t['kontakt.lok.naslov']} ?: _">Naselje Crkvice, Zenica</h2>
+                <p class="jp-lead" data-uredi="kontakt.lok.opis" data-uredi-vise th:text="${t['kontakt.lok.opis']} ?: _">Studentski centar se nalazi u naselju Crkvice, u blizini Kantonalne bolnice i Medicinskog fakulteta. Dokumente možeš donijeti lično ili poslati poštom na adresu ispod.</p>
+
+                <div class="kt-info">
+                    <div class="kt-info-red">
+                        <span class="kt-info-ic kt-info-ic--a"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+                        <div><small>Adresa za poštu</small><b th:text="'Studentski centar Zenica, ' + ${adresa}">Studentski centar Zenica, Crkvice 50, 72000 Zenica</b></div>
+                    </div>
+                    <div class="kt-info-red">
+                        <span class="kt-info-ic kt-info-ic--b"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+                        <div><small>Rad sa studentima</small><b data-uredi="footer.radnoVrijeme" th:text="${t['footer.radnoVrijeme']} ?: _">Radnim danima</b></div>
+                    </div>
+                </div>
+            </div>
+            <div class="jp-mapa">
+                <iframe title="Mapa — Studentski centar Zenica" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                        th:src="|https://maps.google.com/maps?q=${#uris.escapeQueryParam('Studentski centar Zenica, ' + adresa)}&z=15&output=embed|"></iframe>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+<th:block th:replace="~{fragments/layout :: urednik}"></th:block>
+
+<script>
+    (function () {
+        var f = document.getElementById('kontaktForma');
+        if (!f) return;
+        var txt = f.querySelector('textarea[name="poruka"]');
+        var brojac = document.getElementById('ktBrojac');
+        var dugme = document.getElementById('ktPosalji');
+
+        function broji() {
+            brojac.textContent = txt.value.length + ' / 2000';
+            brojac.classList.toggle('kt-brojac--puno', txt.value.length > 1900);
+        }
+        txt.addEventListener('input', broji);
+        broji();
+
+        f.addEventListener('submit', function (e) {
+            f.querySelectorAll('.kt-polje--greska').forEach(function (p) { p.classList.remove('kt-polje--greska'); });
+            var losa = [];
+            ['ime', 'email', 'poruka'].forEach(function (n) {
+                var el = f.elements[n];
+                var v = el.value.trim();
+                var ok = v.length > 0 && el.checkValidity()
+                    && (n !== 'poruka' || v.length >= 10)
+                    && (n !== 'ime' || v.length >= 2);
+                if (!ok) { el.closest('.kt-polje').classList.add('kt-polje--greska'); losa.push(el); }
+            });
+            if (losa.length) { e.preventDefault(); losa[0].focus(); return; }
+            dugme.disabled = true;
+            dugme.textContent = 'Šaljem…';
+        });
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+/* =========================================================
+   E-Dom – nova javna Početna (prefiks jp-)
+   Boje/varijable dolaze iz edom.css; navbar i dugmad iz pocetna.css
+   ========================================================= */
+.jp-wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+.jp-sakriveno{opacity:.45}
+
+/* ---------- najava ---------- */
+.jp-najava{background:#fff6dd;border-bottom:1px solid #f3e1a6}
+.jp-najava-in{display:flex;align-items:center;gap:12px;padding-top:12px;padding-bottom:12px}
+.jp-najava-ic{flex:none;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:#f6c544;color:#5a4300}
+.jp-najava p{font-weight:700;color:#5a4300;font-size:15px}
+
+/* ---------- hero ---------- */
+.jp-hero{
+    position:relative;overflow:hidden;color:#fff;
+    background:
+            radial-gradient(900px 500px at 85% -10%, rgba(0,191,154,.28), transparent 60%),
+            radial-gradient(700px 500px at -10% 110%, rgba(95,214,180,.14), transparent 60%),
+            linear-gradient(160deg,var(--teal-800) 0%,var(--teal-900) 100%);
+}
+.jp-hero::after{ /* blagi "prozori" uzorak */
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;
+    background-image:radial-gradient(#fff 1.2px, transparent 1.4px);background-size:26px 26px;
+    mask-image:linear-gradient(90deg, transparent 40%, #000);
+    -webkit-mask-image:linear-gradient(90deg, transparent 40%, #000);
+}
+.jp-hero-in{
+    position:relative;z-index:1;display:grid;grid-template-columns:1.3fr 1fr;gap:56px;align-items:center;
+    padding-top:clamp(48px,9vh,96px);padding-bottom:clamp(56px,10vh,110px);
+}
+.jp-status{
+    display:inline-flex;align-items:center;gap:10px;padding:8px 16px;border-radius:999px;
+    font-size:14px;font-weight:800;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+    margin-bottom:22px;
+}
+.jp-status i{width:9px;height:9px;border-radius:50%;background:#f6c544}
+.jp-status--da i{background:#3ee6b5;box-shadow:0 0 0 0 rgba(62,230,181,.6);animation:jp-puls 2s infinite}
+@keyframes jp-puls{70%{box-shadow:0 0 0 10px rgba(62,230,181,0)}100%{box-shadow:0 0 0 0 rgba(62,230,181,0)}}
+
+.jp-hero h1{font-size:clamp(34px,4.6vw,58px);font-weight:800;line-height:1.08;letter-spacing:-.02em;max-width:640px}
+.jp-hero-opis{font-size:clamp(16px,1.4vw,19px);line-height:1.65;color:#cfe3e7;max-width:580px;margin:22px 0 32px}
+.jp-hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.jp-hero-login{margin-top:20px;color:#a9cbd2;font-size:15px}
+.jp-hero-login a{color:#5fd6b4;font-weight:800;text-decoration:none}
+.jp-hero-login a:hover{color:#8ff0d3}
+
+.jp-hero-kartica{
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border-radius:24px;padding:26px;box-shadow:0 30px 80px rgba(0,0,0,.25);
+}
+.jp-hk-vrh{display:flex;align-items:center;gap:14px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.12)}
+.jp-hk-vrh img{width:56px;height:56px;border-radius:50%;background:#fff;padding:4px;object-fit:contain}
+.jp-hk-vrh b{display:block;font-size:18px}
+.jp-hk-vrh span{color:#a9cbd2;font-size:14px}
+.jp-hk-lista{list-style:none;margin:8px 0 18px}
+.jp-hk-lista li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px dashed rgba(255,255,255,.1)}
+.jp-hk-lista li:last-child{border-bottom:0}
+.jp-hk-lista span{color:#b9d6dc}
+.jp-hk-lista b{color:#fff;text-align:right}
+.jp-hk-link{
+    display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border-radius:14px;
+    background:#fff;color:var(--teal-900);font-weight:800;text-decoration:none;transition:.15s;
+}
+.jp-hk-link:hover{background:#e9fbf5}
+.jp-hk-link svg{transition:transform .15s}
+.jp-hk-link:hover svg{transform:translateX(4px)}
+
+/* ---------- brojke ---------- */
+.jp-brojke{position:relative;z-index:2;margin-top:-38px}
+.jp-brojke-in{
+    display:grid;grid-template-columns:repeat(4,1fr);
+    background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);
+}
+.jp-broj{padding:24px 26px;border-right:1px solid var(--line)}
+.jp-broj:last-child{border-right:0}
+.jp-broj b{display:block;font-size:clamp(28px,3vw,38px);font-weight:800;color:var(--heading);line-height:1.1}
+.jp-broj span{display:block;margin-top:4px;color:var(--label);font-size:15px}
+
+/* ---------- sekcije ---------- */
+.jp-sekcija{padding:clamp(56px,9vh,96px) 0}
+.jp-sekcija--tonirana{background:linear-gradient(180deg,#f3faf8 0%,#eef6f8 100%)}
+.jp-eyebrow{display:inline-block;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mint-dark);margin-bottom:10px}
+.jp-sekcija h2{font-size:clamp(26px,2.8vw,38px);font-weight:800;color:var(--heading);letter-spacing:-.01em;max-width:760px}
+.jp-lead{color:var(--label);font-size:17px;line-height:1.65;max-width:760px;margin:12px 0 36px}
+
+/* usluge */
+.jp-usluge{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.jp-usluga{
+    background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px;
+    transition:transform .2s,box-shadow .2s,border-color .2s;
+}
+.jp-usluga:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--border)}
+.jp-ic{
+    width:52px;height:52px;border-radius:16px;margin-bottom:16px;display:grid;place-items:center;
+    background:var(--mint-soft);color:var(--mint-dark);
+}
+.jp-ic--malo{width:42px;height:42px;border-radius:12px;margin:0;flex:none}
+.jp-usluga h3{font-size:18px;font-weight:800;color:var(--heading);margin-bottom:6px}
+.jp-usluga p{font-size:15px;line-height:1.55;color:var(--label)}
+
+.jp-cijena{
+    margin-top:22px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+    padding:26px 30px;border-radius:20px;background:linear-gradient(135deg,var(--mint-soft),#eaf6fb);border:1px solid var(--line);
+}
+.jp-cijena h3{font-size:20px;font-weight:800;color:var(--heading)}
+.jp-cijena p{color:var(--label);margin-top:6px;max-width:720px;line-height:1.55}
+
+/* koraci */
+.jp-koraci{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:36px;counter-reset:k}
+.jp-korak{position:relative;background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px 24px}
+.jp-korak:not(:last-child)::after{
+    content:"";position:absolute;top:44px;right:-14px;width:10px;height:10px;
+    border-top:2.5px solid var(--border);border-right:2.5px solid var(--border);transform:rotate(45deg);
+}
+.jp-korak-br{
+    display:grid;place-items:center;width:44px;height:44px;border-radius:50%;margin-bottom:16px;
+    background:var(--teal-800);color:#fff;font-weight:800;font-size:18px;
+}
+.jp-korak h3{font-size:18px;font-weight:800;color:var(--heading);margin-bottom:6px}
+.jp-korak p{font-size:15px;line-height:1.55;color:var(--label)}
+
+/* aktuelno */
+.jp-aktuelno{display:grid;grid-template-columns:1fr 1.5fr;gap:22px;margin-top:32px;align-items:start}
+.jp-auto{display:grid;gap:16px}
+.jp-auto-kartica{
+    border-radius:20px;padding:22px 24px;background:var(--teal-900);color:#fff;
+    background:linear-gradient(150deg,var(--teal-800),var(--teal-900));
+}
+.jp-auto--da{background:linear-gradient(150deg,#0f6b5a,var(--teal-900))}
+.jp-auto-oznaka{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#5fd6b4}
+.jp-auto-kartica b{display:block;font-size:20px;margin-top:6px}
+.jp-auto-kartica p{color:#b9d6dc;margin-top:4px}
+.jp-auto-kartica a{display:inline-block;margin-top:12px;color:#fff;font-weight:800;text-decoration:none}
+.jp-auto-kartica a:hover{color:#8ff0d3}
+
+.jp-obavjestenja{display:grid;gap:14px}
+.jp-obav{background:#fff;border:1px solid var(--line);border-left:4px solid var(--mint-dark);border-radius:16px;padding:18px 22px}
+.jp-obav-datum{font-size:13px;font-weight:800;color:var(--mint-dark)}
+.jp-obav h3{font-size:17px;font-weight:800;color:var(--heading);margin:4px 0}
+.jp-obav p{font-size:15px;line-height:1.55;color:var(--label)}
+
+/* lokacija */
+.jp-lokacija{display:grid;grid-template-columns:1fr 1.1fr;gap:40px;align-items:center}
+.jp-lokacija .jp-lead{margin-bottom:20px}
+.jp-blizu{list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.jp-blizu li{
+    padding:8px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);
+    font-size:14px;font-weight:700;color:var(--heading);
+}
+.jp-adresa{margin-top:20px;font-weight:800;color:var(--heading)}
+.jp-mapa{border-radius:22px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:#e8f0f2;aspect-ratio:4/3}
+.jp-mapa iframe{width:100%;height:100%;border:0;display:block}
+
+/* kontakt */
+.jp-kontakt{
+    display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:center;
+    padding:clamp(28px,4vw,48px);border-radius:28px;color:#fff;
+    background:
+            radial-gradient(600px 300px at 100% 0%, rgba(0,191,154,.25), transparent 60%),
+            linear-gradient(150deg,var(--teal-800),var(--teal-900));
+}
+.jp-kontakt h2{color:#fff}
+.jp-kontakt-tekst p{color:#cfe3e7;font-size:17px;margin:10px 0 24px}
+.jp-kontakt-lista{list-style:none;display:grid;gap:12px}
+.jp-kontakt-lista li{
+    display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+}
+.jp-kontakt-lista .jp-ic{background:rgba(95,214,180,.16);color:#5fd6b4}
+.jp-kontakt-lista small{display:block;color:#a9cbd2;font-size:13px}
+.jp-kontakt-lista b{color:#fff;word-break:break-word}
+.jp-kontakt-lista a{text-decoration:none}
+.jp-kontakt-lista a:hover b{color:#8ff0d3}
+
+/* ---------- responsive ---------- */
+@media (max-width:1050px){
+    .jp-usluge{grid-template-columns:repeat(2,1fr)}
+    .jp-koraci{grid-template-columns:repeat(2,1fr)}
+    .jp-korak::after{display:none}
+    .jp-aktuelno,.jp-lokacija,.jp-kontakt{grid-template-columns:1fr}
+}
+@media (max-width:880px){
+    .jp-hero-in{grid-template-columns:1fr;gap:36px}
+    .jp-brojke-in{grid-template-columns:repeat(2,1fr)}
+    .jp-broj:nth-child(2){border-right:0}
+    .jp-broj:nth-child(-n+2){border-bottom:1px solid var(--line)}
+}
+@media (max-width:560px){
+    .jp-wrap{padding:0 16px}
+    .jp-usluge,.jp-koraci{grid-template-columns:1fr}
+    .jp-hero-cta .btn{flex:1;padding:0 14px;white-space:nowrap}
+    .jp-broj{padding:18px}
+    .jp-cijena{padding:22px}
+}
+
+/* =========================================================
+   BOJE – paleta akcenata (dodano na kraj, gazi gornja pravila)
+   ========================================================= */
+:root{
+    --jp-mint:#00a884;   --jp-mint-bg:#e2f7ef;
+    --jp-plava:#2f7fe0;  --jp-plava-bg:#e6f0fd;
+    --jp-narandz:#f08a24;--jp-narandz-bg:#fff0e0;
+    --jp-ljub:#7a5af5;   --jp-ljub-bg:#efeafe;
+    --jp-roza:#e8547a;   --jp-roza-bg:#fde8ee;
+    --jp-zuta:#d99a00;   --jp-zuta-bg:#fff5d4;
+}
+
+/* svaka kartica dobije svoj par boja preko --a / --a-bg */
+.jp-usluga:nth-child(6n+1),.jp-korak:nth-child(4n+1),.jp-broj:nth-child(1),.jp-obav:nth-child(3n+1),.jp-blizu li:nth-child(6n+1){--a:var(--jp-mint);--a-bg:var(--jp-mint-bg)}
+.jp-usluga:nth-child(6n+2),.jp-korak:nth-child(4n+2),.jp-broj:nth-child(2),.jp-obav:nth-child(3n+2),.jp-blizu li:nth-child(6n+2){--a:var(--jp-plava);--a-bg:var(--jp-plava-bg)}
+.jp-usluga:nth-child(6n+3),.jp-korak:nth-child(4n+3),.jp-broj:nth-child(3),.jp-obav:nth-child(3n+3),.jp-blizu li:nth-child(6n+3){--a:var(--jp-narandz);--a-bg:var(--jp-narandz-bg)}
+.jp-usluga:nth-child(6n+4),.jp-korak:nth-child(4n+4),.jp-broj:nth-child(4),.jp-blizu li:nth-child(6n+4){--a:var(--jp-ljub);--a-bg:var(--jp-ljub-bg)}
+.jp-usluga:nth-child(6n+5),.jp-blizu li:nth-child(6n+5){--a:var(--jp-roza);--a-bg:var(--jp-roza-bg)}
+.jp-usluga:nth-child(6n+6),.jp-blizu li:nth-child(6n+6){--a:var(--jp-zuta);--a-bg:var(--jp-zuta-bg)}
+
+/* hero: topliji odsjaj uz teal */
+.jp-hero{
+    background:
+            radial-gradient(700px 420px at 92% 0%, rgba(240,138,36,.22), transparent 60%),
+            radial-gradient(800px 500px at 70% 110%, rgba(47,127,224,.22), transparent 60%),
+            radial-gradient(700px 500px at -10% 110%, rgba(0,191,154,.22), transparent 60%),
+            linear-gradient(160deg,var(--teal-800) 0%,var(--teal-900) 100%);
+}
+.jp-hero h1{
+    background:linear-gradient(90deg,#fff 55%,#9ff3d6);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+body.uredjivanje .jp-hero h1{color:#fff;background:none} /* da se vidi kursor pri uređivanju */
+.jp-hk-lista li span::before{
+    content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:10px;vertical-align:middle;
+    background:var(--jp-mint);
+}
+.jp-hk-lista li:nth-child(2) span::before{background:var(--jp-narandz)}
+.jp-hk-lista li:nth-child(3) span::before{background:var(--jp-plava)}
+.jp-hk-lista li:nth-child(4) span::before{background:var(--jp-roza)}
+.jp-hk-link{background:linear-gradient(90deg,#fff,#e9fbf5)}
+
+/* brojke */
+.jp-broj{position:relative}
+.jp-broj b{color:var(--a)}
+.jp-broj::before{
+    content:"";position:absolute;left:26px;top:0;width:36px;height:4px;border-radius:0 0 4px 4px;background:var(--a);
+}
+
+/* usluge */
+.jp-usluga{border-top:4px solid var(--a)}
+.jp-usluga .jp-ic{background:var(--a-bg);color:var(--a)}
+.jp-usluga:hover{border-color:var(--a);box-shadow:0 18px 40px -18px var(--a)}
+
+/* cijena: topla kartica */
+.jp-cijena{
+    background:linear-gradient(120deg,#fff3e2 0%,#fff9e6 55%,#eaf8f2 100%);
+    border-color:#f5dcb8;
+}
+.jp-cijena h3{color:#a14f00}
+
+/* koraci */
+.jp-korak{overflow:hidden}
+.jp-korak::before{
+    content:"";position:absolute;inset:0 0 auto 0;height:90px;
+    background:linear-gradient(180deg,var(--a-bg),transparent);pointer-events:none;
+}
+.jp-korak > *{position:relative}
+.jp-korak-br{background:var(--a);box-shadow:0 8px 18px -6px var(--a)}
+.jp-korak:not(:last-child)::after{border-color:var(--a)}
+.jp-korak{overflow:visible} /* strelica između kartica */
+
+/* aktuelno */
+.jp-auto-kartica:nth-child(2){
+    background:
+            radial-gradient(300px 160px at 100% 0%, rgba(240,138,36,.35), transparent 70%),
+            linear-gradient(150deg,#1f4e8c,#132f57);
+}
+.jp-auto-kartica:nth-child(2) .jp-auto-oznaka{color:#ffc27a}
+.jp-obav{border-left-color:var(--a)}
+.jp-obav-datum{
+    display:inline-block;padding:3px 10px;border-radius:999px;background:var(--a-bg);color:var(--a);
+}
+
+/* lokacija */
+.jp-blizu li{display:inline-flex;align-items:center;gap:8px}
+.jp-blizu li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--a)}
+.jp-blizu li{border-color:var(--a-bg)}
+
+/* kontakt */
+.jp-kontakt{
+    background:
+            radial-gradient(520px 300px at 100% 0%, rgba(240,138,36,.28), transparent 60%),
+            radial-gradient(520px 300px at 0% 100%, rgba(47,127,224,.28), transparent 60%),
+            linear-gradient(150deg,var(--teal-800),var(--teal-900));
+}
+.jp-kontakt-lista li:nth-child(1) .jp-ic{background:rgba(0,191,154,.18);color:#5fd6b4}
+.jp-kontakt-lista li:nth-child(2) .jp-ic{background:rgba(240,138,36,.2);color:#ffb469}
+.jp-kontakt-lista li:nth-child(3) .jp-ic{background:rgba(47,127,224,.22);color:#8dbcff}
+
+/* sekcija "tonirana" malo življa */
+.jp-sekcija--tonirana{
+    background:
+            radial-gradient(600px 300px at 100% 0%, rgba(47,127,224,.07), transparent 70%),
+            radial-gradient(600px 300px at 0% 100%, rgba(240,138,36,.07), transparent 70%),
+            linear-gradient(180deg,#f3faf8 0%,#eef6f8 100%);
+}

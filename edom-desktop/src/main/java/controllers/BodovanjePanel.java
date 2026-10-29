@@ -52,12 +52,11 @@ public class BodovanjePanel extends VBox {
         chkPrimanja = kvacica(d.primanjaVerifikovana());
 
         setPadding(new Insets(16));
-        setStyle("-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #e3e8ef; -fx-border-radius: 14;");
+        getStyleClass().add("pr-kartica");
 
-        getChildren().add(naslov("Bodovanje – svi kriteriji"));
-        getChildren().add(sitno("Bodovi se računaju iz unesenih podataka. Promijenite podatak, označite ili skinite kriterij "
-                + "i kliknite „Sačuvaj bodovanje“ — bodovi se preračunaju. ✓ = provjereno (ulazi u potvrđene bodove)."));
-
+        Label nsl = new Label("Bodovanje – svi kriteriji");
+        nsl.getStyleClass().add("pr-kartica-naslov");
+        getChildren().add(nsl);
         if (d.greska() != null) getChildren().add(upozorenje("⚠ " + d.greska(), "#b3261e"));
         for (String u : d.upozorenja()) getChildren().add(upozorenje("⚠ " + u, "#b86e00"));
 
@@ -93,16 +92,16 @@ public class BodovanjePanel extends VBox {
         StavkaBodovanja prim = osnovna(s -> KategorijaBodovanja.PRIMANJA.equals(s.kategorija()));
 
         red(g, 1, new Label("Uspjeh"),
-                new HBox(6, sitno("god."), tfGodina, sitno("prosjek"), tfProsjek, sitno("ispiti"), tfIspiti),
+                unos(kratko("godina"), tfGodina, kratko("prosjek"), tfProsjek, kratko("ispiti"), tfIspiti),
                 brucos ? P_BRUCOS : P_USPJEH, bodovi(uspjeh), chkUspjeh);
         red(g, 2, new Label("Ponovni upis godine"),
-                new HBox(6, sitno("upisuje"), tfUpis, sitno(". put")),
+                unos(kratko("upisuje"), tfUpis, kratko(". put")),
                 P_UPIS, bodovi(upis), sitno("uz uspjeh"));
         red(g, 3, new Label("Udaljenost"),
-                new HBox(6, tfKm, sitno("km")),
+                unos(tfKm, kratko("km")),
                 P_UDALJENOST, bodovi(udalj), chkUdaljenost);
         red(g, 4, new Label("Primanja domaćinstva"),
-                new HBox(6, tfPrimanja, sitno("KM,"), tfClanova, sitno("članova")),
+                unos(tfPrimanja, kratko("KM ukupno,"), tfClanova, kratko("članova")),
                 P_PRIMANJA, bodovi(prim), chkPrimanja);
         return g.getParent();
     }
@@ -220,7 +219,7 @@ public class BodovanjePanel extends VBox {
         g.setHgap(12);
         g.setVgap(8);
         ColumnConstraints c0 = new ColumnConstraints(200, 230, 260);
-        ColumnConstraints c1 = new ColumnConstraints(180, 320, Double.MAX_VALUE);
+        ColumnConstraints c1 = new ColumnConstraints(330, 360, Double.MAX_VALUE);
         c1.setHgrow(Priority.ALWAYS);
         ColumnConstraints c2 = new ColumnConstraints(140, 240, 320);
         ColumnConstraints c3 = new ColumnConstraints(70, 80, 100);
@@ -238,6 +237,20 @@ public class BodovanjePanel extends VBox {
         n.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #0b6b5c;");
         new VBox(6, n, g);   // g dobija roditelja
         return g;
+    }
+
+    /** Kratka oznaka uz polje (god., prosjek, km…) – ne lomi se u dva reda. */
+    private static Label kratko(String t) {
+        Label l = new Label(t);
+        l.setStyle("-fx-text-fill: #6b7a90;");
+        l.setMinWidth(Region.USE_PREF_SIZE);
+        return l;
+    }
+
+    private static HBox unos(Node... dijelovi) {
+        HBox h = new HBox(6, dijelovi);
+        h.setAlignment(Pos.CENTER_LEFT);
+        return h;
     }
 
     private void red(GridPane g, int red, Node stavka, Node unos, String pravilo, Node bodovi, Node ver) {

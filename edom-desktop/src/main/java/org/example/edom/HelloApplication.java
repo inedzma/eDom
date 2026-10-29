@@ -32,6 +32,8 @@ public class HelloApplication extends Application {
             System.out.println("Ikona nije pronađena! Provjeri putanju.");
         }
 
+        util.Dijalozi.ukljuci(stage.getIcons().isEmpty() ? null : stage.getIcons().get(0));
+
         stage.setTitle("E-Dom - Prijava");
         stage.setScene(scene);
 

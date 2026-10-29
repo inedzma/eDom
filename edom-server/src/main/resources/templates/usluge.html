@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
+    <title>Usluge — Studentski centar Zenica</title>
+    <meta name="description" content="Smještaj, ishrana i sadržaji Studentskog centra Univerziteta u Zenici.">
+    <link rel="stylesheet" th:href="@{/css/pocetna.css}">
+    <link rel="stylesheet" th:href="@{/css/javna.css}">
+    <link rel="stylesheet" th:href="@{/css/usluge.css}">
+</head>
+<body class="landing">
+
+<header th:replace="~{fragments/layout :: navbarJavni('usluge')}"></header>
+
+<main>
+
+    <!-- ======================= ZAGLAVLJE ======================= -->
+    <section class="us-hero">
+        <div class="jp-wrap us-hero-in">
+            <span class="jp-eyebrow us-eyebrow-svijetla">Usluge</span>
+            <h1 data-uredi="usluge.hero.naslov" th:text="${t['usluge.hero.naslov']} ?: _">Smještaj i ishrana na jednom mjestu</h1>
+            <p data-uredi="usluge.hero.opis" data-uredi-vise th:text="${t['usluge.hero.opis']} ?: _">Studentski dom u Crkvicama nudi sobe s vlastitim kupatilom, svakodnevne obroke u restoranu doma i prostore za učenje, sport i odmor.</p>
+            <ul class="us-hero-chips">
+                <li><b data-uredi="usluge.chip1.broj" th:text="${t['usluge.chip1.broj']} ?: _">228</b> <span data-uredi="usluge.chip1.opis" th:text="${t['usluge.chip1.opis']} ?: _">ležajeva</span></li>
+                <li><b data-uredi="usluge.chip2.broj" th:text="${t['usluge.chip2.broj']} ?: _">87</b> <span data-uredi="usluge.chip2.opis" th:text="${t['usluge.chip2.opis']} ?: _">soba s kupatilom</span></li>
+                <li><b data-uredi="usluge.chip3.broj" th:text="${t['usluge.chip3.broj']} ?: _">2</b> <span data-uredi="usluge.chip3.opis" th:text="${t['usluge.chip3.opis']} ?: _">obroka dnevno</span></li>
+                <li><b data-uredi="usluge.chip4.broj" th:text="${t['usluge.chip4.broj']} ?: _">8</b> <span data-uredi="usluge.chip4.opis" th:text="${t['usluge.chip4.opis']} ?: _">zajedničkih sadržaja</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ======================= GALERIJA ======================= -->
+    <section class="us-galerija-sekcija">
+        <div class="jp-wrap">
+            <div class="us-karusel" id="karusel" tabindex="0" aria-roledescription="carousel" aria-label="Galerija doma">
+                <div class="us-traka">
+
+                    <!-- prave slike (admin ih dodaje ispod karusela) -->
+                    <figure class="us-slajd" th:each="s : ${galerija}">
+                        <img th:src="@{${s.url}}" th:alt="${t[s.kljuc]} ?: 'Studentski centar Zenica'" loading="lazy">
+                        <figcaption th:if="${urednik or t[s.kljuc] != null}">
+                            <b th:attr="data-uredi=${s.kljuc}"
+                               th:text="${t[s.kljuc]} ?: 'Opis slike (klikni Uredi stranicu)'">Opis</b>
+                        </figcaption>
+                    </figure>
+
+                    <!-- primjer-slajdovi dok nema slika -->
+                    <th:block th:if="${#lists.isEmpty(galerija)}">
+                        <figure class="us-slajd us-primjer us-p1">
+                            <span class="us-p-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6M2 18h20"/></svg></span>
+                            <figcaption>
+                                <b data-uredi="usluge.g1.naslov" th:text="${t['usluge.g1.naslov']} ?: _">Sobe s kupatilom</b>
+                                <span data-uredi="usluge.g1.opis" th:text="${t['usluge.g1.opis']} ?: _">Dvokrevetne i trokrevetne sobe</span>
+                            </figcaption>
+                        </figure>
+                        <figure class="us-slajd us-primjer us-p2">
+                            <span class="us-p-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7a3 3 0 0 0 6 0V2M6 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6a2 2 0 0 0 2 2h3zm0 0v7"/></svg></span>
+                            <figcaption>
+                                <b data-uredi="usluge.g2.naslov" th:text="${t['usluge.g2.naslov']} ?: _">Restoran doma</b>
+                                <span data-uredi="usluge.g2.opis" th:text="${t['usluge.g2.opis']} ?: _">Ručak i večera svaki dan</span>
+                            </figcaption>
+                        </figure>
+                        <figure class="us-slajd us-primjer us-p3">
+                            <span class="us-p-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span>
+                            <figcaption>
+                                <b data-uredi="usluge.g3.naslov" th:text="${t['usluge.g3.naslov']} ?: _">Čitaonica i biblioteka</b>
+                                <span data-uredi="usluge.g3.opis" th:text="${t['usluge.g3.opis']} ?: _">Mir za učenje bez izlaska iz doma</span>
+                            </figcaption>
+                        </figure>
+                        <figure class="us-slajd us-primjer us-p4">
+                            <span class="us-p-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg></span>
+                            <figcaption>
+                                <b data-uredi="usluge.g4.naslov" th:text="${t['usluge.g4.naslov']} ?: _">Fitness sala</b>
+                                <span data-uredi="usluge.g4.opis" th:text="${t['usluge.g4.opis']} ?: _">Trening u istoj zgradi</span>
+                            </figcaption>
+                        </figure>
+                    </th:block>
+                </div>
+
+                <button type="button" class="us-k-btn us-k-prev" aria-label="Prethodna slika">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button type="button" class="us-k-btn us-k-next" aria-label="Sljedeća slika">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+                <div class="us-tacke"></div>
+                <span class="us-primjer-oznaka" th:if="${#lists.isEmpty(galerija)}">Primjer · fotografije uskoro</span>
+            </div>
+
+            <!-- ======== upravljanje galerijom (samo admin) ======== -->
+            <div class="uag" id="adminGalerija" th:if="${urednik}"
+                 th:data-dodaj="@{/urednik/galerija}" th:data-obrisi="@{/urednik/galerija/}">
+                <div class="uag-glava">
+                    <div>
+                        <b>Galerija fotografija</b>
+                        <span th:text="${#lists.size(galerija)} + ' / 30 · JPG, PNG ili WEBP, do 8 MB po slici'">0 / 30</span>
+                    </div>
+                    <label class="btn btn-primary btn-sm uag-dodaj">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                        Dodaj fotografije
+                        <input type="file" id="uagInput" accept="image/jpeg,image/png,image/webp" multiple hidden>
+                    </label>
+                </div>
+
+                <div class="uag-zona" id="uagZona">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                    <span>Prevuci fotografije ovdje ili klikni <b>Dodaj fotografije</b></span>
+                </div>
+
+                <ul class="uag-lista" th:unless="${#lists.isEmpty(galerija)}">
+                    <li th:each="s, st : ${galerija}">
+                        <img th:src="@{${s.url}}" alt="">
+                        <span class="uag-br" th:text="${st.count}">1</span>
+                        <button type="button" class="uag-obrisi" th:data-ime="${s.ime}" title="Obriši fotografiju" aria-label="Obriši fotografiju">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                        </button>
+                    </li>
+                </ul>
+                <p class="uag-savjet">Opis slike: klikni <b>Uredi stranicu</b> na traci dolje i piši direktno na slajdu.</p>
+                <p class="uag-poruka" id="uagPoruka" hidden></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= SMJEŠTAJ ======================= -->
+    <section class="jp-sekcija" id="smjestaj">
+        <div class="jp-wrap us-dvije">
+            <div>
+                <span class="jp-eyebrow">01 · Smještaj</span>
+                <h2 data-uredi="usluge.smj.naslov" th:text="${t['usluge.smj.naslov']} ?: _">Tvoja soba, tvoje kupatilo</h2>
+                <p class="jp-lead" data-uredi="usluge.smj.opis" data-uredi-vise th:text="${t['usluge.smj.opis']} ?: _">Studentski dom ima 87 soba — 33 dvokrevetne i 54 trokrevetne. Svaka soba ima vlastiti higijensko-sanitarni čvor, pa nema čekanja u redu za zajedničko kupatilo.</p>
+                <a class="btn btn-primary" th:href="@{/upute}">Kako dobiti smještaj →</a>
+            </div>
+
+            <div class="us-sobe">
+                <article class="us-soba us-soba--a">
+                    <span class="us-soba-br" data-uredi="usluge.soba1.broj" th:text="${t['usluge.soba1.broj']} ?: _">33</span>
+                    <div>
+                        <h3 data-uredi="usluge.soba1.naslov" th:text="${t['usluge.soba1.naslov']} ?: _">Dvokrevetne sobe</h3>
+                        <p data-uredi="usluge.soba1.opis" th:text="${t['usluge.soba1.opis']} ?: _">Za dvoje, s vlastitim kupatilom.</p>
+                    </div>
+                    <span class="us-kreveti" aria-hidden="true"><i></i><i></i></span>
+                </article>
+                <article class="us-soba us-soba--b">
+                    <span class="us-soba-br" data-uredi="usluge.soba2.broj" th:text="${t['usluge.soba2.broj']} ?: _">54</span>
+                    <div>
+                        <h3 data-uredi="usluge.soba2.naslov" th:text="${t['usluge.soba2.naslov']} ?: _">Trokrevetne sobe</h3>
+                        <p data-uredi="usluge.soba2.opis" th:text="${t['usluge.soba2.opis']} ?: _">Za troje, s vlastitim kupatilom.</p>
+                    </div>
+                    <span class="us-kreveti" aria-hidden="true"><i></i><i></i><i></i></span>
+                </article>
+                <article class="us-soba us-soba--c">
+                    <span class="us-soba-br" data-uredi="usluge.soba3.broj" th:text="${t['usluge.soba3.broj']} ?: _">228</span>
+                    <div>
+                        <h3 data-uredi="usluge.soba3.naslov" th:text="${t['usluge.soba3.naslov']} ?: _">Ležajeva ukupno</h3>
+                        <p data-uredi="usluge.soba3.opis" th:text="${t['usluge.soba3.opis']} ?: _">Mjesta se dodjeljuju putem konkursa i rang liste.</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= SADRŽAJI ======================= -->
+    <section class="jp-sekcija jp-sekcija--tonirana" id="sadrzaji">
+        <div class="jp-wrap">
+            <span class="jp-eyebrow">02 · Sadržaji u domu</span>
+            <h2 data-uredi="usluge.sad.naslov" th:text="${t['usluge.sad.naslov']} ?: _">Više od kreveta i stola</h2>
+            <p class="jp-lead" data-uredi="usluge.sad.opis" data-uredi-vise th:text="${t['usluge.sad.opis']} ?: _">Sve što ti treba za učenje, odmor i svakodnevni život nalazi se u istoj zgradi.</p>
+
+            <div class="jp-usluge us-sadrzaji">
+                <article class="jp-usluga">
+                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg></span>
+                    <h3 data-uredi="usluge.s1.naslov" th:text="${t['usluge.s1.naslov']} ?: _">Edukativni prostor</h3>
+                    <p data-uredi="usluge.s1.opis" data-uredi-vise th:text="${t['usluge.s1.opis']} ?: _">Prostor za radionice, predavanja i grupni rad.</p>
+                </article>
+                <article class="jp-usluga">
+                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span>
+                    <h3 data-uredi="usluge.s2.naslov" th:text="${t['usluge.s2.naslov']} ?: _">Čitaonica</h3>
+                    <p data-uredi="usluge.s2.opis" data-uredi-vise th:text="${t['usluge.s2.opis']} ?: _">Mirno mjesto za učenje i pripremu ispita.</p>
+                </article>
+                <article class="jp-usluga">
+                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg></span>
+                    <h3 data-uredi="usluge.s3.naslov" th:text="${t['usluge.s3.naslov']} ?: _">Biblioteka</h3>
+                    <p data-uredi="usluge.s3.opis" data-uredi-vise th:text="${t['usluge.s3.opis']} ?: _">Knjige i literatura dostupni stanarima doma.</p>
+                </article>
+                <article class="jp-usluga">
+                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+                    <h3 data-uredi="usluge.s4.naslov" th:text="${t['usluge.s4.naslov']} ?: _">Multimedijalni centar</h3>
+                    <p data-uredi="usluge.s4.opis" data-uredi-vise th:text="${t['usluge.s4.opis']} ?: _">Računari i priručna biblioteka na jednom mjestu.</p>
+                </article>
+                <article class="jp-usluga">
+                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg></span>
+                    <h3 data-uredi="usluge.s5.naslov" th:text="${t['usluge.s5.naslov']} ?: _">Fitness</h3>
+                    <p data-uredi="usluge.s5.opis" data-uredi-vise th:text="${t['usluge.s5.opis']} ?: _">Trening bez odlaska u teretanu u gradu.</p>
+                </article>
+                <article class="jp-usluga">
+                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M7 6h.01M10 6h.01"/></svg></span>
+                    <h3 data-uredi="usluge.s6.naslov" th:text="${t['usluge.s6.naslov']} ?: _">Vešeraj</h3>
+                    <p data-uredi="usluge.s6.opis" data-uredi-vise th:text="${t['usluge.s6.opis']} ?: _">Pranje veša u domu.</p>
+                </article>
+                <article class="jp-usluga">
+                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 5H9l3-5z"/><path d="M5 22V11l7-4 7 4v11"/><path d="M10 22v-5h4v5"/></svg></span>
+                    <h3 data-uredi="usluge.s7.naslov" th:text="${t['usluge.s7.naslov']} ?: _">Prostor za vjerske aktivnosti</h3>
+                    <p data-uredi="usluge.s7.opis" data-uredi-vise th:text="${t['usluge.s7.opis']} ?: _">Miran prostor u okviru doma.</p>
+                </article>
+                <article class="jp-usluga">
+                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7a3 3 0 0 0 6 0V2M6 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6a2 2 0 0 0 2 2h3zm0 0v7"/></svg></span>
+                    <h3 data-uredi="usluge.s8.naslov" th:text="${t['usluge.s8.naslov']} ?: _">Restoran s kuhinjom</h3>
+                    <p data-uredi="usluge.s8.opis" data-uredi-vise th:text="${t['usluge.s8.opis']} ?: _">Obroci se pripremaju u kuhinji doma.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= ISHRANA ======================= -->
+    <section class="jp-sekcija" id="ishrana">
+        <div class="jp-wrap">
+            <span class="jp-eyebrow">03 · Ishrana</span>
+            <h2 data-uredi="usluge.ish.naslov" th:text="${t['usluge.ish.naslov']} ?: _">Topao obrok, svaki dan</h2>
+
+            <div class="us-ishrana">
+                <div class="us-obroci">
+                    <article class="us-obrok us-obrok--rucak">
+                        <span class="us-obrok-ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span>
+                        <h3 data-uredi="usluge.rucak.naslov" th:text="${t['usluge.rucak.naslov']} ?: _">Ručak</h3>
+                        <p data-uredi="usluge.rucak.opis" th:text="${t['usluge.rucak.opis']} ?: _">Glavni obrok dana u restoranu doma.</p>
+                    </article>
+                    <article class="us-obrok us-obrok--vecera">
+                        <span class="us-obrok-ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span>
+                        <h3 data-uredi="usluge.vecera.naslov" th:text="${t['usluge.vecera.naslov']} ?: _">Večera</h3>
+                        <p data-uredi="usluge.vecera.opis" th:text="${t['usluge.vecera.opis']} ?: _">Obrok na kraju dana, bez kuhanja i čekanja.</p>
+                    </article>
+                </div>
+
+                <div class="us-ish-tekst">
+                    <div class="us-ish-blok">
+                        <h3 data-uredi="usluge.ish.k1.naslov" th:text="${t['usluge.ish.k1.naslov']} ?: _">Kako se plaća?</h3>
+                        <p data-uredi="usluge.ish.k1.opis" data-uredi-vise th:text="${t['usluge.ish.k1.opis']} ?: _">Studenti dobijaju određeni broj ručkova i večera. Dio troškova subvencioniše kanton iz kojeg student dolazi, a ostatak student plaća mjesečnom uplatom.</p>
+                    </div>
+                    <div class="us-ish-blok">
+                        <h3 data-uredi="usluge.ish.k2.naslov" th:text="${t['usluge.ish.k2.naslov']} ?: _">Kvalitet i higijena</h3>
+                        <p data-uredi="usluge.ish.k2.opis" data-uredi-vise th:text="${t['usluge.ish.k2.opis']} ?: _">Obroci su raznovrsni. Periodično se rade mikrobiološke i hemijske analize namirnica, vode, površina i pribora, kako bi se zaštitilo zdravlje studenata.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= ČESTA PITANJA ======================= -->
+    <section class="jp-sekcija jp-sekcija--tonirana" id="pitanja">
+        <div class="jp-wrap us-faq-wrap">
+            <div>
+                <span class="jp-eyebrow">Česta pitanja</span>
+                <h2 data-uredi="usluge.faq.naslov" th:text="${t['usluge.faq.naslov']} ?: _">Imaš pitanje?</h2>
+                <p class="jp-lead" data-uredi="usluge.faq.opis" data-uredi-vise th:text="${t['usluge.faq.opis']} ?: _">Odgovori na pitanja koja studenti najčešće postavljaju prije useljenja.</p>
+            </div>
+
+            <div class="us-faq" id="faq">
+                <div class="us-faq-stavka">
+                    <div class="us-faq-pitanje" role="button" tabindex="0">
+                        <h3 data-uredi="usluge.faq1.p" th:text="${t['usluge.faq1.p']} ?: _">Ko može dobiti smještaj?</h3><i></i>
+                    </div>
+                    <div class="us-faq-odgovor">
+                        <p data-uredi="usluge.faq1.o" data-uredi-vise
+                           th:text="${t['usluge.faq1.o']} ?: |Redovni studenti fakulteta Univerziteta u Zenici čije je prebivalište najmanje ${postavke.minUdaljenostKm} km od Zenice. Mjesta se dodjeljuju putem konkursa i rang liste.|">Redovni studenti…</p>
+                    </div>
+                </div>
+                <div class="us-faq-stavka">
+                    <div class="us-faq-pitanje" role="button" tabindex="0">
+                        <h3 data-uredi="usluge.faq2.p" th:text="${t['usluge.faq2.p']} ?: _">Kako se prijavljujem?</h3><i></i>
+                    </div>
+                    <div class="us-faq-odgovor">
+                        <p data-uredi="usluge.faq2.o" data-uredi-vise th:text="${t['usluge.faq2.o']} ?: _">Prijava je online: napravi nalog, popuni prijavu i priloži skenirane dokumente. Nakon toga originale ili ovjerene kopije dostaviš poštom ili lično.</p>
+                    </div>
+                </div>
+                <div class="us-faq-stavka">
+                    <div class="us-faq-pitanje" role="button" tabindex="0">
+                        <h3 data-uredi="usluge.faq3.p" th:text="${t['usluge.faq3.p']} ?: _">Kako se plaća ishrana?</h3><i></i>
+                    </div>
+                    <div class="us-faq-odgovor">
+                        <p data-uredi="usluge.faq3.o" data-uredi-vise th:text="${t['usluge.faq3.o']} ?: _">Dio troškova subvencioniše kanton iz kojeg dolaziš, a ostatak plaćaš mjesečno. Tačan iznos i uputa za uplatu objavljuju se uz konkurs.</p>
+                    </div>
+                </div>
+                <div class="us-faq-stavka">
+                    <div class="us-faq-pitanje" role="button" tabindex="0">
+                        <h3 data-uredi="usluge.faq4.p" th:text="${t['usluge.faq4.p']} ?: _">Kada se useljavam?</h3><i></i>
+                    </div>
+                    <div class="us-faq-odgovor">
+                        <p data-uredi="usluge.faq4.o" data-uredi-vise th:text="${t['usluge.faq4.o']} ?: _">Nakon objave konačne rang liste. Termin zaduženja soba objavljuje se na rang listi i u obavještenjima na početnoj stranici.</p>
+                    </div>
+                </div>
+                <div class="us-faq-stavka">
+                    <div class="us-faq-pitanje" role="button" tabindex="0">
+                        <h3 data-uredi="usluge.faq5.p" th:text="${t['usluge.faq5.p']} ?: _">Gdje se nalazi dom?</h3><i></i>
+                    </div>
+                    <div class="us-faq-odgovor">
+                        <p data-uredi="usluge.faq5.o" data-uredi-vise
+                           th:text="${t['usluge.faq5.o']} ?: |${postavke.adresa}, u naselju Crkvice. U blizini su Medicinski fakultet, Kantonalna bolnica, prodavnice, apoteke i pošta.|">Crkvice 50…</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= CTA ======================= -->
+    <section class="jp-sekcija">
+        <div class="jp-wrap">
+            <div class="jp-kontakt us-cta">
+                <div class="jp-kontakt-tekst">
+                    <h2 data-uredi="usluge.cta.naslov" th:text="${t['usluge.cta.naslov']} ?: _">Želiš mjesto u domu?</h2>
+                    <p data-uredi="usluge.cta.opis" th:text="${t['usluge.cta.opis']} ?: _">Prijava na konkurs je online i traje nekoliko minuta.</p>
+                </div>
+                <div class="jp-hero-cta us-cta-dugmad">
+                    <a class="btn btn-primary btn-lg" th:href="@{/registracija}">Prijavi se na konkurs</a>
+                    <a class="btn btn-outline btn-lg" th:href="@{/upute}">Kako se prijaviti</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+<th:block th:replace="~{fragments/layout :: urednik}"></th:block>
+
+<script>
+    /* ---------- karusel ---------- */
+    (function () {
+        var k = document.getElementById('karusel');
+        if (!k) return;
+        var traka = k.querySelector('.us-traka');
+        var n = traka.children.length;
+        var tacke = k.querySelector('.us-tacke');
+        var i = 0;
+
+        if (n <= 1) { k.classList.add('us-jedna'); return; }
+
+        for (var j = 0; j < n; j++) {
+            (function (x) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.setAttribute('aria-label', 'Slika ' + (x + 1));
+                b.addEventListener('click', function () { idi(x); });
+                tacke.appendChild(b);
+            })(j);
+        }
+
+        function idi(x) {
+            i = (x + n) % n;
+            traka.style.transform = 'translateX(' + (-i * 100) + '%)';
+            Array.prototype.forEach.call(tacke.children, function (t, y) { t.classList.toggle('on', y === i); });
+        }
+
+        k.querySelector('.us-k-prev').addEventListener('click', function () { idi(i - 1); });
+        k.querySelector('.us-k-next').addEventListener('click', function () { idi(i + 1); });
+        k.addEventListener('keydown', function (e) {
+            if (document.body.classList.contains('uredjivanje')) return;
+            if (e.key === 'ArrowLeft') idi(i - 1);
+            if (e.key === 'ArrowRight') idi(i + 1);
+        });
+
+        var x0 = null;
+        k.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+        k.addEventListener('touchend', function (e) {
+            if (x0 === null) return;
+            var dx = e.changedTouches[0].clientX - x0;
+            if (Math.abs(dx) > 40) idi(dx < 0 ? i + 1 : i - 1);
+            x0 = null;
+        });
+
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            setInterval(function () {
+                if (document.hidden || k.matches(':hover') || document.body.classList.contains('uredjivanje')) return;
+                idi(i + 1);
+            }, 5000);
+        }
+        idi(0);
+    })();
+
+    /* ---------- česta pitanja ---------- */
+    (function () {
+        var faq = document.getElementById('faq');
+        if (!faq) return;
+        function prebaci(p) {
+            if (document.body.classList.contains('uredjivanje')) return;
+            p.parentElement.classList.toggle('otvoreno');
+        }
+        faq.querySelectorAll('.us-faq-pitanje').forEach(function (p) {
+            p.addEventListener('click', function () { prebaci(p); });
+            p.addEventListener('keydown', function (e) {
+                if ((e.key === 'Enter' || e.key === ' ') && e.target === p) { e.preventDefault(); prebaci(p); }
+            });
+        });
+        faq.querySelector('.us-faq-stavka').classList.add('otvoreno');
+    })();
+
+    /* ---------- galerija: dodavanje i brisanje (admin) ---------- */
+    (function () {
+        var box = document.getElementById('adminGalerija');
+        if (!box) return;
+        var input = document.getElementById('uagInput');
+        var zona = document.getElementById('uagZona');
+        var poruka = document.getElementById('uagPoruka');
+        var MAX = 8 * 1024 * 1024;
+        var DOZVOLJENO = ['image/jpeg', 'image/png', 'image/webp'];
+
+        function csrf() {
+            var h = {};
+            var t = document.querySelector('meta[name="_csrf"]');
+            var n = document.querySelector('meta[name="_csrf_header"]');
+            if (t && n && t.content) h[n.content] = t.content;
+            return h;
+        }
+        function javi(tekst, greska) {
+            poruka.hidden = false;
+            poruka.textContent = tekst;
+            poruka.classList.toggle('uag-poruka--greska', !!greska);
+        }
+        function posalji(url, body) {
+            return fetch(url, { method: 'POST', headers: csrf(), body: body })
+                .then(function (r) {
+                    return r.json().catch(function () { return {}; }).then(function (j) {
+                        if (!r.ok) throw new Error(j.message || ('Greška ' + r.status));
+                        return j;
+                    });
+                });
+        }
+
+        function dodaj(fajlovi) {
+            fajlovi = Array.prototype.slice.call(fajlovi || []);
+            if (!fajlovi.length) return;
+            for (var i = 0; i < fajlovi.length; i++) {
+                var f = fajlovi[i];
+                if (DOZVOLJENO.indexOf(f.type) < 0) return javi('"' + f.name + '" nije JPG, PNG ili WEBP.', true);
+                if (f.size > MAX) return javi('"' + f.name + '" je veća od 8 MB.', true);
+            }
+            var fd = new FormData();
+            fajlovi.forEach(function (f) { fd.append('slike', f); });
+            javi('Šaljem ' + fajlovi.length + (fajlovi.length === 1 ? ' fotografiju…' : ' fotografija…'));
+            box.classList.add('uag--radi');
+            posalji(box.dataset.dodaj, fd)
+                .then(function () { location.reload(); })
+                .catch(function (e) { javi(e.message, true); box.classList.remove('uag--radi'); });
+        }
+
+        input.addEventListener('change', function () { dodaj(input.files); input.value = ''; });
+
+        ['dragenter', 'dragover'].forEach(function (ev) {
+            zona.addEventListener(ev, function (e) { e.preventDefault(); zona.classList.add('uag-zona--iznad'); });
+        });
+        ['dragleave', 'drop'].forEach(function (ev) {
+            zona.addEventListener(ev, function (e) { e.preventDefault(); zona.classList.remove('uag-zona--iznad'); });
+        });
+        zona.addEventListener('drop', function (e) { dodaj(e.dataTransfer.files); });
+        zona.addEventListener('click', function () { input.click(); });
+
+        box.querySelectorAll('.uag-obrisi').forEach(function (b) {
+            b.addEventListener('click', function () {
+                if (!confirm('Obrisati ovu fotografiju iz galerije?')) return;
+                b.disabled = true;
+                posalji(box.dataset.obrisi + encodeURIComponent(b.dataset.ime) + '/obrisi', null)
+                    .then(function () { location.reload(); })
+                    .catch(function (e) { javi(e.message, true); b.disabled = false; });
+            });
+        });
+    })();
+</script>
+</body>
+</html>

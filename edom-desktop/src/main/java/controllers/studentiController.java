@@ -46,6 +46,7 @@ public class studentiController {
     private FilteredList<EvidencijaRedDTO> filteredList;
     private SortedList<EvidencijaRedDTO> sortedList;
     private Integer godina;
+    private Integer najnovijaGodina;
 
     // =====================================================================
     //  KOLONE
@@ -286,14 +287,6 @@ public class studentiController {
         ucitaj(godina);
     }
 
-    private void azurirajGodine() {
-        if (godina == null) return;
-        List<Integer> godine = new ArrayList<>();
-        for (int g = godina; g >= godina - 4; g--) godine.add(g);
-        if (!cmbGodina.getItems().equals(godine)) cmbGodina.getItems().setAll(godine);
-        cmbGodina.setValue(godina);
-    }
-
     private void osvjeziPodnaslov() {
         long uDomu = masterList.stream().filter(r -> "USELJEN".equals(r.statusSmjestaja())).count();
         List<String> d = new ArrayList<>();
@@ -516,5 +509,17 @@ public class studentiController {
         Alert a = new Alert(Alert.AlertType.ERROR, ex instanceof ApiException ? ex.getMessage() : opsta);
         a.setHeaderText(null);
         a.showAndWait();
+    }
+
+    private void azurirajGodine() {
+        if (godina == null) return;
+        if (najnovijaGodina == null || godina > najnovijaGodina) najnovijaGodina = godina;
+
+        List<Integer> godine = new ArrayList<>();
+        for (int g = najnovijaGodina; g >= najnovijaGodina - 5; g--) godine.add(g);
+        if (!godine.contains(godina)) godine.add(godina);    // za svaki slučaj, ako je izabrana starija
+
+        if (!cmbGodina.getItems().equals(godine)) cmbGodina.getItems().setAll(godine);
+        cmbGodina.setValue(godina);
     }
 }

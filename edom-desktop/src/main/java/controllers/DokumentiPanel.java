@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import service.DokumentPregled;
 import service.PdfService;
 
 import java.time.format.DateTimeFormatter;
@@ -31,10 +32,10 @@ public class DokumentiPanel extends VBox {
         this.idPrijave = idPrijave;
         this.osvjezi = osvjezi;
         setPadding(new Insets(16));
-        setStyle("-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #e3e8ef; -fx-border-radius: 14;");
+        getStyleClass().add("pr-kartica");
 
         Label n = new Label("Dokumenti");
-        n.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        n.getStyleClass().add("pr-kartica-naslov");
         getChildren().addAll(n, sitno("Označite „Dostavljen“ kad student dostavi dokument (original ili ovjerenu kopiju). "
                 + "Ako je donio papir koji nije priložio online, dodajte ga dugmetom „+ Dostavljen papirno“."));
 
@@ -84,11 +85,13 @@ public class DokumentiPanel extends VBox {
         for (DokumentDTO d : z.prilozeni()) k.getChildren().add(dokument(d));
 
         Button papir = new Button("+ Dostavljen papirno");
+        papir.getStyleClass().add("pr-mali-btn");
         papir.setOnAction(e -> dodajPapir(z));
         k.getChildren().add(papir);
 
         k.setPadding(new Insets(10, 12, 10, 12));
-        k.setStyle("-fx-background-color: #f8fafc; -fx-background-radius: 10;");
+        k.setStyle("-fx-background-color: #f8fbfb; -fx-background-radius: 10; "
+                + "-fx-border-color: #e6eef0; -fx-border-radius: 10;");
         return k;
     }
 
@@ -105,11 +108,13 @@ public class DokumentiPanel extends VBox {
 
         if (d.imaSadrzaj()) {
             Button pregled = new Button("Pregledaj");
+            pregled.getStyleClass().add("pr-mali-btn");
             pregled.setOnAction(e -> pozadina(() -> PrijavaApi.sadrzajDokumenta(idPrijave, d.idDokument()),
-                    b64 -> PdfService.prikaziPdf(b64, d.naziv())));
+                    b64 -> DokumentPregled.prikazi(b64, d.naziv())));
             red.getChildren().add(pregled);
         } else {
             Button obrisi = new Button("Obriši");
+            obrisi.getStyleClass().addAll("pr-mali-btn", "pr-mali-btn--crveno");
             obrisi.setOnAction(e -> {
                 Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Obrisati papirni dokument „" + d.naziv() + "“?",
                         ButtonType.YES, ButtonType.NO);

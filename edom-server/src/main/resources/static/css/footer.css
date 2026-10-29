@@ -1,0 +1,79 @@
+/* =========================================================
+   E-Dom – puni footer (sve stranice osim login/registracija)
+   ========================================================= */
+.footer.ft-puni{
+    padding:0;margin-top:0;border:0;color:#cfe3e7;
+    background:
+            radial-gradient(600px 300px at 100% 0%, rgba(47,127,224,.18), transparent 70%),
+            radial-gradient(500px 260px at 0% 100%, rgba(240,138,36,.14), transparent 70%),
+            linear-gradient(170deg,#0c4352 0%,#082f3a 100%);
+}
+.ft-traka{height:5px;background:linear-gradient(90deg,#00a884,#2f7fe0,#7a5af5,#e8547a,#f08a24,#d99a00)}
+.ft-wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+
+.ft-grid{
+    display:grid;grid-template-columns:1.5fr 1fr 1.1fr 1.3fr;gap:40px;
+    padding-top:56px;padding-bottom:44px;
+}
+
+/* o domu */
+.ft-brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;margin-bottom:16px}
+.ft-brand img{width:52px;height:52px;border-radius:50%;background:#fff;padding:3px;object-fit:contain}
+.ft-brand b{display:block;color:#fff;font-size:17px;line-height:1.2}
+.ft-brand small{color:#8fb7bf;font-size:13px}
+.ft-o p{line-height:1.65;font-size:15px;max-width:360px}
+
+.ft-drustvene{display:flex;gap:10px;margin-top:20px}
+.ft-soc{
+    width:40px;height:40px;border-radius:12px;display:grid;place-items:center;text-decoration:none;
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;transition:.15s;
+}
+.ft-soc:hover{transform:translateY(-2px)}
+.ft-soc--fb:hover{background:#1877f2;border-color:#1877f2}
+.ft-soc--ig:hover{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af);border-color:transparent}
+.ft-soc--web:hover{background:#00a884;border-color:#00a884}
+.ft-soc--mail:hover{background:#f08a24;border-color:#f08a24}
+
+.ft-uredi-linkove{display:none;margin-top:14px;font-size:13px}
+body.uredjivanje .ft-uredi-linkove{display:grid;gap:6px}
+.ft-uredi-linkove small{color:#8fb7bf;margin-right:6px}
+.ft-uredi-linkove span{color:#fff;word-break:break-all}
+
+/* kolone */
+.ft-kol h4{
+    color:#fff;font-size:14px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;
+}
+.ft-h4-razmak{margin-top:26px}
+.ft-kol ul{list-style:none;display:grid;gap:10px}
+.ft-kol a{color:#cfe3e7;text-decoration:none;font-size:15px;transition:color .15s, padding .15s}
+.ft-kol nav a:hover,.ft-kol li > a:hover{color:#5fd6b4;padding-left:4px}
+.ft-kol small{color:#7fa6ae;font-size:12px}
+.ft-dok a::before{content:"📄";margin-right:8px;font-size:13px}
+
+/* kontakt */
+.ft-kontakt li{display:flex;gap:10px;align-items:flex-start;font-size:15px}
+.ft-kontakt svg{flex:none;margin-top:2px;color:#5fd6b4}
+.ft-kontakt li:nth-child(2) svg{color:#ffb469}
+.ft-kontakt li:nth-child(3) svg{color:#8dbcff}
+.ft-kontakt li:nth-child(4) svg{color:#c3b2ff}
+.ft-kontakt a{word-break:break-word}
+.ft-cta{
+    display:inline-flex;align-items:center;margin-top:22px;height:44px;padding:0 18px;border-radius:12px;
+    background:#00bf9a;color:#04303a !important;font-weight:800;text-decoration:none;transition:.15s;
+}
+.ft-cta:hover{background:#19d3ad;padding-left:18px !important}
+
+/* dno */
+.ft-dno{border-top:1px solid rgba(255,255,255,.08)}
+.ft-dno-in{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-top:18px;padding-bottom:18px;font-size:14px;color:#8fb7bf}
+.ft-vrh{display:inline-flex;align-items:center;gap:6px;color:#cfe3e7;text-decoration:none;font-weight:700}
+.ft-vrh:hover{color:#5fd6b4}
+
+/* responsive */
+@media (max-width:1000px){
+    .ft-grid{grid-template-columns:1fr 1fr;gap:32px}
+}
+@media (max-width:560px){
+    .ft-wrap{padding:0 16px}
+    .ft-grid{grid-template-columns:1fr;padding-top:40px}
+}
