@@ -97,6 +97,7 @@
                     <li><a th:href="@{/}">Početna</a></li>
                     <li><a th:href="@{/upute}">Kako se prijaviti</a></li>
                     <li><a th:href="@{/rang-lista}">Rang lista</a></li>
+                    <li><a th:href="@{/o-ustanovi}">O ustanovi</a></li>
                     <li><a th:href="@{/usluge}">Usluge i život u domu</a></li>
                     <li><a th:href="@{/}+'#aktuelno'">Obavještenja</a></li>
                     <li><a th:href="@{/}+'#lokacija'">Lokacija</a></li>
@@ -171,6 +172,7 @@
         </a>
         <nav class="pub-links">
             <a th:href="@{/}" th:classappend="${aktivna == 'pocetna'} ? 'active'">Početna</a>
+            <a th:href="@{/o-ustanovi}" th:classappend="${aktivna == 'o-ustanovi'} ? 'active'">O ustanovi</a>
             <a th:href="@{/usluge}" th:classappend="${aktivna == 'usluge'} ? 'active'">Usluge</a>
             <a th:href="@{/upute}" th:classappend="${aktivna == 'upute'} ? 'active'">Kako se prijaviti</a>
             <a th:href="@{/rang-lista}" th:classappend="${aktivna == 'rang'} ? 'active'">Rang lista</a>

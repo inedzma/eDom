@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
+    <title>O ustanovi — Studentski centar Zenica</title>
+    <meta name="description" content="Studentski centar Univerziteta u Zenici: historija od 1977. godine, misija, vizija i djelatnost.">
+    <link rel="stylesheet" th:href="@{/css/pocetna.css}">
+    <link rel="stylesheet" th:href="@{/css/javna.css}">
+    <link rel="stylesheet" th:href="@{/css/o-ustanovi.css}">
+</head>
+<body class="landing">
+
+<header th:replace="${ime != null} ? ~{fragments/layout :: navbarStudent('o-ustanovi')} : ~{fragments/layout :: navbarJavni('o-ustanovi')}"></header>
+
+<main>
+
+    <!-- ======================= ZAGLAVLJE ======================= -->
+    <section class="ou-hero">
+        <div class="jp-wrap ou-hero-in">
+            <div>
+                <span class="jp-eyebrow ou-eyebrow">O ustanovi</span>
+                <h1 data-uredi="ou.hero.naslov" th:text="${t['ou.hero.naslov']} ?: _">Dom studentima Univerziteta u Zenici od 1977. godine</h1>
+                <p data-uredi="ou.hero.opis" data-uredi-vise th:text="${t['ou.hero.opis']} ?: _">Studentski centar brine o smještaju i ishrani studenata, kako bi se oni mogli posvetiti onome najvažnijem — studiju.</p>
+            </div>
+            <div class="ou-hero-znak" aria-hidden="true">
+                <img th:src="@{/img/studentski-centar-logo.png}" alt="">
+                <span class="ou-od">od <b>1977.</b></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= BROJKE ======================= -->
+    <section class="jp-brojke">
+        <div class="jp-wrap jp-brojke-in">
+            <div class="jp-broj">
+                <b data-uredi="ou.b1.broj" th:text="${t['ou.b1.broj']} ?: _">1977.</b>
+                <span data-uredi="ou.b1.opis" th:text="${t['ou.b1.opis']} ?: _">godina početka rada</span>
+            </div>
+            <div class="jp-broj">
+                <b data-uredi="ou.b2.broj" th:text="${t['ou.b2.broj']} ?: _">2006.</b>
+                <span data-uredi="ou.b2.opis" th:text="${t['ou.b2.opis']} ?: _">u sastavu Univerziteta u Zenici</span>
+            </div>
+            <div class="jp-broj">
+                <b th:text="${postavke.kapacitet}">220</b>
+                <span data-uredi="ou.b3.opis" th:text="${t['ou.b3.opis']} ?: _">mjesta za studente</span>
+            </div>
+            <div class="jp-broj">
+                <b data-uredi="ou.b4.broj" th:text="${t['ou.b4.broj']} ?: _">87</b>
+                <span data-uredi="ou.b4.opis" th:text="${t['ou.b4.opis']} ?: _">soba, 33 dvokrevetne i 54 trokrevetne</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= HISTORIJA ======================= -->
+    <section class="jp-sekcija" id="historija">
+        <div class="jp-wrap ou-historija">
+            <div class="ou-historija-uvod">
+                <span class="jp-eyebrow">Historija</span>
+                <h2 data-uredi="ou.hist.naslov" th:text="${t['ou.hist.naslov']} ?: _">Skoro pola stoljeća bez prekida</h2>
+                <p class="jp-lead" data-uredi="ou.hist.opis" data-uredi-vise th:text="${t['ou.hist.opis']} ?: _">Od otvaranja do danas dom je bez prekida bio mjesto gdje su generacije studenata živjele, učile i sklapale prijateljstva.</p>
+            </div>
+
+            <ol class="ou-linija">
+                <li class="ou-tacka">
+                    <span class="ou-datum" data-uredi="ou.l1.datum" th:text="${t['ou.l1.datum']} ?: _">26. januar 1977.</span>
+                    <h3 data-uredi="ou.l1.naslov" th:text="${t['ou.l1.naslov']} ?: _">Dom otvara vrata</h3>
+                    <p data-uredi="ou.l1.opis" data-uredi-vise th:text="${t['ou.l1.opis']} ?: _">Objekat Studentskog centra izgrađen je 1977. godine i od tada radi bez prekida.</p>
+                </li>
+                <li class="ou-tacka">
+                    <span class="ou-datum" data-uredi="ou.l2.datum" th:text="${t['ou.l2.datum']} ?: _">1. januar 2006.</span>
+                    <h3 data-uredi="ou.l2.naslov" th:text="${t['ou.l2.naslov']} ?: _">Dio Univerziteta u Zenici</h3>
+                    <p data-uredi="ou.l2.opis" data-uredi-vise th:text="${t['ou.l2.opis']} ?: _">Univerzitet u Zenici preuzima prava osnivača u dijelu koji se odnosi na životni standard studenata.</p>
+                </li>
+                <li class="ou-tacka">
+                    <span class="ou-datum" data-uredi="ou.l3.datum" th:text="${t['ou.l3.datum']} ?: _">Danas</span>
+                    <h3 data-uredi="ou.l3.naslov" th:text="${t['ou.l3.naslov']} ?: _">Digitalni dom</h3>
+                    <p data-uredi="ou.l3.opis" data-uredi-vise th:text="${t['ou.l3.opis']} ?: _">Prijava na konkurs, dokumenti i rang lista dostupni su online, putem sistema E-Dom.</p>
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- ======================= MISIJA I VIZIJA ======================= -->
+    <section class="jp-sekcija jp-sekcija--tonirana" id="misija">
+        <div class="jp-wrap">
+            <span class="jp-eyebrow">Čemu težimo</span>
+            <h2 data-uredi="ou.mv.naslov" th:text="${t['ou.mv.naslov']} ?: _">Misija i vizija</h2>
+
+            <div class="ou-mv">
+                <article class="ou-mv-kartica ou-mv--misija">
+                    <span class="ou-mv-ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
+                    <h3>Misija</h3>
+                    <p data-uredi="ou.misija" data-uredi-vise th:text="${t['ou.misija']} ?: _">Studentski centar nije obrazovna ustanova, ali pruža logističku podršku misiji i ciljevima Univerziteta u Zenici. Stalno unapređujemo usluge i podižemo studentski standard, stavljajući studente i stanare doma u prvi plan — uz svijest o značaju mobilnosti studenata kroz evropske univerzitete u okviru Bolonjskog procesa.</p>
+                </article>
+                <article class="ou-mv-kartica ou-mv--vizija">
+                    <span class="ou-mv-ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
+                    <h3>Vizija</h3>
+                    <p data-uredi="ou.vizija" data-uredi-vise th:text="${t['ou.vizija']} ?: _">Kroz upravljanje zasnovano na radu, redu i miru želimo kvalitetnu i održivu uslugu i zadovoljne studente u kolektivnom smještaju — a time i bolju prolaznost na Univerzitetu i kvalitetniji razvoj pojedinca i društva.</p>
+                </article>
+            </div>
+
+            <div class="ou-vrijednosti">
+                <span class="ou-vr ou-vr--a" data-uredi="ou.v1" th:text="${t['ou.v1']} ?: _">Rad</span>
+                <span class="ou-vr ou-vr--b" data-uredi="ou.v2" th:text="${t['ou.v2']} ?: _">Red</span>
+                <span class="ou-vr ou-vr--c" data-uredi="ou.v3" th:text="${t['ou.v3']} ?: _">Mir</span>
+                <span class="ou-vr ou-vr--d" data-uredi="ou.v4" th:text="${t['ou.v4']} ?: _">Studenti na prvom mjestu</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= DJELATNOST I SARADNJA ======================= -->
+    <section class="jp-sekcija" id="djelatnost">
+        <div class="jp-wrap ou-dvije">
+            <div>
+                <span class="jp-eyebrow">Djelatnost</span>
+                <h2 data-uredi="ou.dj.naslov" th:text="${t['ou.dj.naslov']} ?: _">Čime se bavimo</h2>
+                <div class="ou-djelatnost">
+                    <article class="ou-dj ou-dj--glavna">
+                        <small>Osnovna djelatnost</small>
+                        <h3 data-uredi="ou.dj1.naslov" th:text="${t['ou.dj1.naslov']} ?: _">Smještaj i ishrana studenata</h3>
+                        <p data-uredi="ou.dj1.opis" data-uredi-vise th:text="${t['ou.dj1.opis']} ?: _">Studentima Univerziteta u Zenici obezbjeđujemo smještaj u domu i svakodnevne obroke u restoranu doma.</p>
+                        <a th:href="@{/usluge}">Pogledaj usluge →</a>
+                    </article>
+                    <article class="ou-dj">
+                        <small>Sporedne djelatnosti</small>
+                        <p data-uredi="ou.dj2.opis" data-uredi-vise th:text="${t['ou.dj2.opis']} ?: _">Sve ostale djelatnosti su sporedne i služe tome da se osnovni cilj — dobar smještaj i ishrana studenata — ostvari što bolje.</p>
+                    </article>
+                </div>
+            </div>
+
+            <div>
+                <span class="jp-eyebrow">Saradnja</span>
+                <h2 data-uredi="ou.sar.naslov" th:text="${t['ou.sar.naslov']} ?: _">Radimo zajedno s</h2>
+                <ul class="ou-partneri">
+                    <li><span class="ou-p-tacka"></span><span data-uredi="ou.p1" th:text="${t['ou.p1']} ?: _">Studentima i stanarima doma</span></li>
+                    <li><span class="ou-p-tacka"></span><span data-uredi="ou.p2" th:text="${t['ou.p2']} ?: _">Univerzitetom u Zenici</span></li>
+                    <li><span class="ou-p-tacka"></span><span data-uredi="ou.p3" th:text="${t['ou.p3']} ?: _">Zeničko-dobojskim kantonom</span></li>
+                    <li><span class="ou-p-tacka"></span><span data-uredi="ou.p4" th:text="${t['ou.p4']} ?: _">Zajednicom studentskih centara FBiH</span></li>
+                    <li><span class="ou-p-tacka"></span><span data-uredi="ou.p5" th:text="${t['ou.p5']} ?: _">Srodnim ustanovama</span></li>
+                    <li><span class="ou-p-tacka"></span><span data-uredi="ou.p6" th:text="${t['ou.p6']} ?: _">Institucijama važnim za studentski život</span></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= LOKACIJA ======================= -->
+    <section class="jp-sekcija jp-sekcija--tonirana" id="okolina">
+        <div class="jp-wrap">
+            <div class="ou-lokacija">
+                <div class="ou-lok-tekst">
+                    <span class="jp-eyebrow">Gdje smo</span>
+                    <h2 data-uredi="ou.lok.naslov" th:text="${t['ou.lok.naslov']} ?: _">Uređeno naselje, sve na dohvat ruke</h2>
+                    <p class="jp-lead" data-uredi="ou.lok.opis" data-uredi-vise th:text="${t['ou.lok.opis']} ?: _">Dom je u zeničkom naselju Crkvice. U blizini su restorani, prodavnice, apoteke, pošta, policijska stanica, Kantonalna bolnica i Medicinski fakultet, a tu su i ljetni bazeni i sportski tereni. Obližnja cesta vodi do izletišta Smetovi, s pogledom na cijelu Zenicu.</p>
+                    <a class="btn btn-primary" th:href="@{/kontakt}+'#lokacija'">Pogledaj na mapi →</a>
+                </div>
+                <div class="ou-lok-kartice">
+                    <div class="ou-lk ou-lk--a"><b data-uredi="ou.lk1" th:text="${t['ou.lk1']} ?: _">Medicinski fakultet</b><span>u blizini</span></div>
+                    <div class="ou-lk ou-lk--b"><b data-uredi="ou.lk2" th:text="${t['ou.lk2']} ?: _">Kantonalna bolnica</b><span>u blizini</span></div>
+                    <div class="ou-lk ou-lk--c"><b data-uredi="ou.lk3" th:text="${t['ou.lk3']} ?: _">Ljetni bazeni</b><span>i sportski tereni</span></div>
+                    <div class="ou-lk ou-lk--d"><b data-uredi="ou.lk4" th:text="${t['ou.lk4']} ?: _">Smetovi</b><span>izletište iznad grada</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= CTA ======================= -->
+    <section class="jp-sekcija">
+        <div class="jp-wrap">
+            <div class="jp-kontakt ou-cta">
+                <div class="jp-kontakt-tekst">
+                    <h2 data-uredi="ou.cta.naslov" th:text="${t['ou.cta.naslov']} ?: _">Postani dio naše priče</h2>
+                    <p data-uredi="ou.cta.opis" th:text="${t['ou.cta.opis']} ?: _">Prijava na konkurs za smještaj je online i traje nekoliko minuta.</p>
+                </div>
+                <div class="jp-hero-cta ou-cta-dugmad">
+                    <a class="btn btn-primary btn-lg" th:href="@{/registracija}">Prijavi se na konkurs</a>
+                    <a class="btn btn-outline btn-lg" th:href="@{/kontakt}">Kontakt</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+<th:block th:replace="~{fragments/layout :: urednik}"></th:block>
+</body>
+</html>

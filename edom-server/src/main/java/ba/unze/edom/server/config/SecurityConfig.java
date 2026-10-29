@@ -62,7 +62,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a -> a
                         .requestMatchers("/", "/login", "/registracija", "/error", "/rang-lista",
                                 "/zaboravljena-lozinka", "/zaboravljena-lozinka/**",
-                                "/css/**", "/js/**", "/img/**", "/upute", "/upute/**", "/dokumenti/**", "/usluge", "/galerija/**", "/kontakt").permitAll()
+                                "/css/**", "/js/**", "/img/**", "/upute", "/upute/**", "/dokumenti/**", "/usluge", "/galerija/**",
+                                "/kontakt", "/o-ustanovi").permitAll()
                         .requestMatchers("/urednik/**").access((auth, ctx1) ->
                                 new AuthorizationDecision(Uloge.jeAdmin(auth.get())))
                         .requestMatchers("/student/**").hasRole("Student")

@@ -83,4 +83,10 @@ public class StraniceController {
         }
         return "kontakt";
     }
+
+    /** Javna stranica: historija, misija, vizija. */
+    @GetMapping("/o-ustanovi")
+    public String oUstanovi() {
+        return "o-ustanovi";
+    }
 }
