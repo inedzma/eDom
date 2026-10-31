@@ -1,13 +1,13 @@
 package ba.unze.edom.server.web;
 
-import ba.unze.edom.common.dto.RangObjavaDTO;
+import ba.unze.edom.common.dto.rang.RangObjavaDTO;
 import ba.unze.edom.server.dto.KontaktForma;
 import ba.unze.edom.server.security.KorisnikPrincipal;
 import ba.unze.edom.server.security.Uloge;
-import ba.unze.edom.server.service.GalerijaService;
-import ba.unze.edom.server.service.ObavjestenjaService;
-import ba.unze.edom.server.service.ProfilService;
-import ba.unze.edom.server.service.RangListaObjavaService;
+import ba.unze.edom.server.service.javna.GalerijaService;
+import ba.unze.edom.server.service.javna.ObavjestenjaService;
+import ba.unze.edom.server.service.korisnik.ProfilService;
+import ba.unze.edom.server.service.rang.RangListaObjavaService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

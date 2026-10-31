@@ -1,5 +1,6 @@
 package ba.unze.edom.server.service;
 
+import ba.unze.edom.server.service.obavijesti.EmailService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +15,8 @@ import org.springframework.test.context.ActiveProfiles;
 @Disabled("Rucni test - salje pravi e-mail")
 class EmailSlanjeTest {
 
-    @Autowired EmailService emailService;
+    @Autowired
+    EmailService emailService;
 
     @Test
     @DisplayName("Slanje reset koda na pravu adresu")

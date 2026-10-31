@@ -1,7 +1,7 @@
 package ba.unze.edom.server.web;
 
 import ba.unze.edom.server.dto.KontaktForma;
-import ba.unze.edom.server.service.KontaktPorukaService;
+import ba.unze.edom.server.service.javna.KontaktPorukaService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

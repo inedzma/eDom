@@ -1,10 +1,10 @@
 package service.export;
 
 import api.PostavkeApi;
-import ba.unze.edom.common.dto.KategorijaRanga;
-import ba.unze.edom.common.dto.PostavkeDTO;
-import ba.unze.edom.common.dto.RangListaAdminDTO;
-import ba.unze.edom.common.dto.RangRedDTO;
+import ba.unze.edom.common.dto.rang.KategorijaRanga;
+import ba.unze.edom.common.dto.opste.PostavkeDTO;
+import ba.unze.edom.common.dto.rang.RangListaAdminDTO;
+import ba.unze.edom.common.dto.rang.RangRedDTO;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
 import java.io.File;

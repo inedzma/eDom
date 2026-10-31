@@ -2,7 +2,7 @@ package controllers;
 
 import api.ApiException;
 import api.SobeApi;
-import ba.unze.edom.common.dto.*;
+import ba.unze.edom.common.dto.sobe.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;

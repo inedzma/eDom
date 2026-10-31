@@ -1,9 +1,9 @@
 package ba.unze.edom.server.api;
 
-import ba.unze.edom.common.dto.KorisnikIzmjenaDTO;
-import ba.unze.edom.common.dto.KorisnikProfilDTO;
-import ba.unze.edom.common.dto.PromjenaLozinkeDTO;
-import ba.unze.edom.server.service.KorisnikService;
+import ba.unze.edom.common.dto.korisnik.KorisnikIzmjenaDTO;
+import ba.unze.edom.common.dto.korisnik.KorisnikProfilDTO;
+import ba.unze.edom.common.dto.korisnik.PromjenaLozinkeDTO;
+import ba.unze.edom.server.service.korisnik.KorisnikService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

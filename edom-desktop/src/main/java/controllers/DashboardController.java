@@ -2,7 +2,7 @@ package controllers;
 
 import api.ApiException;
 import api.DashboardApi;
-import ba.unze.edom.common.dto.DashboardDTO;
+import ba.unze.edom.common.dto.opste.DashboardDTO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;

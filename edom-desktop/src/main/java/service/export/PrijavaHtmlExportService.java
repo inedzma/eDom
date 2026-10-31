@@ -1,6 +1,6 @@
 package service.export;
 
-import ba.unze.edom.common.dto.PrijavaListaDTO;
+import ba.unze.edom.common.dto.prijava.PrijavaListaDTO;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
 import java.io.File;

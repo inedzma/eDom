@@ -1,7 +1,7 @@
 package ba.unze.edom.server.api;
 
-import ba.unze.edom.common.dto.DashboardDTO;
-import ba.unze.edom.server.service.DashboardService;
+import ba.unze.edom.common.dto.opste.DashboardDTO;
+import ba.unze.edom.server.service.opste.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

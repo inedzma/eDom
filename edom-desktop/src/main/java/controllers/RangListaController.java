@@ -2,9 +2,9 @@ package controllers;
 
 import api.ApiException;
 import api.RangListaApi;
-import ba.unze.edom.common.dto.KategorijaRanga;
-import ba.unze.edom.common.dto.RangListaAdminDTO;
-import ba.unze.edom.common.dto.RangRedDTO;
+import ba.unze.edom.common.dto.rang.KategorijaRanga;
+import ba.unze.edom.common.dto.rang.RangListaAdminDTO;
+import ba.unze.edom.common.dto.rang.RangRedDTO;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;

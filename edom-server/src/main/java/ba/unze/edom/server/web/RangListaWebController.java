@@ -2,8 +2,8 @@ package ba.unze.edom.server.web;
 
 import ba.unze.edom.server.dto.ObjavljenaRangLista;
 import ba.unze.edom.server.security.KorisnikPrincipal;
-import ba.unze.edom.server.service.ProfilService;
-import ba.unze.edom.server.service.RangListaObjavaService;
+import ba.unze.edom.server.service.korisnik.ProfilService;
+import ba.unze.edom.server.service.rang.RangListaObjavaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;

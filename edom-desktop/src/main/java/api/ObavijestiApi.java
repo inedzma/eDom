@@ -1,6 +1,6 @@
 package api;
 
-import ba.unze.edom.common.dto.ObavijestDTO;
+import ba.unze.edom.common.dto.opste.ObavijestDTO;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.util.List;

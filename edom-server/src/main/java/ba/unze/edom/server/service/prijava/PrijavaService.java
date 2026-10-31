@@ -1,0 +1,353 @@
+package ba.unze.edom.server.service.prijava;
+
+import ba.unze.edom.common.util.Jmbg;
+import ba.unze.edom.common.util.Opcine;
+import ba.unze.edom.server.dto.*;
+import ba.unze.edom.server.entity.*;
+import ba.unze.edom.server.exception.PrijavaException;
+import ba.unze.edom.server.repository.*;
+import ba.unze.edom.server.service.bodovanje.BodovanjeService;
+import ba.unze.edom.server.service.opste.PostavkeService;
+import ba.unze.edom.server.service.student.SifraStudenta;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.*;
+
+@Service
+@RequiredArgsConstructor
+public class PrijavaService {
+
+    private final PrijavaRepository prijavaRepository;
+    private final StudentRepository studentRepository;
+    private final StatusPrijaveRepository statusRepository;
+    private final VrstaKriterijaRepository vrstaKriterijaRepository;
+    private final BodovanjeService bodovanjeService;
+    private final ApplicationEventPublisher dogadjaji;
+    private final SifraStudenta sifraStudenta;
+    private final PostavkeService postavke;
+
+    // ---------- KREIRANJE ----------
+
+    @Transactional
+    public Prijava kreirajIliNastavi(Integer idStudenta, int akademskaGodina) {
+
+        var postojeca = prijavaRepository
+                .findByStudent_IdStudentAndAkademskaGodina(idStudenta, akademskaGodina);
+
+        if (postojeca.isPresent()) {
+            Prijava p = postojeca.get();
+            if (!Statusi.U_IZRADI.equals(nazivStatusa(p))) {
+                throw new PrijavaException(
+                        "Već ste podnijeli prijavu za akademsku " + akademskaGodina
+                                + ". godinu. Za izmjene se obratite administraciji doma.");
+            }
+            return p;   // nastavak zapocete prijave
+        }
+
+        Student student = studentRepository.findById(idStudenta)
+                .orElseThrow(() -> new PrijavaException("Student ne postoji."));
+
+        if (!postavke.prijaveOtvorene()) {
+            throw new PrijavaException(postavke.porukaZatvoreno());
+        }
+
+        Prijava p = new Prijava();
+        p.setStudent(student);
+        p.setAkademskaGodina(akademskaGodina);
+        p.setDatumPrijave(LocalDate.now());
+        p.setStatus(status(Statusi.U_IZRADI));
+        p.setUkupniBodovi(0.0);
+
+        // pocetne vrijednosti iz profila - student ih moze promijeniti
+        p.setGodinaStudija(student.getGodinaStudija());
+
+        return prijavaRepository.save(p);
+    }
+
+    // ---------- KORAK 1 ----------
+
+    /** Forma za korak 1: podaci prijave + lični podaci iz profila studenta. */
+    @Transactional(readOnly = true)
+    public StudijKorakDTO pripremiStudij(Integer idPrijave, Integer idStudenta) {
+        Prijava p = dohvatiSvoju(idPrijave, idStudenta);
+        Student s = p.getStudent();
+        return new StudijKorakDTO(
+                p.getAkademskaGodina(), p.getGodinaStudija(), p.getProsjek(), p.getPolozeniIspiti(),
+                p.getUpisGodinePut() != null ? p.getUpisGodinePut() : 1,
+                s.getBrojLicneKarte(), s.getTelefonRoditelja(), s.getKanton(), s.getOpcina());
+    }
+
+    @Transactional
+    public void sacuvajStudij(Integer idPrijave, Integer idStudenta,
+                              StudijKorakDTO dto) {
+        Prijava p = dohvatiZaIzmjenu(idPrijave, idStudenta);
+
+        if (!Opcine.postoji(dto.kanton(), dto.opcina())) {
+            throw new PrijavaException("Odaberite općinu iz liste za izabrani kanton.");
+        }
+
+        p.setGodinaStudija(dto.godinaStudija());
+        p.setProsjek(dto.prosjek());
+        p.setPolozeniIspiti(dto.polozeniIspiti());
+        p.setUpisGodinePut(dto.upisGodinePut());
+
+        // lični podaci se pamte u profilu, pa ih sljedeće godine ne treba ponovo unositi
+        Student s = p.getStudent();
+        s.setBrojLicneKarte(dto.brojLicneKarte().trim().toUpperCase());
+        s.setTelefonRoditelja(dto.telefonRoditelja().trim());
+        s.setKanton(dto.kanton());
+        s.setOpcina(dto.opcina());
+        s.setSpol(Jmbg.spol(s.getJmbg()));
+    }
+
+    // ---------- KORAK 2 ----------
+
+    @Transactional
+    public void sacuvajDomacinstvo(Integer idPrijave, Integer idStudenta,
+                                   DomacinstvoKorakDTO dto) {
+        Prijava p = dohvatiZaIzmjenu(idPrijave, idStudenta);
+
+        Integer minKm = postavke.trenutne().minUdaljenostKm();
+        if (minKm != null && dto.udaljenostKm() != null && dto.udaljenostKm().doubleValue() < minKm) {
+            throw new PrijavaException("Prema uslovima konkursa pravo na smještaj imaju studenti čije je prebivalište "
+                    + "udaljeno najmanje " + minKm + " km od Zenice.");
+        }
+
+        p.setBrojClanovaDomacinstva(dto.brojClanovaDomacinstva());
+        p.setUkupnaPrimanja(dto.ukupnaPrimanja());
+        p.setUdaljenostKm(dto.udaljenostKm());
+    }
+
+    // ---------- KORAK 3 ----------
+
+    /** Priprema formu - sve aktivne vrste, sa oznakom sta je vec izabrano. */
+    @Transactional(readOnly = true)
+    public KriterijiFormaDTO pripremiKriterije(Integer idPrijave, Integer idStudenta) {
+
+        Prijava p = dohvatiZaIzmjenu(idPrijave, idStudenta);
+
+        Map<Integer, PrijavaKriterij> izabrani = new HashMap<>();
+        for (PrijavaKriterij k : p.getKriteriji()) {
+            izabrani.put(k.getVrsta().getIdVrstaKriterija(), k);
+        }
+
+        var forma = new KriterijiFormaDTO();
+
+        for (VrstaKriterija v : vrstaKriterijaRepository
+                .findByAktivanTrueOrderByGrupaAscNazivAsc()) {
+
+            var red = new KriterijIzborDTO();
+            red.setIdVrsteKriterija(v.getIdVrstaKriterija());
+            red.setNaziv(v.getNaziv());
+            red.setGrupa(v.getGrupa());
+            red.setTraziParametar(v.isTraziParametar());
+            red.setNazivParametra(v.getNazivParametra());
+            red.setTraziPeriod(v.isTraziPeriod());
+
+            PrijavaKriterij vec = izabrani.get(v.getIdVrstaKriterija());
+            if (vec != null) {
+                red.setIzabran(true);
+                red.setParametar(vec.getParametar());
+                red.setDatumOd(vec.getDatumOd());
+                red.setDatumDo(vec.getDatumDo());
+            }
+
+            forma.getKriteriji().add(red);
+        }
+
+        return forma;
+    }
+
+    @Transactional
+    public void sacuvajKriterije(Integer idPrijave, Integer idStudenta,
+                                 KriterijiFormaDTO forma) {
+
+        Prijava p = dohvatiZaIzmjenu(idPrijave, idStudenta);
+
+        // izmjena kriterija ponistava raniju verifikaciju
+        p.getKriteriji().clear();
+
+        prijavaRepository.saveAndFlush(p);
+        for (KriterijIzborDTO red : forma.getKriteriji()) {
+
+            if (!red.isIzabran()) continue;
+
+            VrstaKriterija v = vrstaKriterijaRepository
+                    .findById(red.getIdVrsteKriterija())
+                    .orElseThrow(() -> new PrijavaException("Nepoznat kriterij."));
+
+            if (v.isTraziParametar() && red.getParametar() == null) {
+                throw new PrijavaException(
+                        "Za kriterij '" + v.getNaziv() + "' morate unijeti "
+                                + v.getNazivParametra().toLowerCase() + ".");
+            }
+
+            PrijavaKriterij k = new PrijavaKriterij();
+            k.setVrsta(v);
+            k.setParametar(v.isTraziParametar() ? red.getParametar() : null);
+            k.setVerifikovan(false);   // uvijek ceka administratora
+            if (v.isTraziPeriod()) {
+                if (red.getDatumOd() == null || red.getDatumDo() == null) {
+                    throw new PrijavaException("Za kriterij '" + v.getNaziv() + "' unesite datum od i datum do.");
+                }
+                if (red.getDatumOd().isAfter(red.getDatumDo())) {
+                    throw new PrijavaException("Za kriterij '" + v.getNaziv()
+                            + "' datum od ne može biti poslije datuma do.");
+                }
+                k.setDatumOd(red.getDatumOd());
+                k.setDatumDo(red.getDatumDo());
+            }
+            p.dodajKriterij(k);
+        }
+    }
+
+    // ---------- PODNOSENJE ----------
+
+    @Transactional
+    public void podnesi(Integer idPrijave, Integer idStudenta, String napomena) {
+
+        Prijava p = dohvatiZaIzmjenu(idPrijave, idStudenta);
+
+        if (!postavke.prijaveOtvorene()) {
+            throw new PrijavaException(postavke.porukaZatvoreno());
+        }
+        p.setNapomena(NapomenaPrijaveService.ocisti(napomena));
+
+        List<String> nedostaje = provjeriPotpunost(p);
+        if (!nedostaje.isEmpty()) {
+            throw new PrijavaException(
+                    "Prijava nije potpuna: " + String.join(", ", nedostaje) + ".");
+        }
+
+        p.setDatumPrijave(LocalDate.now());
+        p.setStatus(status(Statusi.NA_PREGLEDU));
+
+        // kes potvrdjenih bodova; u ovom trenutku jos nista nije verifikovano
+        p.setUkupniBodovi(bodovanjeService.izracunaj(p).potvrdjeno());
+
+        // potvrda studentu sa šifrom (mail ide tek kad je prijava sigurno u bazi)
+        Student s = p.getStudent();
+        sifraStudenta.dodijeli(s);   // za svaki slučaj, ako student još nema broj
+        dogadjaji.publishEvent(new PrijavaPodnesenaEvent(
+                s.getEmail(), s.getIme(), p.getAkademskaGodina(),
+                SifraStudenta.format(s.getSifraBroj(), p.getAkademskaGodina())));
+    }
+
+    private List<String> provjeriPotpunost(Prijava p) {
+        List<String> nedostaje = new ArrayList<>();
+
+        if (p.getGodinaStudija() == null) nedostaje.add("godina studija");
+        if (p.getProsjek() == null) nedostaje.add("prosjek");
+        if (p.getBrojClanovaDomacinstva() == null) nedostaje.add("broj članova domaćinstva");
+        if (p.getUkupnaPrimanja() == null) nedostaje.add("primanja domaćinstva");
+        if (p.getUdaljenostKm() == null) nedostaje.add("udaljenost do doma");
+
+        Student s = p.getStudent();
+        if (s.getBrojLicneKarte() == null) nedostaje.add("broj lične karte");
+        if (s.getTelefonRoditelja() == null) nedostaje.add("telefon roditelja");
+        if (s.getOpcina() == null) nedostaje.add("kanton i općina");
+
+        return nedostaje;
+    }
+
+    // ---------- ODUSTAJANJE ----------
+
+    @Transactional
+    public void odustani(Integer idPrijave, Integer idStudenta) {
+        Prijava p = dohvatiZaIzmjenu(idPrijave, idStudenta);
+        prijavaRepository.delete(p);
+    }
+
+    // ---------- CITANJE ----------
+
+    @Transactional(readOnly = true)
+    public Prijava dohvatiSvoju(Integer idPrijave, Integer idStudenta) {
+        Prijava p = prijavaRepository.findById(idPrijave)
+                .orElseThrow(() -> new PrijavaException("Prijava ne postoji."));
+
+        provjeriVlasnistvo(p, idStudenta);
+        return p;
+    }
+
+    // ---------- POMOCNE ----------
+
+    /**
+     * Dohvata prijavu i provjerava da pripada studentu i da je jos u izradi.
+     * Ovo je jedina tacka kroz koju prolaze sve izmjene.
+     */
+    private Prijava dohvatiZaIzmjenu(Integer idPrijave, Integer idStudenta) {
+
+        Prijava p = prijavaRepository.findById(idPrijave)
+                .orElseThrow(() -> new PrijavaException("Prijava ne postoji."));
+
+        provjeriVlasnistvo(p, idStudenta);
+
+        if (!Statusi.U_IZRADI.equals(nazivStatusa(p))) {
+            throw new PrijavaException(
+                    "Podnesena prijava se ne može mijenjati. "
+                            + "Za izmjene se obratite administraciji doma.");
+        }
+
+        return p;
+    }
+
+    /** Sprjecava da student vidi ili mijenja tudju prijavu preko URL-a. */
+    private void provjeriVlasnistvo(Prijava p, Integer idStudenta) {
+        if (p.getStudent() == null
+                || !p.getStudent().getIdStudent().equals(idStudenta)) {
+            throw new PrijavaException("Nemate pristup ovoj prijavi.");
+        }
+    }
+
+    private String nazivStatusa(Prijava p) {
+        return p.getStatus() != null ? p.getStatus().getNaziv() : null;
+    }
+
+    private StatusPrijave status(String naziv) {
+        return statusRepository.findByNaziv(naziv)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Status '" + naziv + "' ne postoji u bazi."));
+    }
+
+    @Transactional(readOnly = true)
+    public List<PrijavaPregledDTO> pregledZaStudenta(Integer idStudenta) {
+        return prijavaRepository.nadjiZaStudenta(idStudenta).stream()
+                .map(p -> new PrijavaPregledDTO(
+                        p.getIdPrijava(),
+                        p.getAkademskaGodina(),
+                        p.getDatumPrijave(),
+                        p.getStatus() != null ? p.getStatus().getNaziv() : "Nepoznat",
+                        p.getUkupniBodovi(),
+                        p.getDokumenti() != null ? p.getDokumenti().size() : 0
+                ))
+                .toList();
+    }
+
+    // ---------- DOPUNA (status "nepotpuna") ----------
+
+    /** Prijave koje čekaju dopunu: id → napomena administratora (šta fali). */
+    @Transactional(readOnly = true)
+    public Map<Integer, String> zaDopunu(Integer idStudenta) {
+        Map<Integer, String> m = new LinkedHashMap<>();
+        for (Prijava p : prijavaRepository.nadjiZaStudenta(idStudenta)) {
+            if (Statusi.NEPOTPUNA.equals(nazivStatusa(p))) {
+                m.put(p.getIdPrijava(), p.getNapomenaAdmina());
+            }
+        }
+        return m;
+    }
+
+    /** Student je dodao tražene dokumente: prijava se vraća na pregled. */
+    @Transactional
+    public void posaljiDopunu(Integer idPrijave, Integer idStudenta) {
+        Prijava p = dohvatiSvoju(idPrijave, idStudenta);
+        if (!Statusi.NEPOTPUNA.equals(nazivStatusa(p))) {
+            throw new PrijavaException("Ova prijava ne čeka dopunu.");
+        }
+        p.setStatus(status(Statusi.NA_PREGLEDU));
+    }
+}

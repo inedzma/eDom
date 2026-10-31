@@ -4,8 +4,8 @@ import ba.unze.edom.server.dto.ProfilIzmjenaDTO;
 import ba.unze.edom.server.exception.PrijavaException;
 import ba.unze.edom.server.exception.RegistracijaException;
 import ba.unze.edom.server.security.KorisnikPrincipal;
-import ba.unze.edom.server.service.PrijavaService;
-import ba.unze.edom.server.service.SifraStudenta;
+import ba.unze.edom.server.service.prijava.PrijavaService;
+import ba.unze.edom.server.service.student.SifraStudenta;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ba.unze.edom.server.service.ProfilService;
+import ba.unze.edom.server.service.korisnik.ProfilService;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller

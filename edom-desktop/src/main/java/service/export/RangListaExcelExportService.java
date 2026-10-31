@@ -1,8 +1,8 @@
 package service.export;
 
-import ba.unze.edom.common.dto.KategorijaRanga;
-import ba.unze.edom.common.dto.RangListaAdminDTO;
-import ba.unze.edom.common.dto.RangRedDTO;
+import ba.unze.edom.common.dto.rang.KategorijaRanga;
+import ba.unze.edom.common.dto.rang.RangListaAdminDTO;
+import ba.unze.edom.common.dto.rang.RangRedDTO;
 
 import java.io.File;
 import java.io.FileOutputStream;

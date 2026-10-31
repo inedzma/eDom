@@ -1,7 +1,7 @@
 package ba.unze.edom.server.api;
 
-import ba.unze.edom.common.dto.SifarniciDTO;
-import ba.unze.edom.server.service.SifarnikService;
+import ba.unze.edom.common.dto.opste.SifarniciDTO;
+import ba.unze.edom.server.service.opste.SifarnikService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

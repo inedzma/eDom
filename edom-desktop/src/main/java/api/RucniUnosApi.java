@@ -1,6 +1,12 @@
 package api;
 
-import ba.unze.edom.common.dto.*;
+import ba.unze.edom.common.dto.bodovanje.RezultatBodovanja;
+import ba.unze.edom.common.dto.opste.SifarniciDTO;
+import ba.unze.edom.common.dto.prijava.RucniUnosDTO;
+import ba.unze.edom.common.dto.prijava.RucniUnosRezultatDTO;
+import ba.unze.edom.common.dto.prijava.SpisakUnosDTO;
+import ba.unze.edom.common.dto.prijava.SpisakUnosZahtjevDTO;
+import ba.unze.edom.common.dto.student.StudentPronadjenDTO;
 
 import java.util.Optional;
 

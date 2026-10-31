@@ -1,7 +1,7 @@
 package ba.unze.edom.server.web;
 
 import ba.unze.edom.server.security.KorisnikPrincipal;
-import ba.unze.edom.server.service.ProfilService;
+import ba.unze.edom.server.service.korisnik.ProfilService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ControllerAdvice;

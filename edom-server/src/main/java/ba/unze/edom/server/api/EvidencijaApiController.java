@@ -1,10 +1,10 @@
 package ba.unze.edom.server.api;
 
-import ba.unze.edom.common.dto.EvidencijaDTO;
-import ba.unze.edom.common.dto.EvidencijaOznakeDTO;
-import ba.unze.edom.common.dto.GenerisaniDokumentDTO;
-import ba.unze.edom.server.service.EvidencijaService;
-import ba.unze.edom.server.service.ObrasciService;
+import ba.unze.edom.common.dto.student.EvidencijaDTO;
+import ba.unze.edom.common.dto.student.EvidencijaOznakeDTO;
+import ba.unze.edom.common.dto.dokumenti.GenerisaniDokumentDTO;
+import ba.unze.edom.server.service.student.EvidencijaService;
+import ba.unze.edom.server.service.prijava.ObrasciService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,12 +1,12 @@
 package ba.unze.edom.server.api;
 
-import ba.unze.edom.common.dto.DokazUslovaDTO;
-import ba.unze.edom.common.dto.ObjavaRangListeDTO;
-import ba.unze.edom.common.dto.RangListaAdminDTO;
-import ba.unze.edom.common.dto.RangObjavaDTO;
-import ba.unze.edom.server.service.DokazUslovaService;
-import ba.unze.edom.server.service.RangListaObjavaService;
-import ba.unze.edom.server.service.RangListaService;
+import ba.unze.edom.common.dto.rang.DokazUslovaDTO;
+import ba.unze.edom.common.dto.rang.ObjavaRangListeDTO;
+import ba.unze.edom.common.dto.rang.RangListaAdminDTO;
+import ba.unze.edom.common.dto.rang.RangObjavaDTO;
+import ba.unze.edom.server.service.rang.DokazUslovaService;
+import ba.unze.edom.server.service.rang.RangListaObjavaService;
+import ba.unze.edom.server.service.rang.RangListaService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

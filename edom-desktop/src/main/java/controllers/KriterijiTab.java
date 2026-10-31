@@ -2,8 +2,8 @@ package controllers;
 
 import api.ApiException;
 import api.PostavkeApi;
-import ba.unze.edom.common.dto.KriterijPostavkaDTO;
-import ba.unze.edom.common.dto.KriterijiPostavkeDTO;
+import ba.unze.edom.common.dto.bodovanje.KriterijPostavkaDTO;
+import ba.unze.edom.common.dto.bodovanje.KriterijiPostavkeDTO;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;

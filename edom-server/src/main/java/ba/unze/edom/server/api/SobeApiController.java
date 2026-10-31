@@ -1,9 +1,11 @@
 package ba.unze.edom.server.api;
 
-import ba.unze.edom.common.dto.*;
-import ba.unze.edom.server.service.SobeService;
-import ba.unze.edom.server.service.StudentDetaljiService;
-import ba.unze.edom.server.service.ZahtjeviSobaService;
+import ba.unze.edom.common.dto.sobe.*;
+import ba.unze.edom.common.dto.student.NovaNapomenaDTO;
+import ba.unze.edom.common.dto.student.StudentDetaljiDTO;
+import ba.unze.edom.server.service.sobe.SobeService;
+import ba.unze.edom.server.service.student.StudentDetaljiService;
+import ba.unze.edom.server.service.sobe.ZahtjeviSobaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

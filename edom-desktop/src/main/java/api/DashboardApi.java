@@ -1,6 +1,6 @@
 package api;
 
-import ba.unze.edom.common.dto.DashboardDTO;
+import ba.unze.edom.common.dto.opste.DashboardDTO;
 
 public final class DashboardApi {
 

@@ -1,6 +1,6 @@
 package ba.unze.edom.server.repository;
 
-import ba.unze.edom.common.dto.DokumentDTO;
+import ba.unze.edom.common.dto.dokumenti.DokumentDTO;
 import ba.unze.edom.server.dto.DokumentPregled;
 import ba.unze.edom.server.dto.PrilozeniDokument;
 import ba.unze.edom.server.entity.Dokument;

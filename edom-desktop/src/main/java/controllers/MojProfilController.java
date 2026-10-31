@@ -2,7 +2,7 @@ package controllers;
 
 import api.ApiException;
 import api.ProfilApi;
-import ba.unze.edom.common.dto.KorisnikProfilDTO;
+import ba.unze.edom.common.dto.korisnik.KorisnikProfilDTO;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;

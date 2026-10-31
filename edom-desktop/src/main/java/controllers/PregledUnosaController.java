@@ -2,11 +2,11 @@ package controllers;
 
 import api.ApiException;
 import api.RucniUnosApi;
-import ba.unze.edom.common.dto.RezultatBodovanja;
-import ba.unze.edom.common.dto.RucniUnosDTO;
-import ba.unze.edom.common.dto.RucniUnosRezultatDTO;
-import ba.unze.edom.common.dto.StudentUnosDTO;
-import ba.unze.edom.common.dto.VrstaKriterijaDTO;
+import ba.unze.edom.common.dto.bodovanje.RezultatBodovanja;
+import ba.unze.edom.common.dto.prijava.RucniUnosDTO;
+import ba.unze.edom.common.dto.prijava.RucniUnosRezultatDTO;
+import ba.unze.edom.common.dto.student.StudentUnosDTO;
+import ba.unze.edom.common.dto.bodovanje.VrstaKriterijaDTO;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,7 +20,6 @@ import unos.NacrtPrijave;
 import util.Ekrani;
 import util.KoraciUnosa;
 
-import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;

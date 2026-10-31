@@ -1,12 +1,12 @@
 package ba.unze.edom.server.mapper;
 
-import ba.unze.edom.common.dto.DokumentDTO;
-import ba.unze.edom.common.dto.PrijavaDetaljiDTO;
-import ba.unze.edom.common.dto.PrijavaListaDTO;
-import ba.unze.edom.common.dto.RezultatBodovanja;
+import ba.unze.edom.common.dto.dokumenti.DokumentDTO;
+import ba.unze.edom.common.dto.prijava.PrijavaDetaljiDTO;
+import ba.unze.edom.common.dto.prijava.PrijavaListaDTO;
+import ba.unze.edom.common.dto.bodovanje.RezultatBodovanja;
 import ba.unze.edom.server.entity.Prijava;
 import ba.unze.edom.server.entity.Student;
-import ba.unze.edom.common.dto.KriterijStanjeDTO;
+import ba.unze.edom.common.dto.prijava.KriterijStanjeDTO;
 
 import java.util.List;
 

@@ -2,7 +2,8 @@ package controllers;
 
 import api.ApiException;
 import api.PrijavaApi;
-import ba.unze.edom.common.dto.*;
+import ba.unze.edom.common.dto.bodovanje.*;
+import ba.unze.edom.common.dto.opste.PostavkeDTO;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

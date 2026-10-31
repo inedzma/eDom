@@ -1,6 +1,6 @@
 package controllers;
 
-import ba.unze.edom.common.dto.ObavijestDTO;
+import ba.unze.edom.common.dto.opste.ObavijestDTO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;

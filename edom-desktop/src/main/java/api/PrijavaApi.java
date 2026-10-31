@@ -1,6 +1,12 @@
 package api;
 
-import ba.unze.edom.common.dto.*;
+import ba.unze.edom.common.dto.bodovanje.BodovanjeDetaljnoDTO;
+import ba.unze.edom.common.dto.bodovanje.BodovanjeIzmjenaDTO;
+import ba.unze.edom.common.dto.dokumenti.DokumentPapirDTO;
+import ba.unze.edom.common.dto.dokumenti.DokumentSadrzajDTO;
+import ba.unze.edom.common.dto.dokumenti.DokumentiSpisakDTO;
+import ba.unze.edom.common.dto.dokumenti.DostavljenDTO;
+import ba.unze.edom.common.dto.prijava.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.util.List;

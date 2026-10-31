@@ -1,7 +1,18 @@
 package ba.unze.edom.server.api;
 
-import ba.unze.edom.common.dto.*;
-import ba.unze.edom.server.service.*;
+import ba.unze.edom.common.dto.bodovanje.BodovanjeDetaljnoDTO;
+import ba.unze.edom.common.dto.bodovanje.BodovanjeIzmjenaDTO;
+import ba.unze.edom.common.dto.dokumenti.DokumentPapirDTO;
+import ba.unze.edom.common.dto.dokumenti.DokumentSadrzajDTO;
+import ba.unze.edom.common.dto.dokumenti.DokumentiSpisakDTO;
+import ba.unze.edom.common.dto.dokumenti.DostavljenDTO;
+import ba.unze.edom.common.dto.prijava.*;
+import ba.unze.edom.server.service.bodovanje.BodovanjeAdminService;
+import ba.unze.edom.server.service.dokumenti.AdminDokumentiService;
+import ba.unze.edom.server.service.dokumenti.PotrebniDokumentiService;
+import ba.unze.edom.server.service.prijava.NapomenaPrijaveService;
+import ba.unze.edom.server.service.prijava.PrijavaAdminService;
+import ba.unze.edom.server.service.prijava.RucniUnosService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +28,7 @@ public class PrijavaApiController {
     private final BodovanjeAdminService bodovanjeAdminService;
     private final AdminDokumentiService adminDokumentiService;
     private final PotrebniDokumentiService potrebniDokumentiService;
-    private final ba.unze.edom.server.service.NapomenaPrijaveService napomenaPrijaveService;
+    private final NapomenaPrijaveService napomenaPrijaveService;
 
     /** GET /api/prijave            -> zadnja akademska godina
      *  GET /api/prijave?godina=2026 -> zadana godina */

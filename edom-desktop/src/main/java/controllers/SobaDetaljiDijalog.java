@@ -1,7 +1,7 @@
 package controllers;
 
 import api.SobeApi;
-import ba.unze.edom.common.dto.*;
+import ba.unze.edom.common.dto.sobe.*;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

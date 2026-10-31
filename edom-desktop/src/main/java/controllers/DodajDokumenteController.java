@@ -2,8 +2,8 @@ package controllers;
 
 import api.ApiException;
 import api.RucniUnosApi;
-import ba.unze.edom.common.dto.SpisakUnosDTO;
-import ba.unze.edom.common.dto.SpisakUnosZahtjevDTO;
+import ba.unze.edom.common.dto.prijava.SpisakUnosDTO;
+import ba.unze.edom.common.dto.prijava.SpisakUnosZahtjevDTO;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;

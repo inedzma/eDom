@@ -2,8 +2,8 @@ package controllers;
 
 import api.ApiException;
 import api.EvidencijaApi;
-import ba.unze.edom.common.dto.EvidencijaDTO;
-import ba.unze.edom.common.dto.EvidencijaRedDTO;
+import ba.unze.edom.common.dto.student.EvidencijaDTO;
+import ba.unze.edom.common.dto.student.EvidencijaRedDTO;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;

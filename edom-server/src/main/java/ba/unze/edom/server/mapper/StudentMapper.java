@@ -1,7 +1,7 @@
 package ba.unze.edom.server.mapper;
 
-import ba.unze.edom.common.dto.SocijalniStatusDTO;
-import ba.unze.edom.common.dto.StudentListaDTO;
+import ba.unze.edom.common.dto.prijava.SocijalniStatusDTO;
+import ba.unze.edom.common.dto.student.StudentListaDTO;
 import ba.unze.edom.server.entity.SocijalniStatus;
 import ba.unze.edom.server.entity.Student;
 

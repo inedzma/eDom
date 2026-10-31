@@ -1,8 +1,8 @@
 package api;
 
-import ba.unze.edom.common.dto.KriterijPostavkaDTO;
-import ba.unze.edom.common.dto.KriterijiPostavkeDTO;
-import ba.unze.edom.common.dto.PostavkeDTO;
+import ba.unze.edom.common.dto.bodovanje.KriterijPostavkaDTO;
+import ba.unze.edom.common.dto.bodovanje.KriterijiPostavkeDTO;
+import ba.unze.edom.common.dto.opste.PostavkeDTO;
 
 public final class PostavkeApi {
 

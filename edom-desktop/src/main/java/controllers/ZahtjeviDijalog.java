@@ -1,7 +1,7 @@
 package controllers;
 
 import api.SobeApi;
-import ba.unze.edom.common.dto.ZahtjevSobeDTO;
+import ba.unze.edom.common.dto.sobe.ZahtjevSobeDTO;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;

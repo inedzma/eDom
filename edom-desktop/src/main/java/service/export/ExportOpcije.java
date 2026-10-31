@@ -1,6 +1,6 @@
 package service.export;
 
-import ba.unze.edom.common.dto.KategorijaRanga;
+import ba.unze.edom.common.dto.rang.KategorijaRanga;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -1,7 +1,7 @@
 package controllers;
 
 import api.SobeApi;
-import ba.unze.edom.common.dto.StudentDetaljiDTO;
+import ba.unze.edom.common.dto.student.StudentDetaljiDTO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;

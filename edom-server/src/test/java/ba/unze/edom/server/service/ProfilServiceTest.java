@@ -6,6 +6,7 @@ import ba.unze.edom.server.entity.Student;
 import ba.unze.edom.server.exception.RegistracijaException;
 import ba.unze.edom.server.repository.KorisnikRepository;
 import ba.unze.edom.server.repository.StudentRepository;
+import ba.unze.edom.server.service.korisnik.ProfilService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -23,7 +24,8 @@ class ProfilServiceTest {
 
     @Mock StudentRepository studentRepository;
     @Mock KorisnikRepository korisnikRepository;
-    @InjectMocks ProfilService service;
+    @InjectMocks
+    ProfilService service;
 
     private Student student;
     private Korisnik korisnik;

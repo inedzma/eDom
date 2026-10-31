@@ -1,6 +1,8 @@
 package api;
 
-import ba.unze.edom.common.dto.*;
+import ba.unze.edom.common.dto.sobe.*;
+import ba.unze.edom.common.dto.student.NovaNapomenaDTO;
+import ba.unze.edom.common.dto.student.StudentDetaljiDTO;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

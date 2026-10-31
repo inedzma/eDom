@@ -1,6 +1,6 @@
 package ba.unze.edom.server.web;
 
-import ba.unze.edom.server.service.ObavjestenjaService;
+import ba.unze.edom.server.service.javna.ObavjestenjaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;

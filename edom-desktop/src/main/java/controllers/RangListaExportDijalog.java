@@ -1,7 +1,7 @@
 package controllers;
 
-import ba.unze.edom.common.dto.KategorijaRanga;
-import ba.unze.edom.common.dto.RangListaAdminDTO;
+import ba.unze.edom.common.dto.rang.KategorijaRanga;
+import ba.unze.edom.common.dto.rang.RangListaAdminDTO;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;

@@ -2,8 +2,8 @@ package controllers;
 
 import api.ApiException;
 import api.PrijavaApi;
-import ba.unze.edom.common.dto.DokumentDTO;
-import ba.unze.edom.common.dto.DokumentiSpisakDTO;
+import ba.unze.edom.common.dto.dokumenti.DokumentDTO;
+import ba.unze.edom.common.dto.dokumenti.DokumentiSpisakDTO;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,7 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import service.DokumentPregled;
-import service.PdfService;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;

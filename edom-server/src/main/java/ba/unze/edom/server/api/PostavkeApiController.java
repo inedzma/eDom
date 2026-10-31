@@ -1,11 +1,11 @@
 package ba.unze.edom.server.api;
 
-import ba.unze.edom.common.dto.KriterijPostavkaDTO;
-import ba.unze.edom.common.dto.KriterijiPostavkeDTO;
-import ba.unze.edom.common.dto.PostavkeDTO;
-import ba.unze.edom.server.service.KriterijiPostavkeService;
-import ba.unze.edom.server.service.PostavkeService;
-import ba.unze.edom.server.service.PreracunBodovaService;
+import ba.unze.edom.common.dto.bodovanje.KriterijPostavkaDTO;
+import ba.unze.edom.common.dto.bodovanje.KriterijiPostavkeDTO;
+import ba.unze.edom.common.dto.opste.PostavkeDTO;
+import ba.unze.edom.server.service.bodovanje.KriterijiPostavkeService;
+import ba.unze.edom.server.service.opste.PostavkeService;
+import ba.unze.edom.server.service.bodovanje.PreracunBodovaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

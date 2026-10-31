@@ -2,7 +2,7 @@ package controllers;
 
 import api.ApiException;
 import api.PrijavaApi;
-import ba.unze.edom.common.dto.PrijavaListaDTO;
+import ba.unze.edom.common.dto.prijava.PrijavaListaDTO;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;

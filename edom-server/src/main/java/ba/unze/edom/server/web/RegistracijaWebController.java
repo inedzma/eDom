@@ -2,7 +2,7 @@ package ba.unze.edom.server.web;
 
 import ba.unze.edom.server.dto.RegistracijaZahtjev;
 import ba.unze.edom.server.exception.RegistracijaException;
-import ba.unze.edom.server.service.RegistracijaService;
+import ba.unze.edom.server.service.korisnik.RegistracijaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

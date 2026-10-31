@@ -1,9 +1,9 @@
 package ba.unze.edom.server.web;
 
-import ba.unze.edom.server.service.GalerijaService;
-import ba.unze.edom.server.service.JavniDokumentiService;
-import ba.unze.edom.server.service.ObavjestenjaService;
-import ba.unze.edom.server.service.WebTekstoviService;
+import ba.unze.edom.server.service.javna.GalerijaService;
+import ba.unze.edom.server.service.javna.JavniDokumentiService;
+import ba.unze.edom.server.service.javna.ObavjestenjaService;
+import ba.unze.edom.server.service.javna.WebTekstoviService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

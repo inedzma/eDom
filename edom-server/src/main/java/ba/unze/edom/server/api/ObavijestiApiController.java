@@ -1,7 +1,7 @@
 package ba.unze.edom.server.api;
 
-import ba.unze.edom.common.dto.ObavijestDTO;
-import ba.unze.edom.server.service.ObavijestiAdminService;
+import ba.unze.edom.common.dto.opste.ObavijestDTO;
+import ba.unze.edom.server.service.obavijesti.ObavijestiAdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

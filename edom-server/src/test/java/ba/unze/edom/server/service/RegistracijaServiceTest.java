@@ -4,6 +4,7 @@ import ba.unze.edom.server.dto.RegistracijaZahtjev;
 import ba.unze.edom.server.entity.*;
 import ba.unze.edom.server.exception.RegistracijaException;
 import ba.unze.edom.server.repository.*;
+import ba.unze.edom.server.service.korisnik.RegistracijaService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -24,7 +25,8 @@ class RegistracijaServiceTest {
     @Mock UlogaRepository ulogaRepository;
     @Mock PasswordEncoder passwordEncoder;
 
-    @InjectMocks RegistracijaService service;
+    @InjectMocks
+    RegistracijaService service;
 
     private Uloga ulogaStudent;
 

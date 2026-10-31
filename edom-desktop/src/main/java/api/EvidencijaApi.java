@@ -1,8 +1,8 @@
 package api;
 
-import ba.unze.edom.common.dto.EvidencijaDTO;
-import ba.unze.edom.common.dto.EvidencijaOznakeDTO;
-import ba.unze.edom.common.dto.GenerisaniDokumentDTO;
+import ba.unze.edom.common.dto.student.EvidencijaDTO;
+import ba.unze.edom.common.dto.student.EvidencijaOznakeDTO;
+import ba.unze.edom.common.dto.dokumenti.GenerisaniDokumentDTO;
 
 import java.util.Map;
 

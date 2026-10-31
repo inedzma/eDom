@@ -4,10 +4,12 @@ import ba.unze.edom.common.util.Opcine;
 import ba.unze.edom.server.dto.*;
 import ba.unze.edom.server.exception.PrijavaException;
 import ba.unze.edom.server.security.KorisnikPrincipal;
-import ba.unze.edom.server.service.BodovanjeService;
-import ba.unze.edom.server.service.PotrebniDokumentiService;
-import ba.unze.edom.server.service.PrijavaService;
-import ba.unze.edom.server.service.DokumentService;
+import ba.unze.edom.server.service.bodovanje.BodovanjeService;
+import ba.unze.edom.server.service.dokumenti.PotrebniDokumentiService;
+import ba.unze.edom.server.service.opste.PostavkeService;
+import ba.unze.edom.server.service.prijava.ObrazacPrijaveService;
+import ba.unze.edom.server.service.prijava.PrijavaService;
+import ba.unze.edom.server.service.dokumenti.DokumentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -21,8 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
-
 @Controller
 @RequestMapping("/student/prijava")
 @RequiredArgsConstructor
@@ -31,8 +31,8 @@ public class PrijavaWebController {
     private final PrijavaService prijavaService;
     private final BodovanjeService bodovanjeService;
     private final PotrebniDokumentiService potrebniDokumentiService;
-    private final ba.unze.edom.server.service.ObrazacPrijaveService obrazacPrijaveService;
-    private final ba.unze.edom.server.service.PostavkeService postavkeService;
+    private final ObrazacPrijaveService obrazacPrijaveService;
+    private final PostavkeService postavkeService;
 
     // ---------- KREIRANJE ----------
 

@@ -1,7 +1,7 @@
 package ba.unze.edom.server.web;
 
 import ba.unze.edom.server.exception.RegistracijaException;
-import ba.unze.edom.server.service.ResetLozinkeService;
+import ba.unze.edom.server.service.korisnik.ResetLozinkeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

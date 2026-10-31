@@ -1,9 +1,9 @@
 package ba.unze.edom.server.api;
 
-import ba.unze.edom.common.dto.StudentListaDTO;
-import ba.unze.edom.common.dto.StudentPronadjenDTO;
-import ba.unze.edom.server.service.RucniUnosService;
-import ba.unze.edom.server.service.StudentService;
+import ba.unze.edom.common.dto.student.StudentListaDTO;
+import ba.unze.edom.common.dto.student.StudentPronadjenDTO;
+import ba.unze.edom.server.service.prijava.RucniUnosService;
+import ba.unze.edom.server.service.student.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

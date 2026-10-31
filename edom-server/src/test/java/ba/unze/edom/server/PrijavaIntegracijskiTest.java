@@ -2,13 +2,12 @@ package ba.unze.edom.server;
 
 import ba.unze.edom.server.dto.RegistracijaZahtjev;
 import ba.unze.edom.server.repository.*;
-import ba.unze.edom.server.service.*;
+import ba.unze.edom.server.service.bodovanje.BodovanjeService;
+import ba.unze.edom.server.service.korisnik.RegistracijaService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,8 +15,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional          // svaki test se poništava na kraju
 class PrijavaIntegracijskiTest {
 
-    @Autowired RegistracijaService registracijaService;
-    @Autowired BodovanjeService bodovanjeService;
+    @Autowired
+    RegistracijaService registracijaService;
+    @Autowired
+    BodovanjeService bodovanjeService;
     @Autowired StudentRepository studentRepository;
     @Autowired KorisnikRepository korisnikRepository;
     @Autowired PrijavaRepository prijavaRepository;

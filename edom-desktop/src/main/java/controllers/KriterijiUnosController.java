@@ -1,6 +1,6 @@
 package controllers;
 
-import ba.unze.edom.common.dto.VrstaKriterijaDTO;
+import ba.unze.edom.common.dto.bodovanje.VrstaKriterijaDTO;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

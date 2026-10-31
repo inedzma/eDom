@@ -3,6 +3,8 @@ package ba.unze.edom.server.service;
 import ba.unze.edom.server.entity.Korisnik;
 import ba.unze.edom.server.exception.RegistracijaException;
 import ba.unze.edom.server.repository.KorisnikRepository;
+import ba.unze.edom.server.service.korisnik.ResetLozinkeService;
+import ba.unze.edom.server.service.obavijesti.EmailService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -22,7 +24,8 @@ import static org.mockito.Mockito.*;
 class ResetLozinkeServiceTest {
 
     @Mock KorisnikRepository korisnikRepository;
-    @Mock EmailService emailService;
+    @Mock
+    EmailService emailService;
 
     private final PasswordEncoder encoder = new BCryptPasswordEncoder(4); // brze u testu
     private ResetLozinkeService service;

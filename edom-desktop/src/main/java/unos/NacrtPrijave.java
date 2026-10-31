@@ -1,6 +1,12 @@
 package unos;
 
-import ba.unze.edom.common.dto.*;
+import ba.unze.edom.common.dto.dokumenti.DokumentUnosDTO;
+import ba.unze.edom.common.dto.opste.SifarniciDTO;
+import ba.unze.edom.common.dto.prijava.KriterijUnosDTO;
+import ba.unze.edom.common.dto.prijava.PrijavaUnosDTO;
+import ba.unze.edom.common.dto.prijava.RucniUnosDTO;
+import ba.unze.edom.common.dto.prijava.SpisakUnosDTO;
+import ba.unze.edom.common.dto.student.StudentUnosDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

@@ -1,7 +1,7 @@
 package controllers;
 
 import api.ObavijestiApi;
-import ba.unze.edom.common.dto.ObavijestDTO;
+import ba.unze.edom.common.dto.opste.ObavijestDTO;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.concurrent.Task;

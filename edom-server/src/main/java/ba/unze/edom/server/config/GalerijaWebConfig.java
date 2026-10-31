@@ -1,6 +1,6 @@
 package ba.unze.edom.server.config;
 
-import ba.unze.edom.server.service.GalerijaService;
+import ba.unze.edom.server.service.javna.GalerijaService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

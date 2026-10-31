@@ -1,7 +1,7 @@
 package api;
 
-import ba.unze.edom.common.dto.LoginOdgovor;
-import ba.unze.edom.common.dto.LoginZahtjev;
+import ba.unze.edom.common.dto.korisnik.LoginOdgovor;
+import ba.unze.edom.common.dto.korisnik.LoginZahtjev;
 import service.Session;
 
 public final class AuthApi {

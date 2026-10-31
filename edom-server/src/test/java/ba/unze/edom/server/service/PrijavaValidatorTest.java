@@ -2,6 +2,7 @@ package ba.unze.edom.server.service;
 
 import ba.unze.edom.server.entity.*;
 import ba.unze.edom.server.exception.NevalidnaPrijavaException;
+import ba.unze.edom.server.service.prijava.PrijavaValidator;
 import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
