@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
+    <title>Dokumenti — Studentski centar Zenica</title>
+    <meta name="description" content="Konkurs, prijavni obrazac, pravilnici i uputstva za uplatu Studentskog centra Zenica.">
+    <link rel="stylesheet" th:href="@{/css/pocetna.css}">
+    <link rel="stylesheet" th:href="@{/css/javna.css}">
+    <link rel="stylesheet" th:href="@{/css/dokumenti.css}">
+</head>
+<body class="landing">
+
+<header th:replace="${ime != null} ? ~{fragments/layout :: navbarStudent('dokumenti')} : ~{fragments/layout :: navbarJavni('dokumenti')}"></header>
+
+<main>
+
+    <!-- ======================= ZAGLAVLJE ======================= -->
+    <section class="dk-hero">
+        <div class="jp-wrap dk-hero-in">
+            <span class="jp-eyebrow dk-eyebrow">Pravilnici i obrasci</span>
+            <h1 data-uredi="dok.hero.naslov" th:text="${t['dok.hero.naslov']} ?: _">Dokumenti na jednom mjestu</h1>
+            <p data-uredi="dok.hero.opis" data-uredi-vise th:text="${t['dok.hero.opis']} ?: _">Konkurs, prijavni obrazac, pravilnici i uputstva za uplatu. Otvori, odštampaj ili preuzmi ono što ti treba.</p>
+
+            <div class="dk-pretraga">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                <input type="search" id="dkTrazi" placeholder="Pretraži dokumente, npr. pravilnik, uplata…" autocomplete="off">
+            </div>
+        </div>
+    </section>
+
+    <section class="jp-sekcija dk-sadrzaj">
+        <div class="jp-wrap">
+
+            <!-- ======== dodavanje (samo admin) ======== -->
+            <div class="dk-admin" th:if="${urednik}" id="dkAdmin"
+                 th:data-dodaj="@{/urednik/dokumenti}" th:data-osnova="@{/urednik/dokumenti/}">
+                <div class="dk-admin-glava">
+                    <div>
+                        <b>Upravljanje dokumentima</b>
+                        <span>PDF, Word (DOC, DOCX) ili Excel (XLSX), do 10 MB</span>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" id="dkOtvoriFormu">+ Dodaj dokument</button>
+                </div>
+
+                <form class="dk-forma" id="dkForma" hidden>
+                    <label class="dk-polje dk-polje--siroko">
+                        <span>Naslov</span>
+                        <input type="text" name="naslov" maxlength="250" required placeholder="npr. Pravilnik o unutrašnjem životu studenata">
+                    </label>
+                    <label class="dk-polje">
+                        <span>Kategorija</span>
+                        <select name="kategorija" required>
+                            <option th:each="k : ${kategorije}" th:value="${k}" th:text="${k}">Pravilnici</option>
+                        </select>
+                    </label>
+                    <label class="dk-polje">
+                        <span>Datum</span>
+                        <input type="date" name="datum" th:value="${#temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}">
+                    </label>
+                    <label class="dk-polje dk-polje--siroko dk-fajl">
+                        <span>Fajl</span>
+                        <input type="file" name="fajl" required accept=".pdf,.doc,.docx,.xlsx">
+                    </label>
+                    <div class="dk-forma-dno">
+                        <button type="button" class="btn btn-ghost btn-sm" id="dkZatvoriFormu">Odustani</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Sačuvaj dokument</button>
+                    </div>
+                </form>
+                <p class="dk-poruka" id="dkPoruka" hidden></p>
+            </div>
+
+            <!-- ======== filter po kategoriji ======== -->
+            <div class="dk-filteri" th:unless="${#lists.isEmpty(grupe)}">
+                <button type="button" class="dk-filter on" data-kat="">
+                    Sve <small th:text="${ukupno}">8</small>
+                </button>
+                <button type="button" class="dk-filter" th:each="g : ${grupe}" th:data-kat="${g.sidro}">
+                    <th:block th:text="${g.naziv}">Pravilnici</th:block> <small th:text="${#lists.size(g.dokumenti)}">2</small>
+                </button>
+            </div>
+
+            <!-- ======== prazno ======== -->
+            <div class="dk-prazno" th:if="${#lists.isEmpty(grupe)}">
+                <span class="dk-prazno-ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
+                <h3>Dokumenti će uskoro biti objavljeni</h3>
+                <p>U međuvremenu nas kontaktirajte za sve informacije.</p>
+                <a class="btn btn-primary" th:href="@{/kontakt}">Kontakt</a>
+            </div>
+
+            <!-- ======== grupe ======== -->
+            <div class="dk-grupa" th:each="g : ${grupe}" th:id="${g.sidro}" th:data-kat="${g.sidro}">
+                <h2 class="dk-grupa-naslov">
+                    <span th:text="${g.naziv}">Pravilnici</span>
+                    <small th:text="${#lists.size(g.dokumenti)} + (${#lists.size(g.dokumenti)} == 1 ? ' dokument' : ' dokumenta')">2 dokumenta</small>
+                </h2>
+
+                <div class="dk-lista">
+                    <article class="dk-kartica" th:each="d : ${g.dokumenti}"
+                             th:classappend="'dk--' + ${d.ekstenzija()}"
+                             th:data-trazi="${#strings.toLowerCase(d.naslov + ' ' + g.naziv)}">
+                        <a class="dk-glavni" th:href="@{${d.url()}}" target="_blank" rel="noopener">
+                            <span class="dk-ikona">
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                                <b th:text="${#strings.toUpperCase(d.ekstenzija())}">PDF</b>
+                            </span>
+                            <span class="dk-tekst">
+                                <h3 th:text="${d.naslov}">Pravilnik o unutrašnjem životu</h3>
+                                <span class="dk-meta">
+                                    <span th:text="${d.datumTekst()}">23.08.2026.</span>
+                                    <span th:text="${d.velicinaTekst()}">240 KB</span>
+                                </span>
+                            </span>
+                            <span class="dk-akcija" th:text="${d.ekstenzija() == 'pdf'} ? 'Otvori' : 'Preuzmi'">Otvori</span>
+                        </a>
+
+                        <!-- admin: uredi / obriši -->
+                        <div class="dk-admin-akcije" th:if="${urednik}">
+                            <button type="button" class="dk-mini dk-uredi">Uredi</button>
+                            <button type="button" class="dk-mini dk-mini--opasno dk-obrisi" th:data-id="${d.id}">Obriši</button>
+                        </div>
+                        <form class="dk-uredi-forma" th:if="${urednik}" th:data-id="${d.id}" hidden>
+                            <input type="text" name="naslov" maxlength="250" required th:value="${d.naslov}">
+                            <select name="kategorija">
+                                <option th:each="k : ${kategorije}" th:value="${k}" th:text="${k}" th:selected="${k == d.kategorija}">Pravilnici</option>
+                            </select>
+                            <input type="date" name="datum" th:value="${d.datum}">
+                            <button type="submit" class="btn btn-primary btn-sm">Sačuvaj</button>
+                            <button type="button" class="btn btn-ghost btn-sm dk-uredi-odustani">Odustani</button>
+                        </form>
+                    </article>
+                </div>
+            </div>
+
+            <div class="dk-nema-rezultata" id="dkNema" hidden>
+                Nijedan dokument ne odgovara pretrazi.
+            </div>
+
+            <!-- ======== napomena ======== -->
+            <div class="dk-napomena" th:unless="${#lists.isEmpty(grupe)}">
+                <span class="dk-napomena-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+                <p data-uredi="dok.napomena" data-uredi-vise th:text="${t['dok.napomena']} ?: _">Prijavni obrazac za tvoju prijavu sistem pravi sam: nakon online prijave otvori „Moje prijave“ → „Dokumenti“ i odštampaj već popunjen obrazac.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+<th:block th:replace="~{fragments/layout :: urednik}"></th:block>
+
+<script>
+    /* ---------- pretraga i filter (svi) ---------- */
+    (function () {
+        var polje = document.getElementById('dkTrazi');
+        var filteri = document.querySelectorAll('.dk-filter');
+        var grupe = document.querySelectorAll('.dk-grupa');
+        var nema = document.getElementById('dkNema');
+        var kat = '';
+
+        function osvjezi() {
+            var q = (polje.value || '').trim().toLowerCase();
+            var vidljivih = 0;
+            grupe.forEach(function (g) {
+                var uGrupi = 0;
+                var grupaOk = !kat || g.dataset.kat === kat;
+                g.querySelectorAll('.dk-kartica').forEach(function (k) {
+                    var ok = grupaOk && (!q || k.dataset.trazi.indexOf(q) >= 0);
+                    k.hidden = !ok;
+                    if (ok) uGrupi++;
+                });
+                g.hidden = uGrupi === 0;
+                vidljivih += uGrupi;
+            });
+            if (nema) nema.hidden = vidljivih > 0 || grupe.length === 0;
+        }
+
+        polje.addEventListener('input', osvjezi);
+        filteri.forEach(function (f) {
+            f.addEventListener('click', function () {
+                filteri.forEach(function (x) { x.classList.remove('on'); });
+                f.classList.add('on');
+                kat = f.dataset.kat;
+                osvjezi();
+            });
+        });
+    })();
+
+    /* ---------- upravljanje (admin) ---------- */
+    (function () {
+        var box = document.getElementById('dkAdmin');
+        if (!box) return;
+        var forma = document.getElementById('dkForma');
+        var poruka = document.getElementById('dkPoruka');
+        var osnova = box.dataset.osnova;
+
+        function csrf() {
+            var h = {};
+            var t = document.querySelector('meta[name="_csrf"]');
+            var n = document.querySelector('meta[name="_csrf_header"]');
+            if (t && n && t.content) h[n.content] = t.content;
+            return h;
+        }
+        function javi(tekst, greska) {
+            poruka.hidden = false;
+            poruka.textContent = tekst;
+            poruka.classList.toggle('dk-poruka--greska', !!greska);
+            poruka.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        function posalji(url, body) {
+            return fetch(url, { method: 'POST', headers: csrf(), body: body }).then(function (r) {
+                return r.json().catch(function () { return {}; }).then(function (j) {
+                    if (!r.ok) throw new Error(j.message || ('Greška ' + r.status));
+                    return j;
+                });
+            });
+        }
+
+        document.getElementById('dkOtvoriFormu').addEventListener('click', function () {
+            forma.hidden = false;
+            forma.elements.naslov.focus();
+        });
+        document.getElementById('dkZatvoriFormu').addEventListener('click', function () {
+            forma.hidden = true;
+            forma.reset();
+        });
+
+        forma.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var f = forma.elements.fajl.files[0];
+            if (!forma.elements.naslov.value.trim()) return javi('Upišite naslov dokumenta.', true);
+            if (!f) return javi('Izaberite fajl.', true);
+            if (f.size > 10 * 1024 * 1024) return javi('Fajl je veći od 10 MB.', true);
+            var dugme = forma.querySelector('[type="submit"]');
+            dugme.disabled = true;
+            javi('Šaljem dokument…');
+            posalji(box.dataset.dodaj, new FormData(forma))
+                .then(function () { location.reload(); })
+                .catch(function (err) { javi(err.message, true); dugme.disabled = false; });
+        });
+
+        document.querySelectorAll('.dk-kartica').forEach(function (k) {
+            var uredi = k.querySelector('.dk-uredi');
+            var obrisi = k.querySelector('.dk-obrisi');
+            var uf = k.querySelector('.dk-uredi-forma');
+            if (!uredi || !uf) return;
+
+            uredi.addEventListener('click', function () { uf.hidden = !uf.hidden; });
+            uf.querySelector('.dk-uredi-odustani').addEventListener('click', function () { uf.hidden = true; });
+            uf.addEventListener('submit', function (e) {
+                e.preventDefault();
+                posalji(osnova + uf.dataset.id + '/izmijeni', new FormData(uf))
+                    .then(function () { location.reload(); })
+                    .catch(function (err) { javi(err.message, true); });
+            });
+            obrisi.addEventListener('click', function () {
+                if (!confirm('Obrisati dokument? Fajl se briše sa servera.')) return;
+                obrisi.disabled = true;
+                posalji(osnova + obrisi.dataset.id + '/obrisi', null)
+                    .then(function () { location.reload(); })
+                    .catch(function (err) { javi(err.message, true); obrisi.disabled = false; });
+            });
+        });
+    })();
+</script>
+</body>
+</html>

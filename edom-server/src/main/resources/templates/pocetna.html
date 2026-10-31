@@ -205,28 +205,22 @@
                 </div>
 
                 <!-- obavještenja: admin mijenja; "-" u naslovu = sakrij -->
+                <!-- zadnja 3 obavještenja (admin ih dodaje na stranici Obavještenja) -->
                 <div class="jp-obavjestenja">
-                    <th:block th:with="n=${t['pocetna.obav1.naslov']}">
-                        <article class="jp-obav" th:if="${urednik or n != '-'}" th:classappend="${n == '-'} ? 'jp-sakriveno'">
-                            <span class="jp-obav-datum" data-uredi="pocetna.obav1.datum" th:text="${t['pocetna.obav1.datum']} ?: _">13.10.2026.</span>
-                            <h3 data-uredi="pocetna.obav1.naslov" th:text="${n} ?: _">Objavljena konačna rang lista</h3>
-                            <p data-uredi="pocetna.obav1.tekst" data-uredi-vise th:text="${t['pocetna.obav1.tekst']} ?: _">Konačna rang lista za akademsku 2026/2027. godinu je objavljena. Svoje mjesto provjerite po šifri.</p>
-                        </article>
-                    </th:block>
-                    <th:block th:with="n=${t['pocetna.obav2.naslov']}">
-                        <article class="jp-obav" th:if="${urednik or n != '-'}" th:classappend="${n == '-'} ? 'jp-sakriveno'">
-                            <span class="jp-obav-datum" data-uredi="pocetna.obav2.datum" th:text="${t['pocetna.obav2.datum']} ?: _">05.10.2026.</span>
-                            <h3 data-uredi="pocetna.obav2.naslov" th:text="${n} ?: _">Lista primljenih sa liste čekanja</h3>
-                            <p data-uredi="pocetna.obav2.tekst" data-uredi-vise th:text="${t['pocetna.obav2.tekst']} ?: _">Objavljen je spisak studenata primljenih sa liste čekanja.</p>
-                        </article>
-                    </th:block>
-                    <th:block th:with="n=${t['pocetna.obav3.naslov']}">
-                        <article class="jp-obav" th:if="${urednik or n != '-'}" th:classappend="${n == '-'} ? 'jp-sakriveno'">
-                            <span class="jp-obav-datum" data-uredi="pocetna.obav3.datum" th:text="${t['pocetna.obav3.datum']} ?: _">01.10.2026.</span>
-                            <h3 data-uredi="pocetna.obav3.naslov" th:text="${n} ?: _">Zaduženje soba</h3>
-                            <p data-uredi="pocetna.obav3.tekst" data-uredi-vise th:text="${t['pocetna.obav3.tekst']} ?: _">Zaduženje soba obavlja se od 1. do 9. oktobra, od 8:30 do 14:00.</p>
-                        </article>
-                    </th:block>
+                    <a class="jp-obav jp-obav--link" th:each="o : ${zadnjaObavjestenja}"
+                       th:href="@{/obavjestenja}+'#o-'+${o.id}">
+                        <span class="jp-obav-datum" th:text="${o.datumTekst()}">13.10.2026.</span>
+                        <span class="jp-obav-vazno" th:if="${o.vazno}">Važno</span>
+                        <h3 th:text="${o.naslov}">Naslov</h3>
+                        <p th:if="${!#strings.isEmpty(o.tekst)}" th:text="${o.tekst}">Tekst</p>
+                    </a>
+
+                    <div class="jp-obav jp-obav--prazno" th:if="${#lists.isEmpty(zadnjaObavjestenja)}">
+                        <h3>Trenutno nema novih obavještenja</h3>
+                        <p>Ovdje će se pojaviti najnovije vijesti o konkursu, rang listi i useljenju.</p>
+                    </div>
+
+                    <a class="jp-sva-obav" th:href="@{/obavjestenja}">Sva obavještenja →</a>
                 </div>
             </div>
         </div>

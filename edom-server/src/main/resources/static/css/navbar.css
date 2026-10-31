@@ -1,0 +1,139 @@
+/* =========================================================
+   E-Dom – zajednički navbar (posjetilac / student / admin)
+   ========================================================= */
+.nb{
+    position:sticky;top:0;z-index:900;
+    background:rgba(255,255,255,.94);
+    backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);
+    border-bottom:1px solid var(--line);
+}
+.nb-in{
+    max-width:1280px;margin:0 auto;padding:0 24px;height:76px;
+    display:flex;align-items:center;gap:20px;
+}
+
+/* logo */
+.nb-brand{display:flex;align-items:center;gap:12px;text-decoration:none;flex:none}
+.nb-brand img{width:46px;height:46px;border-radius:50%;object-fit:contain}
+.nb-brand-tekst b{display:block;font-size:20px;font-weight:800;color:var(--heading);line-height:1.1}
+.nb-brand-tekst small{display:block;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* glavni meni */
+.nb-meni{list-style:none;display:flex;align-items:center;gap:2px;flex:1;justify-content:center;margin:0;padding:0}
+.nb-link{
+    position:relative;display:inline-flex;align-items:center;gap:6px;height:42px;padding:0 14px;border-radius:10px;
+    font:inherit;font-weight:700;font-size:15px;color:var(--label);white-space:nowrap;
+    text-decoration:none;background:none;border:0;cursor:pointer;transition:background .15s,color .15s;
+}
+.nb-link:hover,.nb-drop.otvoren > .nb-link{background:var(--mint-soft);color:var(--heading)}
+.nb-aktivan{color:var(--heading)}
+.nb-aktivan::after{
+    content:"";position:absolute;left:50%;bottom:4px;width:18px;height:3px;border-radius:3px;
+    transform:translateX(-50%);background:linear-gradient(90deg,#00a884,#2f7fe0);
+}
+.nb-strelica{transition:transform .2s}
+.nb-drop.otvoren .nb-strelica{transform:rotate(180deg)}
+
+/* padajući paneli */
+.nb-drop{position:relative}
+.nb-panel{
+    position:absolute;top:calc(100% + 12px);left:50%;min-width:310px;padding:8px;border-radius:18px;
+    background:#fff;border:1px solid var(--line);box-shadow:0 28px 60px -22px rgba(4,30,38,.38);
+    opacity:0;visibility:hidden;transform:translate(-50%,8px);transition:opacity .18s,transform .18s,visibility .18s;
+}
+.nb-panel::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px} /* most za miša */
+.nb-panel--desno{left:auto;right:0;transform:translateY(8px)}
+.nb-drop.otvoren .nb-panel{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.nb-drop.otvoren .nb-panel--desno{transform:translateY(0)}
+@media (hover:hover) and (min-width:1001px){
+    .nb-drop:hover .nb-panel{opacity:1;visibility:visible;transform:translate(-50%,0)}
+    .nb-drop:hover .nb-panel--desno{transform:translateY(0)}
+    .nb-drop:hover .nb-strelica{transform:rotate(180deg)}
+}
+
+.nb-stavka{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;text-decoration:none;transition:background .15s}
+.nb-stavka:hover{background:#f3f8f8}
+.nb-st-ic{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--nb-bg);color:var(--nb-a);transition:.15s}
+.nb-stavka:hover .nb-st-ic{background:var(--nb-a);color:#fff}
+.nb-stavka b{display:block;font-size:15px;color:var(--heading)}
+.nb-stavka small{display:block;font-size:13px;color:var(--muted)}
+.nb-c1{--nb-a:#00a884;--nb-bg:#e2f7ef}
+.nb-c2{--nb-a:#2f7fe0;--nb-bg:#e6f0fd}
+.nb-c3{--nb-a:#f08a24;--nb-bg:#fff0e0}
+.nb-c4{--nb-a:#7a5af5;--nb-bg:#efeafe}
+.nb-c5{--nb-a:#e8547a;--nb-bg:#fde8ee}
+
+/* desni dio */
+.nb-desno{display:flex;align-items:center;gap:10px;flex:none}
+.nb-desno .btn{white-space:nowrap}
+.nb-odjava-forma{margin:0}
+.nb-portal--aktivan{box-shadow:0 0 0 4px rgba(0,191,154,.22)}
+
+.nb-avatar-btn{
+    display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 10px 0 4px;border-radius:999px;
+    border:1px solid var(--line);background:#fff;cursor:pointer;font:inherit;transition:.15s;
+}
+.nb-avatar-btn:hover,.nb-korisnik.otvoren .nb-avatar-btn{border-color:var(--border);background:var(--mint-soft)}
+.nb-avatar{
+    width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;
+    background:linear-gradient(135deg,#00a884,#2f7fe0);
+}
+.nb-ime{font-weight:700;color:var(--heading);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nb-odjava{
+    display:flex;align-items:center;gap:10px;width:100%;margin-top:6px;padding:12px;border-radius:12px;
+    border:0;border-top:1px solid var(--line);background:none;cursor:pointer;font:inherit;font-weight:700;color:#dc2626;
+}
+.nb-odjava:hover{background:#fef2f2}
+
+/* admin */
+.admin-chip{display:inline-flex;align-items:center;gap:10px;padding:4px 14px 4px 4px;border-radius:999px;background:var(--mint-soft)}
+.admin-av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;background:linear-gradient(135deg,#f08a24,#e8547a)}
+.admin-chip b{display:block;font-size:14px;color:var(--heading);line-height:1.1}
+.admin-chip small{font-size:12px;color:var(--muted)}
+
+/* hamburger (samo mobitel) */
+.nb-toggle{
+    display:none;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:#fff;cursor:pointer;
+    flex-direction:column;align-items:center;justify-content:center;gap:5px;
+}
+.nb-toggle span{width:20px;height:2.5px;border-radius:2px;background:var(--heading);transition:.2s}
+.nb.nb-otvoren .nb-toggle span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
+.nb.nb-otvoren .nb-toggle span:nth-child(2){opacity:0}
+.nb.nb-otvoren .nb-toggle span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
+.nb-mob{display:none}
+
+/* ---------- uža desktop širina ---------- */
+@media (max-width:1180px){
+    .nb-brand-tekst small{display:none}
+    .nb-link{padding:0 10px}
+    .nb-ime{display:none}
+}
+
+/* ---------- tablet i mobitel ---------- */
+@media (max-width:1000px){
+    .nb-toggle{display:flex}
+    .nb-skrij-mob{display:none !important}
+    .nb-meni{
+        display:none;position:absolute;top:76px;left:0;right:0;
+        flex-direction:column;align-items:stretch;gap:4px;padding:12px 16px 22px;
+        background:#fff;border-bottom:1px solid var(--line);box-shadow:0 30px 50px -30px rgba(4,30,38,.4);
+        max-height:calc(100vh - 76px);overflow:auto;
+    }
+    .nb.nb-otvoren .nb-meni{display:flex}
+    .nb-link{width:100%;height:48px;justify-content:space-between;font-size:16px}
+    .nb-aktivan::after{left:14px;transform:none;bottom:8px}
+    /* na mobitelu su podmeniji uvijek otvoreni ispod naslova */
+    .nb-meni .nb-pad{pointer-events:none;color:var(--muted);font-size:12px;letter-spacing:.1em;text-transform:uppercase;height:34px;margin-top:6px}
+    .nb-meni .nb-pad .nb-strelica{display:none}
+    .nb-meni .nb-panel{
+        position:static;opacity:1;visibility:visible;transform:none;min-width:0;padding:0;
+        border:0;box-shadow:none;background:none;
+    }
+    .nb-meni .nb-panel::before{display:none}
+    .nb-mob{display:flex;gap:10px;margin-top:12px;padding-top:14px;border-top:1px solid var(--line)}
+    .nb-mob .btn{flex:1;justify-content:center}
+}
+@media (max-width:560px){
+    .nb-in{padding:0 16px;gap:12px}
+    .nb-brand-tekst{display:none}
+}

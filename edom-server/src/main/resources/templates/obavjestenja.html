@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="bs" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
+    <title>Obavještenja — Studentski centar Zenica</title>
+    <meta name="description" content="Obavještenja i aktuelnosti Studentskog centra Zenica: konkurs, rang liste, useljenje.">
+    <link rel="stylesheet" th:href="@{/css/pocetna.css}">
+    <link rel="stylesheet" th:href="@{/css/javna.css}">
+    <link rel="stylesheet" th:href="@{/css/obavjestenja.css}">
+</head>
+<body class="landing">
+
+<header th:replace="~{fragments/layout :: navbarJavni('obavjestenja')}"></header>
+
+<main>
+
+    <!-- ======================= ZAGLAVLJE ======================= -->
+    <section class="ob-hero">
+        <div class="jp-wrap ob-hero-in">
+            <span class="jp-eyebrow ob-eyebrow">Obavještenja i aktuelnosti</span>
+            <h1 data-uredi="obav.hero.naslov" th:text="${t['obav.hero.naslov']} ?: _">Šta je novo u domu</h1>
+            <p data-uredi="obav.hero.opis" data-uredi-vise th:text="${t['obav.hero.opis']} ?: _">Konkurs, rang liste, termini useljenja i sve ostale vijesti Studentskog centra — na jednom mjestu.</p>
+        </div>
+    </section>
+
+    <section class="jp-sekcija ob-sadrzaj">
+        <div class="jp-wrap ob-wrap">
+
+            <!-- ======== novo obavještenje (samo admin) ======== -->
+            <div class="ob-admin" th:if="${urednik}" id="obAdmin"
+                 th:data-dodaj="@{/urednik/obavjestenja}" th:data-osnova="@{/urednik/obavjestenja/}">
+                <div class="ob-admin-glava">
+                    <div>
+                        <b>Upravljanje obavještenjima</b>
+                        <span>Prilog može biti PDF ili slika, do 10 MB</span>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" id="obOtvori">+ Novo obavještenje</button>
+                </div>
+
+                <form class="ob-forma" id="obForma" hidden>
+                    <label class="ob-polje ob-siroko"><span>Naslov</span>
+                        <input type="text" name="naslov" maxlength="200" required placeholder="npr. Objavljena konačna rang lista">
+                    </label>
+                    <label class="ob-polje"><span>Vrsta</span>
+                        <select name="vrsta">
+                            <option th:each="v : ${vrste}" th:value="${v}" th:text="${v}">Obavještenje</option>
+                        </select>
+                    </label>
+                    <label class="ob-polje"><span>Datum</span>
+                        <input type="date" name="datum" th:value="${#temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}">
+                    </label>
+                    <label class="ob-polje ob-siroko"><span>Tekst</span>
+                        <textarea name="tekst" rows="6" maxlength="5000" placeholder="Tekst obavještenja…"></textarea>
+                    </label>
+                    <label class="ob-polje"><span>Prilog (nije obavezno)</span>
+                        <input type="file" name="prilog" accept=".pdf,image/jpeg,image/png,image/webp">
+                    </label>
+                    <label class="ob-check"><input type="checkbox" name="vazno" value="true"> <span>Važno — prikaži na vrhu</span></label>
+                    <div class="ob-forma-dno">
+                        <button type="button" class="btn btn-ghost btn-sm" id="obZatvori">Odustani</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Objavi</button>
+                    </div>
+                </form>
+                <p class="ob-poruka" id="obPoruka" hidden></p>
+            </div>
+
+            <!-- ======== filter ======== -->
+            <div class="ob-filteri" th:unless="${#lists.isEmpty(obavjestenja)}">
+                <button type="button" class="ob-filter on" data-filter="">Sve</button>
+                <button type="button" class="ob-filter" data-filter="obavjestenje">Obavještenja</button>
+                <button type="button" class="ob-filter" data-filter="aktuelnost">Aktuelnosti</button>
+            </div>
+
+            <!-- ======== prazno ======== -->
+            <div class="ob-prazno" th:if="${#lists.isEmpty(obavjestenja)}">
+                <span class="ob-prazno-ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+                <h3>Trenutno nema obavještenja</h3>
+                <p>Ovdje će se pojaviti vijesti o konkursu, rang listi i useljenju.</p>
+            </div>
+
+            <!-- ======== lista ======== -->
+            <div class="ob-lista" id="obLista">
+                <article class="ob-kartica" th:each="o : ${obavjestenja}" th:id="'o-' + ${o.id}"
+                         th:data-filter="${o.filter()}"
+                         th:classappend="(${o.vazno} ? 'ob--vazno ' : '') + 'ob--' + ${o.filter()}">
+
+                    <div class="ob-datum">
+                        <b th:text="${o.dan()}">13</b>
+                        <span th:text="${o.mjesec()}">okt</span>
+                        <small th:text="${o.godina()}">2026</small>
+                    </div>
+
+                    <div class="ob-tijelo">
+                        <div class="ob-oznake">
+                            <span class="ob-vrsta" th:text="${o.vrsta}">Obavještenje</span>
+                            <span class="ob-vazno" th:if="${o.vazno}">Važno</span>
+                        </div>
+                        <h2 th:text="${o.naslov}">Objavljena konačna rang lista</h2>
+                        <p class="ob-tekst" th:unless="${#strings.isEmpty(o.tekst)}" th:text="${o.tekst}">Tekst…</p>
+                        <button type="button" class="ob-vise" hidden>Prikaži više</button>
+
+                        <!-- prilog -->
+                        <a class="ob-slika" th:if="${o.prilogSlika()}" th:href="@{${o.prilogUrl()}}" target="_blank" rel="noopener">
+                            <img th:src="@{${o.prilogUrl()}}" th:alt="${o.naslov}" loading="lazy">
+                        </a>
+                        <a class="ob-pdf" th:if="${o.imaPrilog() and !o.prilogSlika()}" th:href="@{${o.prilogUrl()}}" target="_blank" rel="noopener">
+                            <span class="ob-pdf-ic">PDF</span>
+                            <span><b th:text="${o.prilogNaziv}">odluka.pdf</b><small>Otvori prilog</small></span>
+                        </a>
+
+                        <!-- admin -->
+                        <div class="ob-admin-akcije" th:if="${urednik}">
+                            <button type="button" class="ob-mini ob-uredi">Uredi</button>
+                            <button type="button" class="ob-mini ob-mini--opasno ob-obrisi" th:data-id="${o.id}">Obriši</button>
+                        </div>
+                        <form class="ob-forma ob-uredi-forma" th:if="${urednik}" th:data-id="${o.id}" hidden>
+                            <label class="ob-polje ob-siroko"><span>Naslov</span>
+                                <input type="text" name="naslov" maxlength="200" required th:value="${o.naslov}">
+                            </label>
+                            <label class="ob-polje"><span>Vrsta</span>
+                                <select name="vrsta">
+                                    <option th:each="v : ${vrste}" th:value="${v}" th:text="${v}" th:selected="${v == o.vrsta}">Obavještenje</option>
+                                </select>
+                            </label>
+                            <label class="ob-polje"><span>Datum</span>
+                                <input type="date" name="datum" th:value="${o.datum}">
+                            </label>
+                            <label class="ob-polje ob-siroko"><span>Tekst</span>
+                                <textarea name="tekst" rows="6" maxlength="5000" th:text="${o.tekst}"></textarea>
+                            </label>
+                            <label class="ob-polje"><span th:text="${o.imaPrilog()} ? 'Zamijeni prilog' : 'Dodaj prilog'">Prilog</span>
+                                <input type="file" name="prilog" accept=".pdf,image/jpeg,image/png,image/webp">
+                            </label>
+                            <div class="ob-checkovi">
+                                <label class="ob-check"><input type="checkbox" name="vazno" value="true" th:checked="${o.vazno}"> <span>Važno</span></label>
+                                <label class="ob-check" th:if="${o.imaPrilog()}"><input type="checkbox" name="ukloniPrilog" value="true"> <span>Ukloni prilog</span></label>
+                            </div>
+                            <div class="ob-forma-dno">
+                                <button type="button" class="btn btn-ghost btn-sm ob-uredi-odustani">Odustani</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Sačuvaj</button>
+                            </div>
+                        </form>
+                    </div>
+                </article>
+            </div>
+
+            <div class="ob-jos-wrap">
+                <button type="button" class="btn btn-ghost" id="obJos" hidden>Prikaži još</button>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+
+<th:block th:replace="~{fragments/layout :: toasts}"></th:block>
+<th:block th:replace="~{fragments/layout :: urednik}"></th:block>
+
+<script>
+    /* ---------- filter, "prikaži još", "prikaži više" ---------- */
+    (function () {
+        var kartice = Array.prototype.slice.call(document.querySelectorAll('.ob-kartica'));
+        var filteri = document.querySelectorAll('.ob-filter');
+        var jos = document.getElementById('obJos');
+        var PO_STRANI = 10;
+        var prikazano = PO_STRANI;
+        var filter = '';
+
+        // ako link vodi na određeno obavještenje (#o-...), prikaži dovoljno kartica
+        if (location.hash) {
+            var idx = kartice.findIndex(function (k) { return '#' + k.id === location.hash; });
+            if (idx >= prikazano) prikazano = idx + 1;
+        }
+
+        function osvjezi() {
+            var odgovara = kartice.filter(function (k) { return !filter || k.dataset.filter === filter; });
+            kartice.forEach(function (k) { k.hidden = true; });
+            odgovara.slice(0, prikazano).forEach(function (k) { k.hidden = false; });
+            jos.hidden = odgovara.length <= prikazano;
+            provjeriDuzine();
+        }
+
+        function provjeriDuzine() {
+            kartice.forEach(function (k) {
+                var t = k.querySelector('.ob-tekst');
+                var b = k.querySelector('.ob-vise');
+                if (!t || !b || k.hidden || k.classList.contains('ob--otvoreno')) return;
+                b.hidden = t.scrollHeight <= t.clientHeight + 2;
+            });
+        }
+
+        filteri.forEach(function (f) {
+            f.addEventListener('click', function () {
+                filteri.forEach(function (x) { x.classList.remove('on'); });
+                f.classList.add('on');
+                filter = f.dataset.filter;
+                prikazano = PO_STRANI;
+                osvjezi();
+            });
+        });
+        jos.addEventListener('click', function () { prikazano += PO_STRANI; osvjezi(); });
+
+        kartice.forEach(function (k) {
+            var b = k.querySelector('.ob-vise');
+            if (!b) return;
+            b.addEventListener('click', function () {
+                var otvoreno = k.classList.toggle('ob--otvoreno');
+                b.textContent = otvoreno ? 'Prikaži manje' : 'Prikaži više';
+            });
+        });
+
+        window.addEventListener('resize', provjeriDuzine);
+        osvjezi();
+        if (location.hash) {
+            var cilj = document.querySelector(location.hash);
+            if (cilj) setTimeout(function () { cilj.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+    })();
+
+    /* ---------- upravljanje (admin) ---------- */
+    (function () {
+        var box = document.getElementById('obAdmin');
+        if (!box) return;
+        var forma = document.getElementById('obForma');
+        var poruka = document.getElementById('obPoruka');
+        var osnova = box.dataset.osnova;
+        var MAX = 10 * 1024 * 1024;
+
+        function csrf() {
+            var h = {};
+            var t = document.querySelector('meta[name="_csrf"]');
+            var n = document.querySelector('meta[name="_csrf_header"]');
+            if (t && n && t.content) h[n.content] = t.content;
+            return h;
+        }
+        function javi(tekst, greska) {
+            poruka.hidden = false;
+            poruka.textContent = tekst;
+            poruka.classList.toggle('ob-poruka--greska', !!greska);
+            poruka.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        function posalji(url, body) {
+            return fetch(url, { method: 'POST', headers: csrf(), body: body }).then(function (r) {
+                return r.json().catch(function () { return {}; }).then(function (j) {
+                    if (!r.ok) throw new Error(j.message || ('Greška ' + r.status));
+                    return j;
+                });
+            });
+        }
+        function prevelik(f) {
+            var fajl = f.elements.prilog && f.elements.prilog.files[0];
+            return fajl && fajl.size > MAX;
+        }
+
+        document.getElementById('obOtvori').addEventListener('click', function () {
+            forma.hidden = false;
+            forma.elements.naslov.focus();
+        });
+        document.getElementById('obZatvori').addEventListener('click', function () {
+            forma.hidden = true;
+            forma.reset();
+        });
+
+        forma.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (forma.elements.naslov.value.trim().length < 3) return javi('Upišite naslov.', true);
+            if (prevelik(forma)) return javi('Prilog je veći od 10 MB.', true);
+            var dugme = forma.querySelector('[type="submit"]');
+            dugme.disabled = true;
+            javi('Objavljujem…');
+            posalji(box.dataset.dodaj, new FormData(forma))
+                .then(function () { location.reload(); })
+                .catch(function (err) { javi(err.message, true); dugme.disabled = false; });
+        });
+
+        document.querySelectorAll('.ob-kartica').forEach(function (k) {
+            var uredi = k.querySelector('.ob-uredi');
+            var obrisi = k.querySelector('.ob-obrisi');
+            var uf = k.querySelector('.ob-uredi-forma');
+            if (!uredi || !uf) return;
+
+            uredi.addEventListener('click', function () { uf.hidden = !uf.hidden; });
+            uf.querySelector('.ob-uredi-odustani').addEventListener('click', function () { uf.hidden = true; });
+            uf.addEventListener('submit', function (e) {
+                e.preventDefault();
+                if (prevelik(uf)) return javi('Prilog je veći od 10 MB.', true);
+                posalji(osnova + uf.dataset.id + '/izmijeni', new FormData(uf))
+                    .then(function () { location.reload(); })
+                    .catch(function (err) { javi(err.message, true); });
+            });
+            obrisi.addEventListener('click', function () {
+                if (!confirm('Obrisati ovo obavještenje?')) return;
+                obrisi.disabled = true;
+                posalji(osnova + obrisi.dataset.id + '/obrisi', null)
+                    .then(function () { location.reload(); })
+                    .catch(function (err) { javi(err.message, true); obrisi.disabled = false; });
+            });
+        });
+    })();
+</script>
+</body>
+</html>

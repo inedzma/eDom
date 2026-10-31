@@ -1,0 +1,124 @@
+/* =========================================================
+   E-Dom – stranica Dokumenti (prefiks dk-); osnova iz javna.css
+   ========================================================= */
+
+/* ---------- zaglavlje + pretraga ---------- */
+.dk-hero{
+    position:relative;overflow:hidden;color:#fff;
+    background:
+            radial-gradient(600px 360px at 95% 0%, rgba(47,127,224,.28), transparent 60%),
+            radial-gradient(700px 420px at 0% 120%, rgba(232,84,122,.18), transparent 60%),
+            linear-gradient(160deg,var(--teal-800) 0%,var(--teal-900) 100%);
+}
+.dk-hero-in{padding-top:clamp(44px,7vh,76px);padding-bottom:clamp(44px,7vh,70px)}
+.dk-eyebrow{color:#5fd6b4}
+.dk-hero h1{font-size:clamp(32px,4vw,50px);font-weight:800;line-height:1.1;letter-spacing:-.02em;max-width:720px}
+.dk-hero p{font-size:clamp(16px,1.3vw,18px);line-height:1.65;color:#cfe3e7;max-width:620px;margin:18px 0 28px}
+.dk-pretraga{
+    display:flex;align-items:center;gap:12px;max-width:620px;height:56px;padding:0 18px;border-radius:16px;
+    background:#fff;color:var(--muted);box-shadow:0 20px 50px -20px rgba(0,0,0,.4);
+}
+.dk-pretraga input{flex:1;border:0;outline:0;font:inherit;font-size:16px;color:var(--heading);background:transparent;min-width:0}
+
+/* ---------- filteri ---------- */
+.dk-sadrzaj{padding-top:36px}
+.dk-filteri{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:30px}
+.dk-filter{
+    display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:999px;cursor:pointer;
+    font:inherit;font-weight:700;font-size:15px;color:var(--label);background:#fff;border:1.5px solid var(--line);transition:.15s;
+}
+.dk-filter small{min-width:22px;height:22px;padding:0 6px;border-radius:999px;display:grid;place-items:center;font-size:12px;background:#f0f5f6;color:var(--muted)}
+.dk-filter:hover{border-color:var(--border)}
+.dk-filter.on{color:#fff;background:var(--teal-800);border-color:var(--teal-800)}
+.dk-filter.on small{background:rgba(255,255,255,.2);color:#fff}
+
+/* ---------- grupe ---------- */
+.dk-grupa{margin-bottom:34px;scroll-margin-top:100px}
+.dk-grupa-naslov{display:flex;align-items:baseline;gap:12px;font-size:22px !important;margin-bottom:14px}
+.dk-grupa-naslov small{font-size:14px;font-weight:700;color:var(--muted)}
+.dk-lista{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+
+/* ---------- kartica dokumenta ---------- */
+.dk-kartica{
+    --a:#dc2626;--a-bg:#fdecec;
+    border-radius:18px;background:#fff;border:1px solid var(--line);transition:transform .2s, box-shadow .2s, border-color .2s;
+}
+.dk-kartica:hover{transform:translateY(-3px);border-color:var(--a);box-shadow:0 18px 38px -22px var(--a)}
+.dk--doc,.dk--docx{--a:#2563eb;--a-bg:#e8effd}
+.dk--xlsx{--a:#15803d;--a-bg:#e6f5ec}
+
+.dk-glavni{display:flex;align-items:center;gap:16px;padding:18px 20px;text-decoration:none}
+.dk-ikona{
+    position:relative;flex:none;width:56px;height:64px;border-radius:12px;display:grid;place-items:center;
+    background:var(--a-bg);color:var(--a);
+}
+.dk-ikona svg{margin-top:-10px}
+.dk-ikona b{
+    position:absolute;bottom:7px;left:50%;transform:translateX(-50%);padding:1px 6px;border-radius:5px;
+    font-size:10px;letter-spacing:.04em;color:#fff;background:var(--a);
+}
+.dk-tekst{flex:1;min-width:0}
+.dk-tekst h3{font-size:16px;font-weight:800;color:var(--heading);line-height:1.35}
+.dk-meta{display:flex;gap:14px;margin-top:6px;font-size:13px;color:var(--muted)}
+.dk-meta span + span::before{content:"·";margin-right:14px}
+.dk-akcija{
+    flex:none;padding:8px 14px;border-radius:10px;font-weight:800;font-size:14px;color:var(--a);background:var(--a-bg);transition:.15s;
+}
+.dk-kartica:hover .dk-akcija{color:#fff;background:var(--a)}
+
+/* ---------- admin ---------- */
+.dk-admin{
+    margin-bottom:28px;padding:20px 22px;border-radius:20px;background:#fff;
+    border:2px dashed rgba(240,138,36,.45);box-shadow:var(--shadow);
+}
+.dk-admin-glava{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.dk-admin-glava b{display:block;font-size:17px;color:var(--heading)}
+.dk-admin-glava span{font-size:14px;color:var(--muted)}
+.dk-forma{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;padding-top:18px;border-top:1px dashed var(--line)}
+.dk-forma[hidden]{display:none}
+.dk-polje{display:grid;gap:6px}
+.dk-polje--siroko{grid-column:1 / -1}
+.dk-polje > span{font-weight:800;font-size:14px;color:var(--heading)}
+.dk-polje input,.dk-polje select,.dk-uredi-forma input,.dk-uredi-forma select{
+    width:100%;height:46px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:#f8fbfb;
+    font:inherit;font-size:15px;color:var(--heading);
+}
+.dk-fajl input{height:auto;padding:10px 14px}
+.dk-polje input:focus,.dk-polje select:focus{outline:none;border-color:var(--mint-dark);box-shadow:0 0 0 4px rgba(0,191,154,.15);background:#fff}
+.dk-forma-dno{grid-column:1 / -1;display:flex;justify-content:flex-end;gap:10px}
+.dk-poruka{margin-top:12px;font-weight:700;color:var(--mint-dark)}
+.dk-poruka--greska{color:#dc2626}
+
+.dk-admin-akcije{display:flex;gap:8px;padding:0 20px 14px;justify-content:flex-end}
+.dk-mini{
+    height:32px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;
+    font:inherit;font-size:13px;font-weight:700;color:var(--label);
+}
+.dk-mini:hover{border-color:var(--border);color:var(--heading)}
+.dk-mini--opasno{color:#dc2626;border-color:#fecaca}
+.dk-mini--opasno:hover{background:#dc2626;color:#fff;border-color:#dc2626}
+.dk-uredi-forma{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 20px 18px}
+.dk-uredi-forma[hidden]{display:none}
+.dk-uredi-forma input[name="naslov"]{grid-column:1 / -1}
+
+/* ---------- prazno, bez rezultata, napomena ---------- */
+.dk-prazno{text-align:center;padding:50px 20px;border-radius:24px;background:#f6fafa;border:1px dashed var(--line)}
+.dk-prazno-ic{width:72px;height:72px;margin:0 auto 16px;border-radius:22px;display:grid;place-items:center;background:var(--jp-plava-bg);color:var(--jp-plava)}
+.dk-prazno h3{font-size:20px;font-weight:800;color:var(--heading)}
+.dk-prazno p{color:var(--label);margin:6px 0 18px}
+.dk-nema-rezultata{padding:28px;text-align:center;color:var(--muted);font-weight:700;border-radius:18px;background:#f6fafa}
+
+.dk-napomena{
+    display:flex;gap:14px;align-items:flex-start;margin-top:10px;padding:18px 22px;border-radius:18px;
+    background:linear-gradient(120deg,var(--jp-mint-bg),#eaf6fb);border:1px solid var(--line);
+}
+.dk-napomena-ic{flex:none;color:var(--mint-dark);margin-top:1px}
+.dk-napomena p{color:var(--label);line-height:1.6}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){ .dk-lista{grid-template-columns:1fr} }
+@media (max-width:560px){
+    .dk-forma,.dk-uredi-forma{grid-template-columns:1fr}
+    .dk-glavni{padding:16px}
+    .dk-akcija{display:none}
+}

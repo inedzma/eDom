@@ -1,0 +1,59 @@
+/* =========================================================
+   E-Dom – traka koraka prijave (1 Studij … 5 Pregled)
+   ========================================================= */
+.kp{margin:6px 0 26px}
+.kp-lista{list-style:none;display:flex;margin:0;padding:0}
+
+.kp-korak{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+
+/* linija između krugova */
+.kp-korak:not(:first-child)::before{
+    content:"";position:absolute;top:21px;right:calc(50% + 28px);left:calc(-50% + 28px);height:4px;border-radius:4px;
+    background:#e3ecee;
+}
+.kp--gotovo:not(:first-child)::before,
+.kp--sad:not(:first-child)::before{background:linear-gradient(90deg,#00a884,#00bf9a)}
+
+/* krug */
+.kp-krug{
+    position:relative;z-index:1;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+    font-weight:800;font-size:17px;color:#8aa3a9;background:#fff;border:2.5px solid #dbe6e8;
+    transition:background .25s, border-color .25s, color .25s, box-shadow .25s;
+}
+.kp-kvacica{display:none}
+
+.kp--gotovo .kp-krug{color:#fff;background:#00a884;border-color:#00a884}
+.kp--gotovo .kp-br{display:none}
+.kp--gotovo .kp-kvacica{display:block}
+
+.kp--sad .kp-krug{
+    color:#fff;border-color:transparent;
+    background:linear-gradient(135deg,#0b5d6b,#00a884);
+    box-shadow:0 0 0 6px rgba(0,191,154,.18),0 10px 22px -8px rgba(0,168,132,.7);
+    animation:kp-puls 2.4s ease-in-out infinite;
+}
+@keyframes kp-puls{
+    0%,100%{box-shadow:0 0 0 6px rgba(0,191,154,.18),0 10px 22px -8px rgba(0,168,132,.7)}
+    50%{box-shadow:0 0 0 10px rgba(0,191,154,.08),0 10px 22px -8px rgba(0,168,132,.7)}
+}
+
+/* tekst */
+.kp-tekst{display:flex;flex-direction:column;line-height:1.25}
+.kp-tekst small{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#9fb3b8}
+.kp-tekst b{font-size:15px;font-weight:700;color:#7f969c}
+.kp--gotovo .kp-tekst b{color:var(--heading,#0b3c49)}
+.kp--sad .kp-tekst small{color:#00a884}
+.kp--sad .kp-tekst b{color:var(--heading,#0b3c49);font-weight:800}
+
+/* mobitel */
+.kp-mob{display:none}
+@media (max-width:640px){
+    .kp-tekst{display:none}
+    .kp-krug{width:36px;height:36px;font-size:15px}
+    .kp-korak:not(:first-child)::before{top:16px;right:calc(50% + 22px);left:calc(-50% + 22px);height:3px}
+    .kp-mob{display:grid;gap:8px;margin-top:14px;font-size:14px;color:var(--label,#46646b)}
+    .kp-mob b{color:var(--heading,#0b3c49)}
+    .kp-traka{height:6px;border-radius:6px;background:#e3ecee;overflow:hidden}
+    .kp-traka i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#00a884,#2f7fe0);transition:width .4s}
+}
+@media (prefers-reduced-motion:reduce){ .kp--sad .kp-krug{animation:none} }

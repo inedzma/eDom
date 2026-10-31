@@ -5,6 +5,7 @@ import ba.unze.edom.server.dto.KontaktForma;
 import ba.unze.edom.server.security.KorisnikPrincipal;
 import ba.unze.edom.server.security.Uloge;
 import ba.unze.edom.server.service.GalerijaService;
+import ba.unze.edom.server.service.ObavjestenjaService;
 import ba.unze.edom.server.service.ProfilService;
 import ba.unze.edom.server.service.RangListaObjavaService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class StraniceController {
     private final RangListaObjavaService objavaService;
     private final GalerijaService galerijaService;
     private final ProfilService profilService;
+    private final ObavjestenjaService obavjestenjaService;
 
     /** Student ide na svoj portal; admin ostaje na javnoj Početnoj (uređivanje teksta). */
     @GetMapping("/")
@@ -34,6 +36,7 @@ public class StraniceController {
             return "redirect:/student/pocetna";
         }
         model.addAttribute("objava", objava());
+        model.addAttribute("zadnjaObavjestenja", obavjestenjaService.zadnja(3));
         return "pocetna";
     }
 

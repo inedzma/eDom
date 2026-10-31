@@ -30,6 +30,8 @@
     <link rel="stylesheet" th:href="@{/css/edom.css}">
     <link rel="stylesheet" th:href="@{/css/toast.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/koraci.css}">
 </th:block>
 
 <!-- ============ FOOTER ============ -->
@@ -97,9 +99,10 @@
                     <li><a th:href="@{/}">Početna</a></li>
                     <li><a th:href="@{/upute}">Kako se prijaviti</a></li>
                     <li><a th:href="@{/rang-lista}">Rang lista</a></li>
+                    <li><a th:href="@{/dokumenti}">Dokumenti</a></li>
                     <li><a th:href="@{/o-ustanovi}">O ustanovi</a></li>
                     <li><a th:href="@{/usluge}">Usluge i život u domu</a></li>
-                    <li><a th:href="@{/}+'#aktuelno'">Obavještenja</a></li>
+                    <li><a th:href="@{/obavjestenja}">Obavještenja</a></li>
                     <li><a th:href="@{/}+'#lokacija'">Lokacija</a></li>
                 </ul>
             </nav>
@@ -116,10 +119,9 @@
                 </ul>
                 <h4 class="ft-h4-razmak">Dokumenti</h4>
                 <ul class="ft-dok">
-                    <!-- PROVJERI: nazivi fajlova u static/dokumenti/ -->
-                    <li><a th:href="@{/dokumenti/konkurs.pdf}" target="_blank">Konkurs za smještaj</a></li>
-                    <li><a th:href="@{/dokumenti/pravilnik.pdf}" target="_blank">Pravilnik o unutrašnjem životu</a></li>
-                    <li><a th:href="@{/dokumenti/uputa-za-uplatu.pdf}" target="_blank">Uputa za uplatu</a></li>
+                    <li><a th:href="@{/dokumenti}+'#konkurs'">Konkurs i prijava</a></li>
+                    <li><a th:href="@{/dokumenti}+'#pravilnici'">Pravilnici</a></li>
+                    <li><a th:href="@{/dokumenti}+'#uplate'">Uplate i obrasci</a></li>
                 </ul>
             </nav>
 
@@ -159,91 +161,171 @@
         </div>
     </th:block>
 </footer>
+<!-- ============ NAVBAR (isti za sve; desni dio zavisi od uloge) ============ -->
+<!-- stari nazivi ostaju, da se šabloni ne moraju mijenjati -->
+<th:block th:fragment="navbarJavni(aktivna)"><header th:replace="~{fragments/layout :: navbar(${aktivna})}"></header></th:block>
+<th:block th:fragment="navbarStudent(aktivna)"><header th:replace="~{fragments/layout :: navbar(${aktivna})}"></header></th:block>
 
-<!-- ============ NAVBAR ZA POSJETIOCE (nisu prijavljeni) ============ -->
-<header th:fragment="navbarJavni(aktivna)" class="navbar">
-    <div class="navbar-inner">
-        <a class="nav-brand" th:href="@{/}">
+<header th:fragment="navbar(aktivna)" class="nb" id="nb"
+        th:with="jeStudent=${ime != null},
+                 jeAdmin=${urednik != null and urednik},
+                 uDomu=${aktivna == 'o-ustanovi' or aktivna == 'usluge'},
+                 uKonkursu=${aktivna == 'upute' or aktivna == 'rang' or aktivna == 'dokumenti'},
+                 uPortalu=${aktivna == 'prijave' or aktivna == 'smjestaj' or aktivna == 'profil'}">
+    <div class="nb-in">
+
+        <a class="nb-brand" th:href="@{/}">
             <img th:src="@{/img/studentski-centar-logo.png}" alt="Studentski centar Zenica">
-            <div class="nav-brand-text">
-                <strong>E-Dom</strong>
-                <span>Studentski centar Zenica</span>
-            </div>
+            <span class="nb-brand-tekst"><b>E-Dom</b><small>Studentski centar Zenica</small></span>
         </a>
-        <nav class="pub-links">
-            <a th:href="@{/}" th:classappend="${aktivna == 'pocetna'} ? 'active'">Početna</a>
-            <a th:href="@{/o-ustanovi}" th:classappend="${aktivna == 'o-ustanovi'} ? 'active'">O ustanovi</a>
-            <a th:href="@{/usluge}" th:classappend="${aktivna == 'usluge'} ? 'active'">Usluge</a>
-            <a th:href="@{/upute}" th:classappend="${aktivna == 'upute'} ? 'active'">Kako se prijaviti</a>
-            <a th:href="@{/rang-lista}" th:classappend="${aktivna == 'rang'} ? 'active'">Rang lista</a>
-            <a th:href="@{/kontakt}" th:classappend="${aktivna == 'kontakt'} ? 'active'">Kontakt</a>
-        </nav>
-        <div class="pub-actions" th:unless="${urednik}">
-            <a class="btn btn-ghost btn-sm" th:href="@{/login}">Prijavi se</a>
-            <a class="btn btn-primary btn-sm" th:href="@{/registracija}">Registruj se</a>
-        </div>
-        <div class="pub-actions pub-admin" th:if="${urednik}">
-            <span class="admin-chip">
-                <span class="admin-av">A</span>
-                <span><b>Admin</b><small>uređivanje stranice</small></span>
-            </span>
-            <form th:action="@{/logout}" method="post">
-                <button type="submit" class="btn btn-ghost btn-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-                    Odjava
+
+        <ul class="nb-meni" id="nbMeni">
+            <li><a class="nb-link" th:href="@{/}" th:classappend="${aktivna == 'pocetna'} ? 'nb-aktivan'">Početna</a></li>
+
+            <li class="nb-drop">
+                <button type="button" class="nb-link nb-pad" th:classappend="${uDomu} ? 'nb-aktivan'" aria-expanded="false">
+                    O domu
+                    <svg class="nb-strelica" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
                 </button>
-            </form>
-        </div>
-    </div>
-</header>
+                <div class="nb-panel">
+                    <a class="nb-stavka nb-c1" th:href="@{/o-ustanovi}">
+                        <span class="nb-st-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg></span>
+                        <span><b>O ustanovi</b><small>Historija, misija i vizija</small></span>
+                    </a>
+                    <a class="nb-stavka nb-c2" th:href="@{/usluge}">
+                        <span class="nb-st-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4M2 18h20"/></svg></span>
+                        <span><b>Usluge</b><small>Smještaj, ishrana i sadržaji</small></span>
+                    </a>
+                </div>
+            </li>
 
-<header th:fragment="navbarStudent(aktivna)" class="navbar" id="navbar">
-    <div class="navbar-inner">
-        <a class="nav-brand" th:href="@{/student/pocetna}">
-            <img th:src="@{/img/studentski-centar-logo.png}" alt="Studentski centar Zenica">
-            <div class="nav-brand-text">
-                <strong>E-Dom</strong>
-                <span>Studentski centar Zenica</span>
-            </div>
-        </a>
+            <li class="nb-drop">
+                <button type="button" class="nb-link nb-pad" th:classappend="${uKonkursu} ? 'nb-aktivan'" aria-expanded="false">
+                    Konkurs
+                    <svg class="nb-strelica" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="nb-panel">
+                    <a class="nb-stavka nb-c3" th:href="@{/upute}">
+                        <span class="nb-st-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15l2 2 4-4"/></svg></span>
+                        <span><b>Kako se prijaviti</b><small>Uslovi, postupak i dokumenti</small></span>
+                    </a>
+                    <a class="nb-stavka nb-c4" th:href="@{/rang-lista}">
+                        <span class="nb-st-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></span>
+                        <span><b>Rang lista</b><small>Objavljena lista po šiframa</small></span>
+                    </a>
+                    <a class="nb-stavka nb-c5" th:href="@{/dokumenti}">
+                        <span class="nb-st-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg></span>
+                        <span><b>Dokumenti</b><small>Konkurs, pravilnici i obrasci</small></span>
+                    </a>
+                </div>
+            </li>
 
-        <ul class="nav-links">
-            <li><a th:href="@{/student/pocetna}" th:classappend="${aktivna == 'prijave'} ? 'active'">Moje prijave</a></li>
-            <li><a th:href="@{/upute}" th:classappend="${aktivna == 'upute'} ? 'active'">Kako se prijaviti</a></li>
-            <li><a th:href="@{/rang-lista}" th:classappend="${aktivna == 'rang'} ? 'active'">Rang lista</a></li>
-            <li><a th:href="@{/student/smjestaj}" th:classappend="${aktivna == 'smjestaj'} ? 'active'">Moj smještaj</a></li>
-            <li><a th:href="@{/kontakt}" th:classappend="${aktivna == 'kontakt'} ? 'active'">Kontakt</a></li>
-            <li><a th:href="@{/student/profil}" th:classappend="${aktivna == 'profil'} ? 'active'">Moj profil</a></li>
+            <!-- PRIVREMENO: dok ne napravimo stranicu Obavještenja -->
+            <li><a class="nb-link" th:href="@{/obavjestenja}" th:classappend="${aktivna == 'obavjestenja'} ? 'nb-aktivan'">Obavještenja</a></li>
+            <li><a class="nb-link" th:href="@{/kontakt}" th:classappend="${aktivna == 'kontakt'} ? 'nb-aktivan'">Kontakt</a></li>
+
+            <!-- samo na mobitelu: prijava za posjetioce -->
+            <li class="nb-mob" th:unless="${jeStudent or jeAdmin}">
+                <a class="btn btn-ghost" th:href="@{/login}">Prijavi se</a>
+                <a class="btn btn-primary" th:href="@{/registracija}">Registruj se</a>
+            </li>
         </ul>
 
-        <div class="nav-actions">
-            <div class="user" id="user">
-                <button type="button" class="user-btn" id="userBtn" aria-haspopup="true" aria-expanded="false">
-                    <span class="avatar" th:text="${ime != null and !#strings.isEmpty(ime)} ? ${#strings.toUpperCase(#strings.substring(ime, 0, 1))} : 'S'">S</span>
-                    <span class="user-name" th:text="${ime != null} ? ${ime} : 'Student'">Student</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)"><path d="M6 9l6 6 6-6"/></svg>
-                </button>
-                <div class="user-menu" role="menu">
-                    <a th:href="@{/student/profil}">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        Moj profil
-                    </a>
-                    <hr>
-                    <form th:action="@{/logout}" method="post">
-                        <button type="submit" class="menu-logout">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-                            Odjava
-                        </button>
-                    </form>
-                </div>
-            </div>
+        <div class="nb-desno">
+            <!-- posjetilac -->
+            <th:block th:unless="${jeStudent or jeAdmin}">
+                <a class="btn btn-ghost btn-sm nb-skrij-mob" th:href="@{/login}">Prijavi se</a>
+                <a class="btn btn-primary btn-sm nb-skrij-mob" th:href="@{/registracija}">Registruj se</a>
+            </th:block>
 
-            <button type="button" class="icon-btn nav-toggle" id="navToggle" aria-label="Meni">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+            <!-- student -->
+            <th:block th:if="${jeStudent}">
+                <a class="btn btn-primary btn-sm nb-portal nb-skrij-mob" th:href="@{/student/pocetna}"
+                   th:classappend="${uPortalu} ? 'nb-portal--aktivan'">Moj portal</a>
+                <div class="nb-drop nb-korisnik">
+                    <button type="button" class="nb-avatar-btn nb-pad" aria-expanded="false">
+                        <span class="nb-avatar" th:text="${#strings.toUpperCase(#strings.substring(ime, 0, 1))}">A</span>
+                        <span class="nb-ime" th:text="${ime}">Student</span>
+                        <svg class="nb-strelica" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="nb-panel nb-panel--desno">
+                        <a class="nb-stavka nb-c1" th:href="@{/student/pocetna}">
+                            <span class="nb-st-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
+                            <span><b>Moje prijave</b><small>Status, bodovi i dokumenti</small></span>
+                        </a>
+                        <a class="nb-stavka nb-c2" th:href="@{/student/smjestaj}">
+                            <span class="nb-st-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></span>
+                            <span><b>Moj smještaj</b><small>Soba i useljenje</small></span>
+                        </a>
+                        <a class="nb-stavka nb-c4" th:href="@{/student/profil}">
+                            <span class="nb-st-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+                            <span><b>Moj profil</b><small>Podaci i lozinka</small></span>
+                        </a>
+                        <form th:action="@{/logout}" method="post" class="nb-odjava-forma">
+                            <button type="submit" class="nb-odjava">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                                Odjava
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </th:block>
+
+            <!-- admin -->
+            <th:block th:if="${jeAdmin}">
+                <span class="admin-chip">
+                    <span class="admin-av">A</span>
+                    <span class="nb-skrij-mob"><b>Admin</b><small>uređivanje stranice</small></span>
+                </span>
+                <form th:action="@{/logout}" method="post" class="nb-odjava-forma">
+                    <button type="submit" class="btn btn-ghost btn-sm">Odjava</button>
+                </form>
+            </th:block>
+
+            <button type="button" class="nb-toggle" id="nbToggle" aria-label="Meni" aria-expanded="false">
+                <span></span><span></span><span></span>
             </button>
         </div>
     </div>
 
+    <script>
+        (function () {
+            var nb = document.getElementById('nb');
+            if (!nb || nb.dataset.spreman) return;
+            nb.dataset.spreman = '1';
+            var dropovi = nb.querySelectorAll('.nb-drop');
+
+            function zatvoriSve(osim) {
+                dropovi.forEach(function (d) {
+                    if (d === osim) return;
+                    d.classList.remove('otvoren');
+                    var b = d.querySelector('.nb-pad');
+                    if (b) b.setAttribute('aria-expanded', 'false');
+                });
+            }
+            dropovi.forEach(function (d) {
+                var b = d.querySelector('.nb-pad');
+                b.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    var otvori = !d.classList.contains('otvoren');
+                    zatvoriSve(d);
+                    d.classList.toggle('otvoren', otvori);
+                    b.setAttribute('aria-expanded', otvori);
+                });
+            });
+            document.addEventListener('click', function (e) { if (!nb.contains(e.target)) zatvoriSve(); });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') { zatvoriSve(); nb.classList.remove('nb-otvoren'); }
+            });
+
+            var t = document.getElementById('nbToggle');
+            t.addEventListener('click', function () {
+                var o = nb.classList.toggle('nb-otvoren');
+                t.setAttribute('aria-expanded', o);
+            });
+        })();
+    </script>
+</header>
     <script>
         (function () {
             var user = document.getElementById('user');

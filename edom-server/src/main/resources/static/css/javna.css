@@ -302,3 +302,14 @@ body.uredjivanje .jp-hero h1{color:#fff;background:none} /* da se vidi kursor pr
             radial-gradient(600px 300px at 0% 100%, rgba(240,138,36,.07), transparent 70%),
             linear-gradient(180deg,#f3faf8 0%,#eef6f8 100%);
 }
+
+html, body.landing{overflow-x:clip}
+
+/* obavještenja na Početnoj */
+.jp-obav--link{display:block;text-decoration:none;transition:transform .2s, box-shadow .2s}
+.jp-obav--link:hover{transform:translateX(4px);box-shadow:var(--shadow)}
+.jp-obav p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.jp-obav-vazno{display:inline-block;margin-left:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;color:#fff;background:#dc2626}
+.jp-obav--prazno{border-left-color:var(--line)}
+.jp-sva-obav{justify-self:end;font-weight:800;color:var(--mint-dark);text-decoration:none}
+.jp-sva-obav:hover{color:var(--heading)}
