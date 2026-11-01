@@ -26,11 +26,17 @@ public class StudentEvidencijaService {
     @Transactional
     public Student nadjiIliKreiraj(StudentUnosDTO z) {
 
-        // 1. JMBG postoji -> isti čovjek; možda novi indeks ili kontakt
+        if (!Fakulteti.postoji(z.fakultet())) {
+            throw new RegistracijaException("Odaberite fakultet iz liste.");
+        }
+
+        // 1. JMBG postoji -> isti čovjek; možda novi indeks, fakultet ili kontakt
+        //    (broj indeksa NIJE jedinstven: svaki fakultet i smjer ima svoj niz od 1)
         var poJmbg = studentRepository.findByJmbg(z.jmbg());
         if (poJmbg.isPresent()) {
             Student s = poJmbg.get();
             s.setBrojIndeksa(z.brojIndeksa());
+            s.setFakultet(z.fakultet());
             s.setEmail(z.email());
             s.setTelefon(z.telefon());
             s.setGodinaStudija(z.godinaStudija());
@@ -38,15 +44,7 @@ public class StudentEvidencijaService {
             return s;
         }
 
-        // 2. JMBG ne postoji, ali indeks postoji -> sumnjivo, odbij
-        if (studentRepository.findByBrojIndeksa(z.brojIndeksa()).isPresent()) {
-            throw new RegistracijaException(
-                    "Broj indeksa već postoji uz drugi JMBG. Provjerite podatke.");
-        }
-        // 3. potpuno nov student
-        if (!Fakulteti.postoji(z.fakultet())) {
-            throw new RegistracijaException("Odaberite fakultet iz liste.");
-        }
+        // 2. potpuno nov student
         Student s = new Student();
         s.setIme(Imena.formatiraj(z.ime()));
         s.setPrezime(Imena.formatiraj(z.prezime()));

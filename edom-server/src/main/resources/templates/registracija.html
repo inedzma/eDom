@@ -87,6 +87,8 @@
                                 <select th:field="*{godinaStudija}" th:errorclass="is-invalid">
                                     <option value="">Odaberite godinu</option>
                                     <option th:each="g : ${#numbers.sequence(1, 6)}" th:value="${g}" th:text="${g} + '. godina'">1. godina</option>
+                                    <option value="7">Apsolvent</option>
+                                    <option value="8">Postdiplomac</option>
                                 </select>
                             </div>
                             <span class="field-err" th:if="${#fields.hasErrors('godinaStudija')}" th:errors="*{godinaStudija}"></span>

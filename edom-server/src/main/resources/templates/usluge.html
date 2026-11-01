@@ -249,10 +249,24 @@
     <!-- ======================= ČESTA PITANJA ======================= -->
     <section class="jp-sekcija jp-sekcija--tonirana" id="pitanja">
         <div class="jp-wrap us-faq-wrap">
-            <div>
+            <div class="us-faq-uvod">
                 <span class="jp-eyebrow">Česta pitanja</span>
                 <h2 data-uredi="usluge.faq.naslov" th:text="${t['usluge.faq.naslov']} ?: _">Imaš pitanje?</h2>
                 <p class="jp-lead" data-uredi="usluge.faq.opis" data-uredi-vise th:text="${t['usluge.faq.opis']} ?: _">Odgovori na pitanja koja studenti najčešće postavljaju prije useljenja.</p>
+
+                <div class="us-faq-kontakt">
+                    <span class="us-faq-kontakt-ic">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </span>
+                    <div>
+                        <b data-uredi="usluge.faq.kontakt.naslov" th:text="${t['usluge.faq.kontakt.naslov']} ?: _">Nisi pronašao/la odgovor?</b>
+                        <span data-uredi="usluge.faq.kontakt.opis" th:text="${t['usluge.faq.kontakt.opis']} ?: _">Pošalji nam poruku — odgovaramo na e-mail.</span>
+                    </div>
+                </div>
+                <a class="btn btn-primary btn-lg us-faq-dugme" th:href="@{/kontakt}+'#poruka'">
+                    Postavi pitanje
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </a>
             </div>
 
             <div class="us-faq" id="faq">

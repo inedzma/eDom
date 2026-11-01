@@ -20,7 +20,7 @@ public class Student {
     @Column(name = "prezime", length = 50)
     private String prezime;
 
-    @Column(name = "broj_indeksa", length = 20, unique = true)
+    @Column(name = "broj_indeksa", length = 20)
     private String brojIndeksa;
 
     @Column(name = "fakultet", length = 100)

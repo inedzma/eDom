@@ -24,16 +24,23 @@ public class ZahtjeviSobaService {
     public List<ZahtjevSobeDTO> zaGodinu(int godina) {
         List<ZahtjevPromjeneSobe> svi = zahtjevRepository.zaGodinu(godina);
 
-        // trenutne sobe i studenti po broju indeksa / emailu, samo za prikaz
+        // trenutne sobe i studenti po broju indeksa / emailu, samo za prikaz.
+        // Indeks nije jedinstven (različiti fakulteti), pa se dvosmislen indeks ne koristi.
         Map<Integer, Integer> sobaPoPrijavi = new HashMap<>();
         Map<String, Prijava> prijavaPoOznaci = new HashMap<>();
+        Set<String> dvosmisleni = new HashSet<>();
         for (Smjestaj sm : smjestajRepository.aktivniZaGodinu(godina)) {
             Prijava p = sm.getPrijava();
             sobaPoPrijavi.put(p.getIdPrijava(), sm.getSoba().getBroj());
             Student s = p.getStudent();
-            if (s.getBrojIndeksa() != null) prijavaPoOznaci.put(kljuc(s.getBrojIndeksa()), p);
-            if (s.getEmail() != null) prijavaPoOznaci.put(kljuc(s.getEmail()), p);
+            for (String oznaka : new String[]{s.getBrojIndeksa(), s.getEmail()}) {
+                if (oznaka == null || oznaka.isBlank()) continue;
+                String k = kljuc(oznaka);
+                Prijava vec = prijavaPoOznaci.putIfAbsent(k, p);
+                if (vec != null && !vec.getIdPrijava().equals(p.getIdPrijava())) dvosmisleni.add(k);
+            }
         }
+        dvosmisleni.forEach(prijavaPoOznaci::remove);
 
         List<ZahtjevSobeDTO> lista = new ArrayList<>();
         for (ZahtjevPromjeneSobe z : svi) {

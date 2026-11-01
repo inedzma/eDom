@@ -32,7 +32,7 @@ public record RegistracijaZahtjev(
         String fakultet,
 
         @NotNull(message = "Godina studija je obavezna")
-        @Min(1) @Max(6)
+        @Min(1) @Max(8)
         Integer godinaStudija,
 
         @NotBlank(message = "Adresa je obavezna")

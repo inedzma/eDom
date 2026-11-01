@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -15,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -37,7 +39,7 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    /** LANAC 1: /api/** — za desktop klijent. Bez sesije. */
+    /** LANAC 1: /api/** — za desktop klijent. Bez sesije, samo JWT. */
     @Bean
     @Order(1)
     public SecurityFilterChain apiChain(HttpSecurity http) throws Exception {
@@ -49,7 +51,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .anyRequest().hasRole("ADMIN")
                 )
-                .httpBasic(b -> {})
+                // bez httpBasic: prijava je samo preko JWT-a (/api/auth/login → token)
+                .httpBasic(b -> b.disable())
+                .formLogin(f -> f.disable())
+                // nema tokena ili je istekao → 401 (desktop tada traži ponovnu prijavu)
+                .exceptionHandling(e -> e.authenticationEntryPoint(
+                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class SobeService {
 
     /** Prijave koje ulaze u raspored. */
-    static final List<String> STATUSI_ZA_RASPORED = List.of(Statusi.ODOBRENO, Statusi.ZAKLJUCENO);
+    public static final List<String> STATUSI_ZA_RASPORED = List.of(Statusi.ODOBRENO, Statusi.ZAKLJUCENO);
 
     private final SobaRepository sobaRepository;
     private final SmjestajRepository smjestajRepository;

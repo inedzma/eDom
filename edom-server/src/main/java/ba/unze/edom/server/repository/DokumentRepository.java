@@ -24,7 +24,7 @@ public interface DokumentRepository extends JpaRepository<Dokument, Integer> {
 
     /** Lista dokumenata BEZ učitavanja Base64 sadržaja. */
     @Query("""
-           select new ba.unze.edom.common.dto.DokumentDTO(
+           select new ba.unze.edom.common.dto.dokumenti.DokumentDTO(
                d.idDokument, d.naziv, v.naziv, d.datumUpload, d.dostavljen,
                case when d.dokumentB64 is not null then true else false end)
            from Dokument d
