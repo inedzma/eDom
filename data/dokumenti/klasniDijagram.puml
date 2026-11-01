@@ -1,0 +1,559 @@
+@startuml
+!pragma layout smetana
+title E-Dom: model domena
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #0B5D6B
+  HeaderBackgroundColor #E2F7EF
+  ArrowColor #0B5D6B
+}
+skinparam defaultFontName Arial
+hide empty members
+
+package "Korisnici" {
+class Korisnik {
+  - idKorisnik : Integer
+  - ime : String
+  - prezime : String
+  - username : String
+  - passwordHash : String
+  - email : String
+  - zadnjaPrijava : Instant
+  - resetTokenHash : String
+  - resetTokenIstek : Instant
+  - resetPokusaji : int
+  - student : Student
+  - uloga : Uloga
+  --
+  + getIdKorisnik() : Integer
+  + setIdKorisnik(idKorisnik : Integer) : void
+  + getIme() : String
+  + setIme(ime : String) : void
+  + getPrezime() : String
+  + setPrezime(prezime : String) : void
+  + getUsername() : String
+  + setUsername(username : String) : void
+  + getPasswordHash() : String
+  + setPasswordHash(passwordHash : String) : void
+  + getEmail() : String
+  + setEmail(email : String) : void
+  + getZadnjaPrijava() : Instant
+  + setZadnjaPrijava(zadnjaPrijava : Instant) : void
+  + getResetTokenHash() : String
+  + setResetTokenHash(resetTokenHash : String) : void
+  + getResetTokenIstek() : Instant
+  + setResetTokenIstek(resetTokenIstek : Instant) : void
+  + getResetPokusaji() : int
+  + setResetPokusaji(resetPokusaji : int) : void
+  + getStudent() : Student
+  + setStudent(student : Student) : void
+  + getUloga() : Uloga
+  + setUloga(uloga : Uloga) : void
+}
+class Uloga {
+  - idUloga : Integer
+  - naziv : String
+  --
+  + getIdUloga() : Integer
+  + setIdUloga(idUloga : Integer) : void
+  + getNaziv() : String
+  + setNaziv(naziv : String) : void
+}
+}
+
+package "Studenti i prijave" {
+class Student {
+  - idStudent : Integer
+  - ime : String
+  - prezime : String
+  - brojIndeksa : String
+  - fakultet : String
+  - godinaStudija : Integer
+  - prosjek : BigDecimal
+  - email : String
+  - telefon : String
+  - adresa : String
+  - imeRoditelja : String
+  - jmbg : String
+  - socijalniStatus : SocijalniStatus
+  - spol : String
+  - brojLicneKarte : String
+  - telefonRoditelja : String
+  - kanton : String
+  - opcina : String
+  - napomena : String
+  - sifraBroj : Integer
+  --
+  + getIdStudent() : Integer
+  + setIdStudent(idStudent : Integer) : void
+  + getIme() : String
+  + setIme(ime : String) : void
+  + getPrezime() : String
+  + setPrezime(prezime : String) : void
+  + getBrojIndeksa() : String
+  + setBrojIndeksa(brojIndeksa : String) : void
+  + getFakultet() : String
+  + setFakultet(fakultet : String) : void
+  + getGodinaStudija() : Integer
+  + setGodinaStudija(godinaStudija : Integer) : void
+  + getProsjek() : BigDecimal
+  + setProsjek(prosjek : BigDecimal) : void
+  + getEmail() : String
+  + setEmail(email : String) : void
+  + getTelefon() : String
+  + setTelefon(telefon : String) : void
+  + getAdresa() : String
+  + setAdresa(adresa : String) : void
+  + getImeRoditelja() : String
+  + setImeRoditelja(imeRoditelja : String) : void
+  + getJmbg() : String
+  + setJmbg(jmbg : String) : void
+  + getSocijalniStatus() : SocijalniStatus
+  + setSocijalniStatus(socijalniStatus : SocijalniStatus) : void
+  + getSpol() : String
+  + setSpol(spol : String) : void
+  + getBrojLicneKarte() : String
+  + setBrojLicneKarte(brojLicneKarte : String) : void
+  + getTelefonRoditelja() : String
+  + setTelefonRoditelja(telefonRoditelja : String) : void
+  + getKanton() : String
+  + setKanton(kanton : String) : void
+  + getOpcina() : String
+  + setOpcina(opcina : String) : void
+  + getNapomena() : String
+  + setNapomena(napomena : String) : void
+  + getSifraBroj() : Integer
+  + setSifraBroj(sifraBroj : Integer) : void
+}
+class Prijava {
+  - idPrijava : Integer
+  - datumPrijave : LocalDate
+  - ukupniBodovi : Double
+  - napomena : String
+  - akademskaGodina : Integer
+  - student : Student
+  - status : StatusPrijave
+  - dokumenti : List<Dokument>
+  - prosjek : BigDecimal
+  - godinaStudija : Integer
+  - socijalniStatus : SocijalniStatus
+  - udaljenostKm : BigDecimal
+  - brojClanovaDomacinstva : Integer
+  - ukupnaPrimanja : BigDecimal
+  - polozeniIspiti : Integer
+  - kriteriji : List<PrijavaKriterij>
+  - uspjehVerifikovan : boolean
+  - primanjaVerifikovana : boolean
+  - udaljenostVerifikovana : boolean
+  - napomenaAdmina : String
+  - upisGodinePut : Integer
+  - obnavljaoGodinu : Boolean
+  - obnovljeneGodine : String
+  - dokazUslovaAt : LocalDateTime
+  - dokazUslovaEvidentirao : String
+  --
+  + getIdPrijava() : Integer
+  + setIdPrijava(idPrijava : Integer) : void
+  + getDatumPrijave() : LocalDate
+  + setDatumPrijave(datumPrijave : LocalDate) : void
+  + getUkupniBodovi() : Double
+  + setUkupniBodovi(ukupniBodovi : Double) : void
+  + getNapomena() : String
+  + setNapomena(napomena : String) : void
+  + getAkademskaGodina() : Integer
+  + setAkademskaGodina(akademskaGodina : Integer) : void
+  + getStudent() : Student
+  + setStudent(student : Student) : void
+  + getStatus() : StatusPrijave
+  + setStatus(status : StatusPrijave) : void
+  + getDokumenti() : List<Dokument>
+  + setDokumenti(dokumenti : List<Dokument>) : void
+  + getProsjek() : BigDecimal
+  + setProsjek(prosjek : BigDecimal) : void
+  + getGodinaStudija() : Integer
+  + setGodinaStudija(godinaStudija : Integer) : void
+  + getSocijalniStatus() : SocijalniStatus
+  + setSocijalniStatus(socijalniStatus : SocijalniStatus) : void
+  + getUdaljenostKm() : BigDecimal
+  + setUdaljenostKm(udaljenostKm : BigDecimal) : void
+  + getBrojClanovaDomacinstva() : Integer
+  + setBrojClanovaDomacinstva(brojClanovaDomacinstva : Integer) : void
+  + getUkupnaPrimanja() : BigDecimal
+  + setUkupnaPrimanja(ukupnaPrimanja : BigDecimal) : void
+  + getPolozeniIspiti() : Integer
+  + setPolozeniIspiti(polozeniIspiti : Integer) : void
+  + getKriteriji() : List<PrijavaKriterij>
+  + setKriteriji(kriteriji : List<PrijavaKriterij>) : void
+  + isUspjehVerifikovan() : boolean
+  + setUspjehVerifikovan(uspjehVerifikovan : boolean) : void
+  + isPrimanjaVerifikovana() : boolean
+  + setPrimanjaVerifikovana(primanjaVerifikovana : boolean) : void
+  + isUdaljenostVerifikovana() : boolean
+  + setUdaljenostVerifikovana(udaljenostVerifikovana : boolean) : void
+  + getNapomenaAdmina() : String
+  + setNapomenaAdmina(napomenaAdmina : String) : void
+  + getUpisGodinePut() : Integer
+  + setUpisGodinePut(upisGodinePut : Integer) : void
+  + getObnavljaoGodinu() : Boolean
+  + setObnavljaoGodinu(obnavljaoGodinu : Boolean) : void
+  + getObnovljeneGodine() : String
+  + setObnovljeneGodine(obnovljeneGodine : String) : void
+  + getDokazUslovaAt() : LocalDateTime
+  + setDokazUslovaAt(dokazUslovaAt : LocalDateTime) : void
+  + getDokazUslovaEvidentirao() : String
+  + setDokazUslovaEvidentirao(dokazUslovaEvidentirao : String) : void
+  ..
+  + dodajKriterij(k : PrijavaKriterij) : void
+  + dodajDokument(d : Dokument) : void
+  + ukloniDokument(d : Dokument) : void
+}
+class PrijavaKriterij {
+  - idPrijavaKriterij : Integer
+  - prijava : Prijava
+  - vrsta : VrstaKriterija
+  - parametar : BigDecimal
+  - verifikovan : boolean
+  - datumOd : LocalDate
+  - datumDo : LocalDate
+  --
+  + getIdPrijavaKriterij() : Integer
+  + setIdPrijavaKriterij(idPrijavaKriterij : Integer) : void
+  + getPrijava() : Prijava
+  + setPrijava(prijava : Prijava) : void
+  + getVrsta() : VrstaKriterija
+  + setVrsta(vrsta : VrstaKriterija) : void
+  + getParametar() : BigDecimal
+  + setParametar(parametar : BigDecimal) : void
+  + isVerifikovan() : boolean
+  + setVerifikovan(verifikovan : boolean) : void
+  + getDatumOd() : LocalDate
+  + setDatumOd(datumOd : LocalDate) : void
+  + getDatumDo() : LocalDate
+  + setDatumDo(datumDo : LocalDate) : void
+}
+class Dokument {
+  - idDokument : Integer
+  - naziv : String
+  - datumUpload : LocalDate
+  - brojBodova : double
+  - dostavljen : Boolean
+  - dokumentB64 : String
+  - prijava : Prijava
+  - vrstaDokumenta : VrstaDokumenta
+  --
+  + getIdDokument() : Integer
+  + setIdDokument(idDokument : Integer) : void
+  + getNaziv() : String
+  + setNaziv(naziv : String) : void
+  + getDatumUpload() : LocalDate
+  + setDatumUpload(datumUpload : LocalDate) : void
+  + getBrojBodova() : double
+  + setBrojBodova(brojBodova : double) : void
+  + getDostavljen() : Boolean
+  + setDostavljen(dostavljen : Boolean) : void
+  + getDokumentB64() : String
+  + setDokumentB64(dokumentB64 : String) : void
+  + getPrijava() : Prijava
+  + setPrijava(prijava : Prijava) : void
+  + getVrstaDokumenta() : VrstaDokumenta
+  + setVrstaDokumenta(vrstaDokumenta : VrstaDokumenta) : void
+}
+class StatusPrijave {
+  - idStatus : Integer
+  - naziv : String
+  --
+  + getIdStatus() : Integer
+  + setIdStatus(idStatus : Integer) : void
+  + getNaziv() : String
+  + setNaziv(naziv : String) : void
+}
+class SocijalniStatus {
+  - idStatus : Integer
+  - naziv : String
+  --
+  + getIdStatus() : Integer
+  + setIdStatus(idStatus : Integer) : void
+  + getNaziv() : String
+  + setNaziv(naziv : String) : void
+}
+class VrstaKriterija {
+  - idVrstaKriterija : Integer
+  - sifra : String
+  - naziv : String
+  - bodovi : BigDecimal
+  - traziParametar : boolean
+  - nazivParametra : String
+  - grupa : String
+  - aktivan : boolean
+  - dokaz : VrstaDokumenta
+  - traziPeriod : boolean
+  --
+  + getIdVrstaKriterija() : Integer
+  + setIdVrstaKriterija(idVrstaKriterija : Integer) : void
+  + getSifra() : String
+  + setSifra(sifra : String) : void
+  + getNaziv() : String
+  + setNaziv(naziv : String) : void
+  + getBodovi() : BigDecimal
+  + setBodovi(bodovi : BigDecimal) : void
+  + isTraziParametar() : boolean
+  + setTraziParametar(traziParametar : boolean) : void
+  + getNazivParametra() : String
+  + setNazivParametra(nazivParametra : String) : void
+  + getGrupa() : String
+  + setGrupa(grupa : String) : void
+  + isAktivan() : boolean
+  + setAktivan(aktivan : boolean) : void
+  + getDokaz() : VrstaDokumenta
+  + setDokaz(dokaz : VrstaDokumenta) : void
+  + isTraziPeriod() : boolean
+  + setTraziPeriod(traziPeriod : boolean) : void
+}
+class VrstaDokumenta {
+  - idVrsta : Integer
+  - naziv : String
+  - kategorija : String
+  - sifra : String
+  --
+  + getIdVrsta() : Integer
+  + setIdVrsta(idVrsta : Integer) : void
+  + getNaziv() : String
+  + setNaziv(naziv : String) : void
+  + getKategorija() : String
+  + setKategorija(kategorija : String) : void
+  + getSifra() : String
+  + setSifra(sifra : String) : void
+}
+}
+
+package "Smještaj" {
+class Soba {
+  - idSoba : Integer
+  - broj : Integer
+  - sprat : Sprat
+  - kapacitet : Integer
+  - kategorija : KategorijaSobe
+  - spol : String
+  - brojKljuceva : Integer
+  - aktivna : boolean
+  - napomena : String
+  --
+  + getIdSoba() : Integer
+  + setIdSoba(idSoba : Integer) : void
+  + getBroj() : Integer
+  + setBroj(broj : Integer) : void
+  + getSprat() : Sprat
+  + setSprat(sprat : Sprat) : void
+  + getKapacitet() : Integer
+  + setKapacitet(kapacitet : Integer) : void
+  + getKategorija() : KategorijaSobe
+  + setKategorija(kategorija : KategorijaSobe) : void
+  + getSpol() : String
+  + setSpol(spol : String) : void
+  + getBrojKljuceva() : Integer
+  + setBrojKljuceva(brojKljuceva : Integer) : void
+  + isAktivna() : boolean
+  + setAktivna(aktivna : boolean) : void
+  + getNapomena() : String
+  + setNapomena(napomena : String) : void
+  ..
+  + spolSobe() : String
+  + zaRaspored() : boolean
+}
+class Sprat {
+  - idSprat : Integer
+  - naziv : String
+  - redoslijed : Integer
+  - spol : String
+  --
+  + getIdSprat() : Integer
+  + setIdSprat(idSprat : Integer) : void
+  + getNaziv() : String
+  + setNaziv(naziv : String) : void
+  + getRedoslijed() : Integer
+  + setRedoslijed(redoslijed : Integer) : void
+  + getSpol() : String
+  + setSpol(spol : String) : void
+}
+class KategorijaSobe {
+  - idKategorija : Integer
+  - sifra : String
+  - naziv : String
+  - boja : String
+  - zaStudente : boolean
+  - opis : String
+  --
+  + getIdKategorija() : Integer
+  + setIdKategorija(idKategorija : Integer) : void
+  + getSifra() : String
+  + setSifra(sifra : String) : void
+  + getNaziv() : String
+  + setNaziv(naziv : String) : void
+  + getBoja() : String
+  + setBoja(boja : String) : void
+  + isZaStudente() : boolean
+  + setZaStudente(zaStudente : boolean) : void
+  + getOpis() : String
+  + setOpis(opis : String) : void
+}
+class Smjestaj {
+  + {static} PREDLOZEN : String
+  + {static} DODIJELJEN : String
+  + {static} USELJEN : String
+  + {static} ISELJEN : String
+  - idSmjestaj : Integer
+  - soba : Soba
+  - prijava : Prijava
+  - status : String
+  - datumUseljenja : LocalDate
+  - datumIseljenja : LocalDate
+  - oznaka : OznakaStanara
+  - kljuceviPreuzeti : int
+  - kljuceviVraceni : int
+  - razlog : String
+  - napomena : String
+  - karticaPreuzeta : LocalDate
+  - karticaRazduzena : LocalDate
+  - ljekarskoPredano : LocalDate
+  - uvjerenjeFakultetPredano : LocalDate
+  --
+  + getIdSmjestaj() : Integer
+  + setIdSmjestaj(idSmjestaj : Integer) : void
+  + getSoba() : Soba
+  + setSoba(soba : Soba) : void
+  + getPrijava() : Prijava
+  + setPrijava(prijava : Prijava) : void
+  + getStatus() : String
+  + setStatus(status : String) : void
+  + getDatumUseljenja() : LocalDate
+  + setDatumUseljenja(datumUseljenja : LocalDate) : void
+  + getDatumIseljenja() : LocalDate
+  + setDatumIseljenja(datumIseljenja : LocalDate) : void
+  + getOznaka() : OznakaStanara
+  + setOznaka(oznaka : OznakaStanara) : void
+  + getKljuceviPreuzeti() : int
+  + setKljuceviPreuzeti(kljuceviPreuzeti : int) : void
+  + getKljuceviVraceni() : int
+  + setKljuceviVraceni(kljuceviVraceni : int) : void
+  + getRazlog() : String
+  + setRazlog(razlog : String) : void
+  + getNapomena() : String
+  + setNapomena(napomena : String) : void
+  + getKarticaPreuzeta() : LocalDate
+  + setKarticaPreuzeta(karticaPreuzeta : LocalDate) : void
+  + getKarticaRazduzena() : LocalDate
+  + setKarticaRazduzena(karticaRazduzena : LocalDate) : void
+  + getLjekarskoPredano() : LocalDate
+  + setLjekarskoPredano(ljekarskoPredano : LocalDate) : void
+  + getUvjerenjeFakultetPredano() : LocalDate
+  + setUvjerenjeFakultetPredano(uvjerenjeFakultetPredano : LocalDate) : void
+}
+class OznakaStanara {
+  - idOznaka : Integer
+  - naziv : String
+  - boja : String
+  - opis : String
+  --
+  + getIdOznaka() : Integer
+  + setIdOznaka(idOznaka : Integer) : void
+  + getNaziv() : String
+  + setNaziv(naziv : String) : void
+  + getBoja() : String
+  + setBoja(boja : String) : void
+  + getOpis() : String
+  + setOpis(opis : String) : void
+}
+class ZahtjevPromjeneSobe {
+  + {static} ZAMJENA : String
+  + {static} PREMJESTAJ : String
+  + {static} NA_CEKANJU : String
+  + {static} ODOBREN : String
+  + {static} ODBIJEN : String
+  + {static} POVUCEN : String
+  - idZahtjev : Integer
+  - prijava : Prijava
+  - vrsta : String
+  - saStudentom : String
+  - zeljenaSoba : Integer
+  - razlog : String
+  - status : String
+  - datumPodnosenja : LocalDateTime
+  - datumOdgovora : LocalDateTime
+  - odgovor : String
+  --
+  + getIdZahtjev() : Integer
+  + setIdZahtjev(idZahtjev : Integer) : void
+  + getPrijava() : Prijava
+  + setPrijava(prijava : Prijava) : void
+  + getVrsta() : String
+  + setVrsta(vrsta : String) : void
+  + getSaStudentom() : String
+  + setSaStudentom(saStudentom : String) : void
+  + getZeljenaSoba() : Integer
+  + setZeljenaSoba(zeljenaSoba : Integer) : void
+  + getRazlog() : String
+  + setRazlog(razlog : String) : void
+  + getStatus() : String
+  + setStatus(status : String) : void
+  + getDatumPodnosenja() : LocalDateTime
+  + setDatumPodnosenja(datumPodnosenja : LocalDateTime) : void
+  + getDatumOdgovora() : LocalDateTime
+  + setDatumOdgovora(datumOdgovora : LocalDateTime) : void
+  + getOdgovor() : String
+  + setOdgovor(odgovor : String) : void
+}
+class ZeljaSmjestaja {
+  - idZelja : Integer
+  - prijava : Prijava
+  - zeljeniKapacitet : Integer
+  - soba : Soba
+  - cimer1 : String
+  - cimer2 : String
+  - napomena : String
+  --
+  + getIdZelja() : Integer
+  + setIdZelja(idZelja : Integer) : void
+  + getPrijava() : Prijava
+  + setPrijava(prijava : Prijava) : void
+  + getZeljeniKapacitet() : Integer
+  + setZeljeniKapacitet(zeljeniKapacitet : Integer) : void
+  + getSoba() : Soba
+  + setSoba(soba : Soba) : void
+  + getCimer1() : String
+  + setCimer1(cimer1 : String) : void
+  + getCimer2() : String
+  + setCimer2(cimer2 : String) : void
+  + getNapomena() : String
+  + setNapomena(napomena : String) : void
+}
+}
+
+' --- korisnici ---
+Korisnik "0..*" --> "1" Uloga
+Korisnik "0..1" --> "0..1" Student : nalog studenta
+
+' --- studenti i prijave ---
+Student "1" <-- "0..*" Prijava : podnosi
+Student "0..*" --> "0..1" SocijalniStatus
+Prijava "0..*" --> "1" StatusPrijave
+Prijava "0..*" --> "0..1" SocijalniStatus
+Prijava "1" *-- "0..*" Dokument : sadrži
+Prijava "1" *-- "0..*" PrijavaKriterij : sadrži
+PrijavaKriterij "0..*" --> "1" VrstaKriterija
+Dokument "0..*" --> "0..1" VrstaDokumenta
+VrstaKriterija "0..*" --> "0..1" VrstaDokumenta : dokaz
+
+' --- smještaj ---
+Soba "0..*" --> "1" Sprat
+Soba "0..*" --> "1" KategorijaSobe
+Smjestaj "0..*" --> "1" Soba
+Smjestaj "0..*" --> "1" Prijava
+Smjestaj "0..*" --> "0..1" OznakaStanara
+ZahtjevPromjeneSobe "0..*" --> "1" Prijava
+ZeljaSmjestaja "0..1" --> "1" Prijava
+ZeljaSmjestaja "0..*" --> "0..1" Soba : željena soba
+@enduml
