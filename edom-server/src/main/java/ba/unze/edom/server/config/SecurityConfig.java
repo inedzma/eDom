@@ -81,10 +81,14 @@ public class SecurityConfig {
                         .successHandler(prijavaUspjeh)
                         .permitAll()
                 )
-                .exceptionHandling(e -> e
-                        .authenticationEntryPoint(
-                                new LoginUrlAuthenticationEntryPoint("/")
-                        ))
+                .exceptionHandling(e -> e.accessDeniedHandler((req, res, ex) -> {
+                    if (ex instanceof org.springframework.security.web.csrf.CsrfException) {
+                        // forma je "istekla" (npr. poslije restarta) -> vrati na istu stranicu s porukom
+                        res.sendRedirect(req.getContextPath() + req.getServletPath() + "?istekla");
+                    } else {
+                        res.sendError(403);
+                    }
+                }))
                 .logout(l -> l.logoutSuccessUrl("/").permitAll());
         return http.build();
     }

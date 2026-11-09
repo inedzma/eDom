@@ -1,0 +1,48 @@
+@startuml
+!pragma layout smetana
+title E-Dom: dijagram komponenti
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BorderColor #0B5D6B
+}
+skinparam ArrowColor #0B5D6B
+
+actor "Neprijavljeni korisnik" as Posjetilac
+actor "Student" as Student
+actor "Administrator" as Admin
+
+rectangle "Web preglednik" as Preglednik #E6F0FD
+rectangle "Desktop aplikacija\n(JavaFX)" as Desktop #E6F0FD
+
+rectangle "Server (Spring Boot)" as Server #E2F7EF {
+  rectangle "Web sloj\n(Thymeleaf kontroleri)" as Web
+  rectangle "REST API\n(/api/**, JWT)" as Api
+  rectangle "Servisni sloj\n(poslovna logika, bodovanje,\nrang lista, raspored)" as Servisi
+  rectangle "Sloj pristupa podacima\n(Spring Data JPA)" as Repo
+}
+
+rectangle "Zajednički modul\n(edom-common: DTO)" as Common #FFF5D4
+database "MySQL baza" as Baza #FFF0E0
+folder "Fajlovi na serveru\n(postavke, objava rang liste,\ngalerija, dokumenti, obavještenja)" as Fajlovi #FFF0E0
+rectangle "E-mail servis\n(Gmail SMTP)" as Mail #EFEAFE
+
+Posjetilac --> Preglednik
+Student --> Preglednik
+Admin --> Desktop
+Admin ..> Preglednik : uređivanje\njavne stranice
+
+Preglednik --> Web : HTTP(S): HTML forme, sesija
+Desktop --> Api : HTTP(S): REST/JSON\n(JWT token)
+
+Web --> Servisi
+Api --> Servisi
+Servisi --> Repo
+Repo --> Baza : JDBC
+Servisi --> Fajlovi
+Servisi --> Mail : SMTP
+
+Desktop ..> Common : koristi
+Api ..> Common : koristi
+@enduml

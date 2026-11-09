@@ -20,23 +20,32 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class StudentEvidencijaService {
 
+    /** Brucoš koji još ne zna na koji će fakultet biti upisan. */
+    public static final String FAKULTET_DRUGO = "Drugo";
+
     private final StudentRepository studentRepository;
     private final SocijalniStatusRepository socijalniStatusRepository;
 
     @Transactional
     public Student nadjiIliKreiraj(StudentUnosDTO z) {
 
-        if (!Fakulteti.postoji(z.fakultet())) {
+        boolean drugo = FAKULTET_DRUGO.equals(z.fakultet());
+        if (!drugo && !Fakulteti.postoji(z.fakultet())) {
             throw new RegistracijaException("Odaberite fakultet iz liste.");
         }
+
+        // brucoš možda još nema indeks: prazno polje = nema indeksa
+        String indeks = prazanUNull(z.brojIndeksa());
 
         // 1. JMBG postoji -> isti čovjek; možda novi indeks, fakultet ili kontakt
         //    (broj indeksa NIJE jedinstven: svaki fakultet i smjer ima svoj niz od 1)
         var poJmbg = studentRepository.findByJmbg(z.jmbg());
         if (poJmbg.isPresent()) {
             Student s = poJmbg.get();
-            s.setBrojIndeksa(z.brojIndeksa());
-            s.setFakultet(z.fakultet());
+            // prazno ne briše indeks koji je sekretar ranije unio
+            if (indeks != null) s.setBrojIndeksa(indeks);
+            // "Drugo" ne briše pravi fakultet koji je već upisan
+            if (!drugo || s.getFakultet() == null) s.setFakultet(z.fakultet());
             s.setEmail(z.email());
             s.setTelefon(z.telefon());
             s.setGodinaStudija(z.godinaStudija());
@@ -49,7 +58,7 @@ public class StudentEvidencijaService {
         s.setIme(Imena.formatiraj(z.ime()));
         s.setPrezime(Imena.formatiraj(z.prezime()));
         s.setJmbg(z.jmbg());
-        s.setBrojIndeksa(z.brojIndeksa());
+        s.setBrojIndeksa(indeks);
         s.setEmail(z.email());
         s.setTelefon(z.telefon());
         s.setFakultet(z.fakultet());
@@ -80,5 +89,9 @@ public class StudentEvidencijaService {
             s.setOpcina(z.opcina());
         }
         s.setSpol(Jmbg.spol(s.getJmbg()));
+    }
+
+    private static String prazanUNull(String t) {
+        return t == null || t.isBlank() ? null : t.trim();
     }
 }

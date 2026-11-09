@@ -313,3 +313,7 @@ html, body.landing{overflow-x:clip}
 .jp-obav--prazno{border-left-color:var(--line)}
 .jp-sva-obav{justify-self:end;font-weight:800;color:var(--mint-dark);text-decoration:none}
 .jp-sva-obav:hover{color:var(--heading)}
+
+@media (max-width:760px){
+    .jp-hero--foto .jp-hero-tekst{padding-top:14px}
+}

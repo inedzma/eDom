@@ -269,7 +269,7 @@
                             <i>„sposoban za kolektivni smještaj“</i>.</li>
                         <li><b>Dokaz o uplati</b> troškova smještaja i ishrane za
                             <span th:text="${lista.mjesecUplate()}">oktobar</span>
-                            u iznosu od <b th:text="${postavke.uplataPriUseljenju} + ' KM'">150,00 KM</b>.
+                            u iznosu od <b th:text="${postavke.uplataPriUseljenju} + ' KM'">165,00 KM</b>.
                     </ul>
                 </article>
 
@@ -296,7 +296,7 @@
                     </h3>
                     <ul class="kontakt">
                         <li>Telefon: <a th:href="'tel:' + ${#strings.replace(postavke.telefon, ' ', '')}" th:text="${postavke.telefon}">032 226 604</a></li>
-                        <li>E-mail: <a th:href="'mailto:' + ${postavke.email}" th:text="${postavke.email}">tehnickisekretar.sc@unze.ba</a></li>
+                        <li>E-mail: <a th:href="'mailto:' + ${postavke.email}" th:text="${postavke.email}">studentski.centar@unze.ba</a></li>
                         <li>Adresa: <span th:text="${postavke.adresa}">Crkvice 50, 72000 Zenica</span></li>
                     </ul>
                 </article>

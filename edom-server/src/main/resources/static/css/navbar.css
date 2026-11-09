@@ -8,15 +8,20 @@
     border-bottom:1px solid var(--line);
 }
 .nb-in{
-    max-width:1280px;margin:0 auto;padding:0 24px;height:76px;
+    position:relative;max-width:1280px;margin:0 auto;padding:0 24px;height:76px;
     display:flex;align-items:center;gap:20px;
 }
 
-/* logo */
+/* logo: Univerzitet + Studentski centar */
 .nb-brand{display:flex;align-items:center;gap:12px;text-decoration:none;flex:none}
-.nb-brand img{width:46px;height:46px;border-radius:50%;object-fit:contain}
+.nb-logotipi{display:flex;align-items:center;gap:6px;flex:none}
+.nb-logotipi img{display:block;width:44px;height:44px;border-radius:50%;object-fit:contain}
 .nb-brand-tekst b{display:block;font-size:20px;font-weight:800;color:var(--heading);line-height:1.1}
-.nb-brand-tekst small{display:block;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.nb-brand-tekst small{
+    display:block;font-size:11px;font-weight:800;letter-spacing:.12em;line-height:1.3;
+    text-transform:uppercase;color:var(--muted);
+}
+.nb-mob-naziv{display:none}   /* naziv na sredini, samo na mobitelu */
 
 /* glavni meni */
 .nb-meni{list-style:none;display:flex;align-items:center;gap:2px;flex:1;justify-content:center;margin:0;padding:0}
@@ -63,8 +68,8 @@
 .nb-c4{--nb-a:#7a5af5;--nb-bg:#efeafe}
 .nb-c5{--nb-a:#e8547a;--nb-bg:#fde8ee}
 
-/* desni dio */
-.nb-desno{display:flex;align-items:center;gap:10px;flex:none}
+/* desni dio (uvijek uz desnu ivicu) */
+.nb-desno{display:flex;align-items:center;gap:10px;flex:none;margin-left:auto}
 .nb-desno .btn{white-space:nowrap}
 .nb-odjava-forma{margin:0}
 .nb-portal--aktivan{box-shadow:0 0 0 4px rgba(0,191,154,.22)}
@@ -120,20 +125,44 @@
         max-height:calc(100vh - 76px);overflow:auto;
     }
     .nb.nb-otvoren .nb-meni{display:flex}
-    .nb-link{width:100%;height:48px;justify-content:space-between;font-size:16px}
+    .nb-link{width:100%;height:50px;justify-content:space-between;font-size:16px}
     .nb-aktivan::after{left:14px;transform:none;bottom:8px}
-    /* na mobitelu su podmeniji uvijek otvoreni ispod naslova */
-    .nb-meni .nb-pad{pointer-events:none;color:var(--muted);font-size:12px;letter-spacing:.1em;text-transform:uppercase;height:34px;margin-top:6px}
-    .nb-meni .nb-pad .nb-strelica{display:none}
+
+    /* "O nama" i "Konkurs" rade kao harmonika: dodir otvori/zatvori podmeni */
     .nb-meni .nb-panel{
-        position:static;opacity:1;visibility:visible;transform:none;min-width:0;padding:0;
-        border:0;box-shadow:none;background:none;
+        display:none;position:static;opacity:1;visibility:visible;transform:none;min-width:0;
+        margin:2px 0 6px 10px;padding:4px 0 4px 10px;border:0;border-left:2px solid var(--line);
+        border-radius:0;box-shadow:none;background:none;
     }
+    .nb-meni .nb-drop.otvoren .nb-panel{display:block;transform:none}
     .nb-meni .nb-panel::before{display:none}
+
     .nb-mob{display:flex;gap:10px;margin-top:12px;padding-top:14px;border-top:1px solid var(--line)}
     .nb-mob .btn{flex:1;justify-content:center}
+
+    /* prijavljeni korisnik: njegov meni ide u hamburger, desno ostaje samo hamburger */
+    .nb-desno .nb-korisnik,
+    .nb-desno .admin-chip,
+    .nb-desno > .nb-odjava-forma{display:none}
+    .nb-mob-korisnik{flex-direction:column;align-items:stretch;gap:2px}
+    .nb-mob-ko{display:flex;align-items:center;gap:12px;padding:4px 12px 10px}
+    .nb-mob-ko b{display:block;font-size:16px;color:var(--heading)}
+    .nb-mob-ko small{display:block;font-size:13px;color:var(--muted)}
 }
-@media (max-width:560px){
+
+/* ---------- mobitel: loga lijevo, naziv na sredini, meni desno ---------- */
+@media (max-width:760px){
     .nb-in{padding:0 16px;gap:12px}
     .nb-brand-tekst{display:none}
+    .nb-mob-naziv{
+        display:block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+        max-width:calc(100% - 230px);text-align:center;text-decoration:none;
+        font-weight:800;font-size:15px;line-height:1.2;color:var(--heading);
+    }
+}
+@media (max-width:480px){
+    .nb-logotipi img{width:38px;height:38px}
+}
+@media (max-width:380px){
+    .nb-mob-naziv{font-size:13px;max-width:calc(100% - 200px)}
 }

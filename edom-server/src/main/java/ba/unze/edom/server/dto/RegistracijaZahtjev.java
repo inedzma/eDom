@@ -17,7 +17,6 @@ public record RegistracijaZahtjev(
         @Pattern(regexp = "\\d{13}", message = "JMBG mora imati 13 cifara")
         String jmbg,
 
-        @NotBlank(message = "Broj indeksa je obavezan")
         @Size(max = 20)
         String brojIndeksa,
 
@@ -43,5 +42,10 @@ public record RegistracijaZahtjev(
         @Size(max = 20)
         String imeRoditelja,
         @JakaLozinka
-        String lozinka
+        String lozinka,
+
+        // ... postojeća polja (lozinka i ostalo) ...,
+        @AssertTrue(message = "Morate dati saglasnost za obradu ličnih podataka.")
+        boolean saglasnost
+
 ) {}

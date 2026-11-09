@@ -208,7 +208,7 @@ public class PotrebniDokumentiService {
         }
 
         obavezni.add(obavezan("kucna", "Uvjerenje o zajedničkom domaćinstvu (kućna lista)",
-                "Dokument izvaditi i ovjeriti u nadležnoj općini.",
+                "Dokument izvaditi i ovjeriti kod nadležnog organa.",
                 vrste(poSifri, KUCNA_LISTA)));
 
         int ostalihClanova = brojClanova != null ? brojClanova - 1 : 0;

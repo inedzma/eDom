@@ -142,6 +142,8 @@ public class EvidencijaDetaljiDijalog {
         d.setHeaderText(r.ime() + " " + r.prezime() + "   ·   " + r.sifra());
         d.getDialogPane().setContent(sp);
         d.getDialogPane().getButtonTypes().add(btPrijava);
+        // ugovor i revers imaju smisla tek kad student ima sobu
+        if (moze) d.getDialogPane().getButtonTypes().addAll(btUgovor, btRevers);
         d.getDialogPane().getButtonTypes().add(btSacuvaj);
         d.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
 

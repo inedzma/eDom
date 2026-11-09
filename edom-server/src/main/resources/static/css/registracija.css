@@ -98,3 +98,31 @@
 @media (max-width:600px){
     .grid-2{grid-template-columns:1fr}
 }
+/* ===== na kraj registracija.css ===== */
+.field-hint{display:block;margin-top:6px;font-size:13px;line-height:1.45;color:var(--muted)}
+
+/* ---------- saglasnost ---------- */
+.field.saglasnost{margin:22px 0 6px}
+.field.saglasnost .saglasnost-label{
+    display:flex;align-items:flex-start;gap:14px;margin:0;padding:16px 18px;border-radius:14px;cursor:pointer;
+    background:var(--mint-soft);border:1.5px solid transparent;
+    font-weight:400;font-size:14px;line-height:1.55;color:var(--label);text-transform:none;letter-spacing:0;
+}
+.field.saglasnost .saglasnost-label span{font-weight:400}
+
+/* vlastita kvačica umjesto standardne */
+.field.saglasnost .saglasnost-label input{
+    appearance:none;-webkit-appearance:none;flex:none;
+    width:22px;height:22px;margin:0;border-radius:7px;cursor:pointer;
+    background:#fff;border:2px solid #9fd8c6;transition:background .15s,border-color .15s,box-shadow .15s;
+}
+.field.saglasnost .saglasnost-label input:hover{border-color:var(--mint-dark)}
+.field.saglasnost .saglasnost-label input:focus-visible{box-shadow:0 0 0 4px rgba(0,191,154,.25);outline:none}
+.field.saglasnost .saglasnost-label input:checked{
+    border-color:var(--mint-dark);
+    background:var(--mint-dark) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E") center / 14px no-repeat;
+}
+
+/* greška: nije označeno */
+.field.saglasnost .saglasnost-label:has(input.is-invalid){border-color:#dc2626;background:#fef2f2}
+.field.saglasnost .saglasnost-label input.is-invalid{border-color:#dc2626}

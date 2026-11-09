@@ -3,6 +3,7 @@ package api;
 import ba.unze.edom.common.dto.sobe.*;
 import ba.unze.edom.common.dto.student.NovaNapomenaDTO;
 import ba.unze.edom.common.dto.student.StudentDetaljiDTO;
+import ba.unze.edom.common.dto.student.StudentIzmjenaDTO;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -91,6 +92,10 @@ public final class SobeApi {
 
     public static StudentDetaljiDTO studentDetalji(int idPrijava) {
         return ApiClient.get("/api/sobe/student/" + idPrijava, StudentDetaljiDTO.class);
+    }
+
+    public static StudentDetaljiDTO izmijeniStudenta(int idPrijava, StudentIzmjenaDTO z) {
+        return ApiClient.put("/api/studenti/prijava/" + idPrijava, z, StudentDetaljiDTO.class);
     }
 
     /** Vraća true ako je mail poslan. */

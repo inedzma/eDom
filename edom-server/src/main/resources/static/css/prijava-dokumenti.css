@@ -243,7 +243,18 @@
 
 /* ---------- mobitel ---------- */
 @media (max-width: 640px) {
-    .pd-napredak { flex-basis: 100%; }
+    /* zaglavlje: okvir s brojem prelazi u novi red, ispod naslova */
+    .pd-card-head { flex-wrap: wrap; }
+    .pd-card-naslov { flex: 1 1 calc(100% - 66px); min-width: 0; }
+    .pd-napredak {
+        flex: 1 1 100%;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: baseline;
+        column-gap: 10px;
+        row-gap: 8px;
+    }
+    .pd-traka { grid-column: 1 / -1; }
     .pd-red { padding: 14px; }
     .pd-red-glava { flex-wrap: wrap; row-gap: 8px; }
     .pd-red-tekst { flex: 1 1 calc(100% - 40px); }

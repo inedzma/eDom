@@ -102,7 +102,7 @@
 .us-kreveti i{width:14px;height:24px;border-radius:4px;background:var(--a);opacity:.85}
 
 /* ---------- sadržaji: 4 kolone ---------- */
-.us-sadrzaji{grid-template-columns:repeat(4,1fr)}
+.us-sadrzaji{grid-template-columns:repeat(3,1fr)}
 .us-sadrzaji .jp-usluga:nth-child(7){--a:var(--jp-mint);--a-bg:var(--jp-mint-bg)}
 .us-sadrzaji .jp-usluga:nth-child(8){--a:var(--jp-plava);--a-bg:var(--jp-plava-bg)}
 
@@ -205,3 +205,235 @@ body.uredjivanje .us-faq-odgovor{display:block}
 .uag-savjet{margin-top:12px;font-size:14px;color:var(--muted)}
 .uag-poruka{margin-top:10px;font-weight:700;color:var(--mint-dark)}
 .uag-poruka--greska{color:#dc2626}
+
+/* ---------- video ---------- */
+.us-video{display:grid;grid-template-columns:1fr auto;gap:56px;align-items:center}
+.us-video-okvir{
+    width:267px;height:476px;border-radius:24px;overflow:hidden;
+    background:#0b3c49;box-shadow:0 30px 70px -20px rgba(4,30,38,.45);
+}
+.us-video-okvir iframe{display:block;width:100%;height:100%;border:0}
+.us-video-link{display:inline-flex;align-items:center;gap:8px;font-weight:800;color:var(--mint-dark);text-decoration:none}
+.us-video-link:hover{text-decoration:underline}
+
+/* ---------- cijena obroka ---------- */
+.us-obrok-cijena{
+    align-self:flex-start;margin-top:12px;padding:6px 14px;border-radius:999px;
+    background:rgba(255,255,255,.2);font-weight:800;font-size:17px;
+}
+
+/* ---------- jelovnik ---------- */
+.us-jelovnik{margin-top:32px;padding:26px 28px;border-radius:22px;background:#fff;border:1px solid var(--line)}
+.us-jel-glava{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.us-jel-glava h3{font-size:22px;font-weight:800;color:var(--heading)}
+.us-jel-glava p{color:var(--muted);margin-top:4px}
+.us-jel-tabovi{display:flex;gap:8px}
+.us-jel-tabovi button{
+    padding:9px 18px;border-radius:999px;border:1px solid var(--line);background:#fff;
+    font:inherit;font-weight:800;color:var(--label);cursor:pointer;transition:.15s;
+}
+.us-jel-tabovi button.on{background:var(--teal-900);border-color:var(--teal-900);color:#fff}
+.us-jel-sedmica{display:none}
+.us-jel-sedmica.on,body.uredjivanje .us-jel-sedmica{display:block}
+body.uredjivanje .us-jel-sedmica + .us-jel-sedmica{margin-top:20px}
+.us-jel-tabela{width:100%;border-collapse:collapse}
+.us-jel-tabela th,.us-jel-tabela td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.us-jel-tabela thead th{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.us-jel-tabela thead th:nth-child(2){color:var(--jp-narandz)}
+.us-jel-tabela thead th:nth-child(3){color:var(--jp-plava)}
+.us-jel-tabela tbody th{width:150px;font-weight:800;color:var(--heading)}
+.us-jel-tabela td{color:var(--label);line-height:1.5}
+.us-jel-tabela tbody tr:last-child > *{border-bottom:0}
+.us-jel-napomena{margin-top:16px;padding:14px 16px;border-radius:14px;background:var(--mint-soft);color:var(--label);line-height:1.6}
+
+@media (max-width:1050px){
+    .us-video{grid-template-columns:1fr;justify-items:center;text-align:center}
+}
+@media (max-width:640px){
+    .us-jelovnik{padding:20px 16px}
+    .us-jel-tabela thead{display:none}
+    .us-jel-tabela tr{display:block;padding:12px 0;border-bottom:1px solid var(--line)}
+    .us-jel-tabela tbody tr:last-child{border-bottom:0}
+    .us-jel-tabela th,.us-jel-tabela td{display:block;border:0;padding:4px 0;width:auto}
+    .us-jel-tabela td::before{
+        content:attr(data-label) ": ";font-weight:800;color:var(--heading);
+    }
+}
+/* ---------- video ---------- */
+.us-video{display:grid;grid-template-columns:1fr auto;gap:56px;align-items:center}
+.us-video-okvir{
+    width:267px;height:476px;border-radius:24px;overflow:hidden;
+    background:#0b3c49;box-shadow:0 30px 70px -20px rgba(4,30,38,.45);
+}
+.us-video-okvir iframe{display:block;width:100%;height:100%;border:0}
+.us-video-link{display:inline-flex;align-items:center;gap:8px;font-weight:800;color:var(--mint-dark);text-decoration:none}
+.us-video-link:hover{text-decoration:underline}
+
+/* ---------- cijena obroka ---------- */
+.us-obrok-cijena{
+    align-self:flex-start;margin-top:12px;padding:6px 14px;border-radius:999px;
+    background:rgba(255,255,255,.2);font-weight:800;font-size:17px;
+}
+
+/* ---------- jelovnik ---------- */
+.us-jelovnik{margin-top:32px;padding:26px 28px;border-radius:22px;background:#fff;border:1px solid var(--line)}
+.us-jel-glava{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.us-jel-glava h3{font-size:22px;font-weight:800;color:var(--heading)}
+.us-jel-glava p{color:var(--muted);margin-top:4px}
+.us-jel-tabovi{display:flex;gap:8px}
+.us-jel-tabovi button{
+    padding:9px 18px;border-radius:999px;border:1px solid var(--line);background:#fff;
+    font:inherit;font-weight:800;color:var(--label);cursor:pointer;transition:.15s;
+}
+.us-jel-tabovi button.on{background:var(--teal-900);border-color:var(--teal-900);color:#fff}
+.us-jel-sedmica{display:none}
+.us-jel-sedmica.on,body.uredjivanje .us-jel-sedmica{display:block}
+body.uredjivanje .us-jel-sedmica + .us-jel-sedmica{margin-top:20px}
+.us-jel-tabela{width:100%;border-collapse:collapse}
+.us-jel-tabela th,.us-jel-tabela td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.us-jel-tabela thead th{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.us-jel-tabela thead th:nth-child(2){color:var(--jp-narandz)}
+.us-jel-tabela thead th:nth-child(3){color:var(--jp-plava)}
+.us-jel-tabela tbody th{width:150px;font-weight:800;color:var(--heading)}
+.us-jel-tabela td{color:var(--label);line-height:1.5}
+.us-jel-tabela tbody tr:last-child > *{border-bottom:0}
+.us-jel-napomena{margin-top:16px;padding:14px 16px;border-radius:14px;background:var(--mint-soft);color:var(--label);line-height:1.6}
+
+@media (max-width:1050px){
+    .us-video{grid-template-columns:1fr;justify-items:center;text-align:center}
+}
+@media (max-width:640px){
+    .us-jelovnik{padding:20px 16px}
+    .us-jel-tabela thead{display:none}
+    .us-jel-tabela tr{display:block;padding:12px 0;border-bottom:1px solid var(--line)}
+    .us-jel-tabela tbody tr:last-child{border-bottom:0}
+    .us-jel-tabela th,.us-jel-tabela td{display:block;border:0;padding:4px 0;width:auto}
+    .us-jel-tabela td::before{
+        content:attr(data-label) ": ";font-weight:800;color:var(--heading);
+    }
+}
+
+/* ---------- zaglavlje s fotografijom ---------- */
+.us-hero{
+    background:
+            linear-gradient(100deg, rgba(5,36,46,.94) 0%, rgba(5,36,46,.82) 50%, rgba(5,36,46,.45) 100%),
+            url('/img/dom-zajednicki-prostor.jpg') center 60% / cover no-repeat;
+}
+
+/* ---------- video ---------- */
+.us-video{display:grid;grid-template-columns:1fr auto;gap:56px;align-items:center}
+.us-video-okvir{
+    width:267px;height:476px;border-radius:24px;overflow:hidden;
+    background:#0b3c49;box-shadow:0 30px 70px -20px rgba(4,30,38,.45);
+}
+.us-video-okvir iframe{display:block;width:100%;height:100%;border:0}
+.us-video-link{display:inline-flex;align-items:center;gap:8px;font-weight:800;color:var(--mint-dark);text-decoration:none}
+.us-video-link:hover{text-decoration:underline}
+
+/* ---------- cijena obroka ---------- */
+.us-obrok-cijena{
+    align-self:flex-start;margin-top:12px;padding:6px 14px;border-radius:999px;
+    background:rgba(255,255,255,.2);font-weight:800;font-size:17px;
+}
+
+/* ---------- jelovnik ---------- */
+.us-jelovnik{margin-top:32px;padding:26px 28px;border-radius:22px;background:#fff;border:1px solid var(--line)}
+.us-jel-glava{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.us-jel-glava h3{font-size:22px;font-weight:800;color:var(--heading)}
+.us-jel-glava p{color:var(--muted);margin-top:4px}
+.us-jel-tabovi{display:flex;gap:8px}
+.us-jel-tabovi button{
+    padding:9px 18px;border-radius:999px;border:1px solid var(--line);background:#fff;
+    font:inherit;font-weight:800;color:var(--label);cursor:pointer;transition:.15s;
+}
+.us-jel-tabovi button.on{background:var(--teal-900);border-color:var(--teal-900);color:#fff}
+.us-jel-sedmica{display:none}
+.us-jel-sedmica.on,body.uredjivanje .us-jel-sedmica{display:block}
+body.uredjivanje .us-jel-sedmica + .us-jel-sedmica{margin-top:20px}
+.us-jel-tabela{width:100%;border-collapse:collapse}
+.us-jel-tabela th,.us-jel-tabela td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.us-jel-tabela thead th{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.us-jel-tabela thead th:nth-child(2){color:var(--jp-narandz)}
+.us-jel-tabela thead th:nth-child(3){color:var(--jp-plava)}
+.us-jel-tabela tbody th{width:150px;font-weight:800;color:var(--heading)}
+.us-jel-tabela td{color:var(--label);line-height:1.5}
+.us-jel-tabela tbody tr:last-child > *{border-bottom:0}
+.us-jel-napomena{margin-top:16px;padding:14px 16px;border-radius:14px;background:var(--mint-soft);color:var(--label);line-height:1.6}
+
+@media (max-width:1050px){
+    .us-video{grid-template-columns:1fr;justify-items:center;text-align:center}
+}
+@media (max-width:640px){
+    .us-jelovnik{padding:20px 16px}
+    .us-jel-tabela thead{display:none}
+    .us-jel-tabela tr{display:block;padding:12px 0;border-bottom:1px solid var(--line)}
+    .us-jel-tabela tbody tr:last-child{border-bottom:0}
+    .us-jel-tabela th,.us-jel-tabela td{display:block;border:0;padding:4px 0;width:auto}
+    .us-jel-tabela td::before{
+        content:attr(data-label) ": ";font-weight:800;color:var(--heading);
+    }
+}
+
+/* ---------- zaglavlje s fotografijom ---------- */
+.us-hero{
+    background:
+            linear-gradient(100deg, rgba(5,36,46,.94) 0%, rgba(5,36,46,.82) 50%, rgba(5,36,46,.45) 100%),
+            url('/img/dom-zajednicki-prostor.jpg') center 60% / cover no-repeat;
+}
+
+/* ---------- cijena ---------- */
+.us-cijena{
+    display:grid;grid-template-columns:auto 1fr;gap:48px;align-items:center;
+    padding:36px 40px;border-radius:28px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);
+}
+.us-cijena-iznos{
+    position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;
+    min-width:240px;padding:30px 32px;border-radius:24px;color:#fff;
+    background:linear-gradient(150deg,#00a884,#0b5d6b);
+}
+.us-cijena-iznos::after{
+    content:"";position:absolute;right:-50px;bottom:-50px;width:170px;height:170px;border-radius:50%;
+    background:rgba(255,255,255,.1);
+}
+.us-cijena-oznaka{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#bff3e3}
+.us-cijena-iznos b{font-size:clamp(44px,5vw,60px);font-weight:800;line-height:1.05;margin:6px 0}
+.us-cijena-iznos span:last-child{color:rgba(255,255,255,.88)}
+.us-cijena-tekst h2{font-size:clamp(24px,2.6vw,32px);font-weight:800;color:var(--heading)}
+.us-cijena-tekst .jp-lead{margin:10px 0 18px}
+.us-cijena-lista{list-style:none;display:grid;gap:12px}
+.us-cijena-lista li{display:flex;align-items:flex-start;gap:12px;color:var(--label);font-size:16px;line-height:1.5}
+.us-cijena-kv{
+    flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+    color:var(--mint-dark);background:var(--mint-soft);
+}
+
+/* ---------- sobe: klik otvara fotografiju ---------- */
+.us-soba--klik{cursor:pointer}
+.us-soba--klik:focus-visible{outline:3px solid rgba(0,191,154,.5);outline-offset:2px}
+.us-soba-pogledaj{
+    display:inline-flex;align-items:center;gap:6px;margin-top:8px;
+    font-size:14px;font-weight:800;color:var(--a);
+}
+body.uredjivanje .us-soba--klik{cursor:text}
+
+.us-soba-dijalog{
+    border:0;padding:0;border-radius:22px;overflow:hidden;background:#0b3c49;
+    width:min(560px,92vw);box-shadow:0 40px 90px rgba(0,0,0,.45);
+}
+.us-soba-dijalog::backdrop{background:rgba(4,30,38,.7);backdrop-filter:blur(3px)}
+.us-soba-dijalog img{display:block;width:100%;height:auto}
+.us-sd-prazno{
+    display:grid;place-items:center;gap:10px;min-height:300px;color:#cfe3e7;
+    background:linear-gradient(150deg,#0b5d6b,#063943);
+}
+.us-sd-prazno[hidden]{display:none}
+.us-sd-naslov{padding:14px 20px;color:#fff;font-weight:800;font-size:18px}
+.us-sd-zatvori{
+    position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:50%;border:0;cursor:pointer;
+    display:grid;place-items:center;color:var(--teal-900);background:rgba(255,255,255,.92);
+}
+
+@media (max-width:900px){
+    .us-cijena{grid-template-columns:1fr;padding:24px;gap:26px}
+    .us-cijena-iznos{min-width:0}
+}

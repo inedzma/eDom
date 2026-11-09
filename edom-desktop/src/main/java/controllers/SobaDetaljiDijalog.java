@@ -60,6 +60,9 @@ final class SobaDetaljiDijalog {
             sadrzaj.getChildren().add(naslov("Dodaj studenta"));
             ComboBox<StudentBezSobeDTO> cmb = new ComboBox<>();
             cmb.setPromptText("Učitavam odobrene bez sobe…");
+            // lista zauzme ostatak reda, ali smije biti uža od teksta studenta
+            cmb.setMinWidth(0);
+            cmb.setPrefWidth(200);
             cmb.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(cmb, Priority.ALWAYS);
             cmb.setCellFactory(c -> studentCell());
@@ -73,9 +76,11 @@ final class SobaDetaljiDijalog {
             });
             Button detalji = new Button("Detalji");
             detalji.getStyleClass().add("sobe-btn");
+            detalji.setTooltip(new Tooltip("Pregled prijave odabranog studenta"));
             detalji.setOnAction(e -> {
                 if (cmb.getValue() != null) StudentDetaljiDijalog.otvori(cmb.getValue().idPrijava());
             });
+            punaSirina(detalji, dodaj);
             HBox red = new HBox(10, cmb, detalji, dodaj);
             red.setAlignment(Pos.CENTER_LEFT);
             sadrzaj.getChildren().add(red);
@@ -109,6 +114,8 @@ final class SobaDetaljiDijalog {
                 }
                 akcija.izvrsi(() -> SobeApi.postaviAktivna(s.idSoba(), aktivna.isSelected(), napomena.getText()));
             });
+            punaSirina(aktivna, sacuvaj);
+            napomena.setMinWidth(0);
             HBox red = new HBox(10, aktivna, napomena, sacuvaj);
             red.setAlignment(Pos.CENTER_LEFT);
             sadrzaj.getChildren().add(red);
@@ -220,7 +227,10 @@ final class SobaDetaljiDijalog {
             }
         });
         dugmad.add(oznaka);
-
+        dugmad.stream()
+                .filter(n -> n instanceof Button)
+                .forEach(n -> punaSirina((Button) n));
+        oznaka.setMinWidth(130);
         HBox red = new HBox(8);
         red.getChildren().addAll(dugmad);
         red.setAlignment(Pos.CENTER_LEFT);
@@ -316,5 +326,9 @@ final class SobaDetaljiDijalog {
                 }
             }
         };
+    }
+    /** Dugme (ili checkbox) nikad ne smije biti uže od svog teksta. */
+    private static void punaSirina(Control... kontrole) {
+        for (Control c : kontrole) c.setMinWidth(Region.USE_PREF_SIZE);
     }
 }

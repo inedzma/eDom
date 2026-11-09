@@ -77,8 +77,9 @@
                     <h3 class="section-title">Studij</h3>
                     <div class="grid-2">
                         <div class="field">
-                            <label for="brojIndeksa">Broj indeksa</label>
+                            <label for="brojIndeksa">Broj indeksa <span class="opt">(ako ga već imate)</span></label>
                             <div class="input"><input type="text" th:field="*{brojIndeksa}" th:errorclass="is-invalid" placeholder="npr. 123/23"></div>
+                            <small class="field-hint">Brucoši koji još nisu dobili indeks ostavljaju prazno.</small>
                             <span class="field-err" th:if="${#fields.hasErrors('brojIndeksa')}" th:errors="*{brojIndeksa}"></span>
                         </div>
                         <div class="field">
@@ -99,8 +100,10 @@
                                 <select th:field="*{fakultet}" th:errorclass="is-invalid">
                                     <option value="">Odaberite fakultet</option>
                                     <option th:each="f : ${fakulteti}" th:value="${f}" th:text="${f}">Politehnički fakultet UNZE</option>
+                                    <option value="Drugo">Drugo / još nije poznato</option>
                                 </select>
                             </div>
+                            <small class="field-hint">Odaberite <b>Drugo</b> ako još ne znate na koji ćete fakultet biti upisani, npr. ako kao brucoš čekate rezultate prijemnog.</small>
                             <span class="field-err" th:if="${#fields.hasErrors('fakultet')}" th:errors="*{fakultet}"></span>
                         </div>
                     </div>
@@ -142,6 +145,16 @@
                                 <li data-rule="special">Poseban znak</li>
                             </ul>
                         </div>
+                    </div>
+
+                    <!-- ============ SAGLASNOST ============ -->
+                    <div class="field saglasnost">
+                        <label class="saglasnost-label">
+                            <input type="checkbox" th:field="*{saglasnost}" th:errorclass="is-invalid" required>
+                            <span>Saglasan/na sam da Studentski centar Univerziteta u Zenici obrađuje moje lične podatke
+                                u svrhu prijave na konkurs za smještaj i ishranu, u skladu sa Zakonom o zaštiti ličnih podataka.</span>
+                        </label>
+                        <span class="field-err" th:if="${#fields.hasErrors('saglasnost')}" th:errors="*{saglasnost}"></span>
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-login" id="submitBtn">Registruj se</button>

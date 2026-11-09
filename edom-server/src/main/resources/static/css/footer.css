@@ -77,3 +77,5 @@ body.uredjivanje .ft-uredi-linkove{display:grid;gap:6px}
     .ft-wrap{padding:0 16px}
     .ft-grid{grid-template-columns:1fr;padding-top:40px}
 }
+.ft-logotipi{display:flex;align-items:center;gap:8px;flex:none}
+.ft-logotipi img{width:48px;height:48px;object-fit:contain;background:#fff;border-radius:50%;padding:3px}

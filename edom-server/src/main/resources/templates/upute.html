@@ -36,10 +36,6 @@
                     <span>mjesta za smještaj i ishranu</span>
                 </li>
                 <li>
-                    <b th:text="'do ' + ${postavke.udioBrucosaPosto} + '%'">do 35%</b>
-                    <span>mjesta za brucoše</span>
-                </li>
-                <li>
                     <b th:text="${postavke.minUdaljenostKm} + ' km'">20 km</b>
                     <span>najmanja udaljenost prebivališta od Zenice</span>
                 </li>
@@ -181,7 +177,7 @@
                 <div class="up-progress" aria-live="polite">
                     <span id="up-progress-text">0 / 6 obaveznih dokumenata</span>
                     <div class="up-progress-track"><div class="up-progress-bar" id="up-progress-bar"></div></div>
-                    <button type="button" class="btn btn-outline btn-sm up-print" onclick="window.print()">Isprintaj spisak</button>
+                    <button type="button" class="btn btn-ghost btn-sm up-print" onclick="window.print()">Isprintaj spisak</button>
                 </div>
             </div>
 
@@ -364,7 +360,7 @@
                 </div>
                 <div class="up-cta-actions">
                     <a class="btn btn-primary btn-lg" th:href="@{/registracija}">Registruj se</a>
-                    <a class="btn btn-outline btn-lg" th:href="@{/login}">Već imam nalog</a>
+                    <a class="btn btn-ghost btn-lg" th:href="@{/login}">Već imam nalog</a>
                 </div>
             </div>
 

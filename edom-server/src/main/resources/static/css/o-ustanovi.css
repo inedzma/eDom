@@ -131,3 +131,9 @@
     .ou-lok-kartice{grid-template-columns:1fr}
     .ou-mv-kartica{padding:24px}
 }
+/* ---------- zaglavlje s fotografijom ulaza ---------- */
+.ou-hero{
+    background:
+            linear-gradient(100deg, rgba(5,36,46,.92) 0%, rgba(5,36,46,.72) 50%, rgba(5,36,46,.30) 100%),
+            url('/img/dom-ulaz.jpg') 30% center / cover no-repeat;
+}

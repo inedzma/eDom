@@ -27,7 +27,7 @@
     </th:block>
 
     <!-- ======================= HERO ======================= -->
-    <section class="jp-hero">
+    <section class="jp-hero jp-hero--foto">
         <div class="jp-wrap jp-hero-in">
             <div class="jp-hero-tekst">
                 <span class="jp-status" th:classappend="${konkurs.otvoren} ? 'jp-status--da' : 'jp-status--ne'">
@@ -45,28 +45,10 @@
                        data-uredi="pocetna.hero.dugme" th:text="${t['pocetna.hero.dugme']} ?: _">Prijavi se na konkurs</a>
                     <a class="btn btn-outline btn-lg" th:href="@{/upute}">Kako se prijaviti</a>
                 </div>
-                <p class="jp-hero-login">Već imaš nalog? <a th:href="@{/login}">Prijavi se</a> i nastavi svoju prijavu.</p>
+                <p class="jp-hero-login">Već imaš nalog? <a th:href="@{/login}">Prijavi se</a> i nastavi svoju prijavu.
+                    <span class="jp-hero-rang">· <a th:href="@{/rang-lista}">Pogledaj rang listu</a></span></p>
             </div>
 
-            <aside class="jp-hero-kartica">
-                <div class="jp-hk-vrh">
-                    <img th:src="@{/img/studentski-centar-logo.png}" alt="">
-                    <div>
-                        <b th:text="'Konkurs ' + ${konkurs.godina}">Konkurs 2026/2027</b>
-                        <span th:text="${konkurs.status}">Prijave su otvorene.</span>
-                    </div>
-                </div>
-                <ul class="jp-hk-lista">
-                    <li><span>Mjesta u domu</span><b th:text="${postavke.kapacitet}">220</b></li>
-                    <li><span>Za brucoše</span><b th:text="'do ' + ${postavke.udioBrucosaPosto} + '%'">do 35%</b></li>
-                    <li><span>Prebivalište od Zenice</span><b th:text="'najmanje ' + ${postavke.minUdaljenostKm} + ' km'">najmanje 20 km</b></li>
-                    <li><span>Prijava</span><b>online</b></li>
-                </ul>
-                <a class="jp-hk-link" th:href="@{/rang-lista}">
-                    Pogledaj rang listu
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-                </a>
-            </aside>
         </div>
     </section>
 
@@ -89,88 +71,6 @@
                 <b data-uredi="pocetna.broj4.broj" th:text="${t['pocetna.broj4.broj']} ?: _">1977.</b>
                 <span data-uredi="pocetna.broj4.opis" th:text="${t['pocetna.broj4.opis']} ?: _">od kada dom radi za studente</span>
             </div>
-        </div>
-    </section>
-
-    <!-- ======================= ŠTA DOBIJAŠ ======================= -->
-    <section class="jp-sekcija" id="usluge">
-        <div class="jp-wrap">
-            <span class="jp-eyebrow">Život u domu</span>
-            <h2 data-uredi="pocetna.usluge.naslov" th:text="${t['pocetna.usluge.naslov']} ?: _">Sve što ti treba, na jednom mjestu</h2>
-            <p class="jp-lead" data-uredi="pocetna.usluge.opis" data-uredi-vise
-               th:text="${t['pocetna.usluge.opis']} ?: _">Dom je u naselju Crkvice, nekoliko minuta od fakulteta. Uz smještaj i ishranu, studentima su na raspolaganju prostori za učenje, druženje i odmor, kao i prostor za vjerske aktivnosti.</p>
-
-            <div class="jp-usluge">
-                <article class="jp-usluga">
-                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6M2 18h20"/></svg></span>
-                    <h3 data-uredi="pocetna.u1.naslov" th:text="${t['pocetna.u1.naslov']} ?: _">Soba s kupatilom</h3>
-                    <p data-uredi="pocetna.u1.opis" data-uredi-vise th:text="${t['pocetna.u1.opis']} ?: _">Dvokrevetne i trokrevetne sobe, svaka s vlastitim kupatilom.</p>
-                </article>
-                <article class="jp-usluga">
-                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7a3 3 0 0 0 6 0V2M6 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6a2 2 0 0 0 2 2h3zm0 0v7"/></svg></span>
-                    <h3 data-uredi="pocetna.u2.naslov" th:text="${t['pocetna.u2.naslov']} ?: _">Restoran: ručak i večera</h3>
-                    <p data-uredi="pocetna.u2.opis" data-uredi-vise th:text="${t['pocetna.u2.opis']} ?: _">Topli obroci svaki dan u restoranu doma s vlastitom kuhinjom.</p>
-                </article>
-                <article class="jp-usluga">
-                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span>
-                    <h3 data-uredi="pocetna.u3.naslov" th:text="${t['pocetna.u3.naslov']} ?: _">Čitaonica i biblioteka</h3>
-                    <p data-uredi="pocetna.u3.opis" data-uredi-vise th:text="${t['pocetna.u3.opis']} ?: _">Mirno mjesto za učenje i pripremu ispita, bez odlaska iz doma.</p>
-                </article>
-                <article class="jp-usluga">
-                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
-                    <h3 data-uredi="pocetna.u4.naslov" th:text="${t['pocetna.u4.naslov']} ?: _">Multimedijalni centar</h3>
-                    <p data-uredi="pocetna.u4.opis" data-uredi-vise th:text="${t['pocetna.u4.opis']} ?: _">Računari, edukativni prostor i mjesto za radionice i predavanja.</p>
-                </article>
-                <article class="jp-usluga">
-                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg></span>
-                    <h3 data-uredi="pocetna.u5.naslov" th:text="${t['pocetna.u5.naslov']} ?: _">Fitness sala</h3>
-                    <p data-uredi="pocetna.u5.opis" data-uredi-vise th:text="${t['pocetna.u5.opis']} ?: _">Trening u istoj zgradi, a u blizini su i sportski tereni i ljetni bazeni.</p>
-                </article>
-                <article class="jp-usluga">
-                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M7 6h.01M10 6h.01"/></svg></span>
-                    <h3 data-uredi="pocetna.u6.naslov" th:text="${t['pocetna.u6.naslov']} ?: _">Vešeraj</h3>
-                    <p data-uredi="pocetna.u6.opis" data-uredi-vise th:text="${t['pocetna.u6.opis']} ?: _">Pranje veša u domu, bez traženja perionice po gradu.</p>
-                </article>
-            </div>
-
-            <div class="jp-cijena">
-                <div>
-                    <h3 data-uredi="pocetna.cijena.naslov" th:text="${t['pocetna.cijena.naslov']} ?: _">Koliko košta?</h3>
-                    <p data-uredi="pocetna.cijena.opis" data-uredi-vise th:text="${t['pocetna.cijena.opis']} ?: _">Dio troškova smještaja i ishrane subvencioniše kanton, a student mjesečno plaća ostatak. Tačan iznos i uputa za uplatu objavljuju se uz konkurs.</p>
-                </div>
-                <a class="btn btn-primary" th:href="@{/upute}">Uslovi i dokumenti →</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- ======================= KORACI ======================= -->
-    <section class="jp-sekcija jp-sekcija--tonirana" id="postupak">
-        <div class="jp-wrap">
-            <span class="jp-eyebrow">Prijava</span>
-            <h2 data-uredi="pocetna.koraci.naslov" th:text="${t['pocetna.koraci.naslov']} ?: _">Do mjesta u domu u 4 koraka</h2>
-
-            <ol class="jp-koraci">
-                <li class="jp-korak">
-                    <span class="jp-korak-br">1</span>
-                    <h3 data-uredi="pocetna.k1.naslov" th:text="${t['pocetna.k1.naslov']} ?: _">Napravi nalog</h3>
-                    <p data-uredi="pocetna.k1.opis" data-uredi-vise th:text="${t['pocetna.k1.opis']} ?: _">Registracija traje minut — treba ti samo e-mail i osnovni podaci.</p>
-                </li>
-                <li class="jp-korak">
-                    <span class="jp-korak-br">2</span>
-                    <h3 data-uredi="pocetna.k2.naslov" th:text="${t['pocetna.k2.naslov']} ?: _">Popuni prijavu online</h3>
-                    <p data-uredi="pocetna.k2.opis" data-uredi-vise th:text="${t['pocetna.k2.opis']} ?: _">Unesi podatke o studiju, uspjehu i porodici i priloži skenirane dokumente.</p>
-                </li>
-                <li class="jp-korak">
-                    <span class="jp-korak-br">3</span>
-                    <h3 data-uredi="pocetna.k3.naslov" th:text="${t['pocetna.k3.naslov']} ?: _">Dostavi originale</h3>
-                    <p data-uredi="pocetna.k3.opis" data-uredi-vise th:text="${t['pocetna.k3.opis']} ?: _">Odštampaj prijavni obrazac, potpiši ga i s dokumentima pošalji poštom ili donesi lično.</p>
-                </li>
-                <li class="jp-korak">
-                    <span class="jp-korak-br">4</span>
-                    <h3 data-uredi="pocetna.k4.naslov" th:text="${t['pocetna.k4.naslov']} ?: _">Prati rang listu i useli se</h3>
-                    <p data-uredi="pocetna.k4.opis" data-uredi-vise th:text="${t['pocetna.k4.opis']} ?: _">Svoje mjesto na listi pronađi po šifri. Primljeni dobijaju termin useljenja.</p>
-                </li>
-            </ol>
         </div>
     </section>
 
@@ -207,12 +107,26 @@
                 <!-- obavještenja: admin mijenja; "-" u naslovu = sakrij -->
                 <!-- zadnja 3 obavještenja (admin ih dodaje na stranici Obavještenja) -->
                 <div class="jp-obavjestenja">
-                    <a class="jp-obav jp-obav--link" th:each="o : ${zadnjaObavjestenja}"
+                    <a class="jp-obav jp-obav--link jp-obav--slika" th:each="o : ${zadnjaObavjestenja}"
                        th:href="@{/obavjestenja}+'#o-'+${o.id}">
-                        <span class="jp-obav-datum" th:text="${o.datumTekst()}">13.10.2026.</span>
-                        <span class="jp-obav-vazno" th:if="${o.vazno}">Važno</span>
-                        <h3 th:text="${o.naslov}">Naslov</h3>
-                        <p th:if="${!#strings.isEmpty(o.tekst)}" th:text="${o.tekst}">Tekst</p>
+
+                        <!-- sličica: fotografija iz priloga ili obojeno polje s ikonom -->
+                        <span class="jp-obav-sl"
+                              th:classappend="${o.prilogSlika()} ? '' : ('jp-obav-sl--prazno jp-obav-sl--' + ${o.filter()} + (${o.vazno} ? ' jp-obav-sl--vazno' : ''))">
+                            <img th:if="${o.prilogSlika()}" th:src="@{${o.prilogUrl()}}" th:alt="${o.naslov}" loading="lazy" width="116" height="116">
+                            <th:block th:unless="${o.prilogSlika()}">
+                                <svg th:if="${o.filter() == 'aktuelnost'}" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+                                <svg th:unless="${o.filter() == 'aktuelnost'}" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+                            </th:block>
+                            <small class="jp-obav-pdf" th:if="${o.imaPrilog() and !o.prilogSlika()}">PDF</small>
+                        </span>
+
+                        <span class="jp-obav-tijelo">
+                            <span class="jp-obav-datum" th:text="${o.datumTekst()}">13.10.2026.</span>
+                            <span class="jp-obav-vazno" th:if="${o.vazno}">Važno</span>
+                            <h3 th:text="${o.naslov}">Naslov</h3>
+                            <p th:if="${!#strings.isEmpty(o.tekst)}" th:text="${o.tekst}">Tekst</p>
+                        </span>
                     </a>
 
                     <div class="jp-obav jp-obav--prazno" th:if="${#lists.isEmpty(zadnjaObavjestenja)}">
@@ -223,6 +137,90 @@
                     <a class="jp-sva-obav" th:href="@{/obavjestenja}">Sva obavještenja →</a>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- ======================= ŠTA DOBIJAŠ ======================= -->
+    <section class="jp-sekcija jp-sekcija--tonirana" id="usluge">
+        <div class="jp-wrap">
+            <span class="jp-eyebrow">Život u domu</span>
+            <h2 data-uredi="pocetna.usluge.naslov" th:text="${t['pocetna.usluge.naslov']} ?: _">Sve što ti treba, na jednom mjestu</h2>
+            <p class="jp-lead" data-uredi="pocetna.usluge.opis" data-uredi-vise
+               th:text="${t['pocetna.usluge.opis']} ?: _">Dom je u naselju Crkvice, nekoliko minuta od fakulteta. Uz smještaj i ishranu, studentima su na raspolaganju prostori za učenje, druženje i odmor, kao i prostor za vjerske aktivnosti.</p>
+
+            <div class="jp-usluge">
+                <article class="jp-usluga">
+                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6M2 18h20"/></svg></span>
+                    <h3 data-uredi="pocetna.u1.naslov" th:text="${t['pocetna.u1.naslov']} ?: _">Soba s kupatilom</h3>
+                    <p data-uredi="pocetna.u1.opis" data-uredi-vise th:text="${t['pocetna.u1.opis']} ?: _">Dvokrevetne i trokrevetne sobe, svaka s vlastitim kupatilom.</p>
+                </article>
+                <article class="jp-usluga">
+                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7a3 3 0 0 0 6 0V2M6 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6a2 2 0 0 0 2 2h3zm0 0v7"/></svg></span>
+                    <h3 data-uredi="pocetna.u2.naslov" th:text="${t['pocetna.u2.naslov']} ?: _">Restoran: ručak i večera</h3>
+                    <p data-uredi="pocetna.u2.opis" data-uredi-vise th:text="${t['pocetna.u2.opis']} ?: _">Topli obroci radnim danima, po sedmičnom jelovniku.</p>
+                </article>
+                <article class="jp-usluga">
+                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span>
+                    <h3 data-uredi="pocetna.u3.naslov" th:text="${t['pocetna.u3.naslov']} ?: _">Čitaonica i biblioteka</h3>
+                    <p data-uredi="pocetna.u3.opis" data-uredi-vise th:text="${t['pocetna.u3.opis']} ?: _">Mirno mjesto za učenje i pripremu ispita, bez odlaska iz doma.</p>
+                </article>
+                <article class="jp-usluga">
+                    <span class="jp-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg></span>
+                    <h3 data-uredi="pocetna.u5.naslov" th:text="${t['pocetna.u5.naslov']} ?: _">Fitness sala</h3>
+                    <p data-uredi="pocetna.u5.opis" data-uredi-vise th:text="${t['pocetna.u5.opis']} ?: _">Trening u istoj zgradi, a u blizini su i sportski tereni i ljetni bazeni.</p>
+                </article>
+            </div>
+
+            <!-- fotografije doma (fiksne, u static/img) -->
+            <div class="jp-foto-mozaik">
+                <figure class="jp-foto jp-foto--velika">
+                    <img th:src="@{/img/dom-zajednicki-prostor.jpg}" alt="Zajednički prostor u studentskom domu" loading="lazy">
+                    <figcaption data-uredi="pocetna.foto1" th:text="${t['pocetna.foto1']} ?: _">Zajednički prostor za odmor i druženje</figcaption>
+                </figure>
+                <figure class="jp-foto">
+                    <img th:src="@{/img/dom-sala-igre.jpg}" alt="Sala sa stolom za stoni tenis i bilijarom" loading="lazy">
+                    <figcaption data-uredi="pocetna.foto2" th:text="${t['pocetna.foto2']} ?: _">Stoni tenis i bilijar</figcaption>
+                </figure>
+            </div>
+
+            <div class="jp-cijena">
+                <div>
+                    <h3 data-uredi="pocetna.cijena.naslov" th:text="${t['pocetna.cijena.naslov']} ?: _">Koliko košta?</h3>
+                    <p data-uredi="pocetna.cijena.opis" data-uredi-vise th:text="${t['pocetna.cijena.opis']} ?: _">Student plaća 165 KM mjesečno, a za to dobija smještaj i karticu za ishranu s oko 220 KM. Većinu troškova pokriva kanton iz kojeg dolaziš.</p>
+                </div>
+                <a class="btn btn-primary" th:href="@{/usluge}+'#cijena'">Šta je uključeno →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= KORACI ======================= -->
+    <section class="jp-sekcija" id="postupak">
+        <div class="jp-wrap">
+            <span class="jp-eyebrow">Prijava</span>
+            <h2 data-uredi="pocetna.koraci.naslov" th:text="${t['pocetna.koraci.naslov']} ?: _">Do mjesta u domu u 4 koraka</h2>
+
+            <ol class="jp-koraci">
+                <li class="jp-korak">
+                    <span class="jp-korak-br">1</span>
+                    <h3 data-uredi="pocetna.k1.naslov" th:text="${t['pocetna.k1.naslov']} ?: _">Napravi nalog</h3>
+                    <p data-uredi="pocetna.k1.opis" data-uredi-vise th:text="${t['pocetna.k1.opis']} ?: _">Registracija traje minut — treba ti samo e-mail i osnovni podaci.</p>
+                </li>
+                <li class="jp-korak">
+                    <span class="jp-korak-br">2</span>
+                    <h3 data-uredi="pocetna.k2.naslov" th:text="${t['pocetna.k2.naslov']} ?: _">Popuni prijavu online</h3>
+                    <p data-uredi="pocetna.k2.opis" data-uredi-vise th:text="${t['pocetna.k2.opis']} ?: _">Unesi podatke o studiju, uspjehu i porodici i priloži skenirane dokumente.</p>
+                </li>
+                <li class="jp-korak">
+                    <span class="jp-korak-br">3</span>
+                    <h3 data-uredi="pocetna.k3.naslov" th:text="${t['pocetna.k3.naslov']} ?: _">Dostavi originale</h3>
+                    <p data-uredi="pocetna.k3.opis" data-uredi-vise th:text="${t['pocetna.k3.opis']} ?: _">Odštampaj prijavni obrazac, potpiši ga i s dokumentima pošalji poštom ili donesi lično.</p>
+                </li>
+                <li class="jp-korak">
+                    <span class="jp-korak-br">4</span>
+                    <h3 data-uredi="pocetna.k4.naslov" th:text="${t['pocetna.k4.naslov']} ?: _">Prati rang listu i useli se</h3>
+                    <p data-uredi="pocetna.k4.opis" data-uredi-vise th:text="${t['pocetna.k4.opis']} ?: _">Svoje mjesto na listi pronađi po šifri. Primljeni dobijaju termin useljenja.</p>
+                </li>
+            </ol>
         </div>
     </section>
 
@@ -272,10 +270,10 @@
                         <div><small>Telefon / fax</small>
                             <a th:href="'tel:' + ${#strings.replace(tel, ' ', '')}"><b data-uredi="pocetna.kontakt.telefon" th:text="${tel}">032 226 604</b></a></div>
                     </li>
-                    <li th:with="mail=${t['pocetna.kontakt.email']} ?: 'tehnickisekretar.sc@unze.ba'">
+                    <li th:with="mail=${t['pocetna.kontakt.email']} ?: 'studentski.centar@unze.ba'">
                         <span class="jp-ic jp-ic--malo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></span>
                         <div><small>E-mail</small>
-                            <a th:href="'mailto:' + ${mail}"><b data-uredi="pocetna.kontakt.email" th:text="${mail}">tehnickisekretar.sc@unze.ba</b></a></div>
+                            <a th:href="'mailto:' + ${mail}"><b data-uredi="pocetna.kontakt.email" th:text="${mail}">studentski.centar@unze.ba</b></a></div>
                     </li>
                 </ul>
             </div>
@@ -287,5 +285,53 @@
 
 <th:block th:replace="~{fragments/layout :: toasts}"></th:block>
 <th:block th:replace="~{fragments/layout :: urednik}"></th:block>
+<script>
+    /* ---------- animacije početne (isključene ako korisnik traži manje pokreta) ---------- */
+    (function () {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (!('IntersectionObserver' in window)) return;
+
+        /* elementi koji se pojavljuju pri skrolanju */
+        var grupe = ['.jp-broj', '.jp-auto-kartica', '.jp-obav', '.jp-usluga', '.jp-foto',
+            '.jp-cijena', '.jp-korak', '.jp-lokacija > *', '.jp-kontakt'];
+        var el = document.querySelectorAll(grupe.join(','));
+        el.forEach(function (e) {
+            var braca = Array.prototype.indexOf.call(e.parentElement.children, e);
+            e.classList.add('jp-anim');
+            e.style.transitionDelay = Math.min(braca, 5) * 80 + 'ms';
+        });
+
+        /* brojevi "broje" do svoje vrijednosti (samo cijeli brojevi, npr. 220) */
+        function izbroji(b) {
+            var cilj = b.textContent.trim();
+            if (!/^\d+$/.test(cilj) || document.body.classList.contains('uredjivanje')) return;
+            var n = parseInt(cilj, 10), t0 = null, trajanje = 1200;
+            function korak(t) {
+                if (!t0) t0 = t;
+                var x = Math.min((t - t0) / trajanje, 1);
+                b.textContent = Math.round(n * (1 - Math.pow(1 - x, 3)));
+                if (x < 1) requestAnimationFrame(korak); else b.textContent = cilj;
+            }
+            requestAnimationFrame(korak);
+        }
+
+        var io = new IntersectionObserver(function (unosi) {
+            unosi.forEach(function (u) {
+                if (!u.isIntersecting) return;
+                var e = u.target;
+                e.classList.add('jp-vidljivo');
+                /* nakon pojavljivanja ukloni klase, da ne smetaju hover efektima */
+                setTimeout(function () {
+                    e.classList.remove('jp-anim', 'jp-vidljivo');
+                    e.style.transitionDelay = '';
+                }, 1300);
+                if (u.target.classList.contains('jp-broj')) izbroji(u.target.querySelector('b'));
+                io.unobserve(u.target);
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+        el.forEach(function (e) { io.observe(e); });
+    })();
+</script>
 </body>
 </html>

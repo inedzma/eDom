@@ -42,6 +42,6 @@ public class RegistracijaWebController {
 
     private RegistracijaZahtjev prazanZahtjev() {
         return new RegistracijaZahtjev(
-                "", "", "", "", "", "", "", null, "", "", "");
+                "", "", "", "", "", "", "", null, "", "", "", false);
     }
 }
