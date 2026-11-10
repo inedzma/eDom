@@ -17,14 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,24 +50,6 @@ public class DokumentService {
     /** Statusi u kojima se dokumenti jos smiju dodavati ili brisati. */
     private static final Set<String> OTVORENI_STATUSI =
             Set.of(Statusi.U_IZRADI, Statusi.NA_PREGLEDU, Statusi.NEPOTPUNA);
-
-    // ---------- CITANJE ----------
-
-    @Transactional(readOnly = true)
-    public List<DokumentPregled> zaPrijavu(Integer idPrijave) {
-        return dokumentRepository
-                .findByPrijava_IdPrijavaOrderByIdDokumentAsc(idPrijave);
-    }
-
-    @Transactional(readOnly = true)
-    public Map<String, List<VrstaDokumenta>> vrstePoKategoriji() {
-        return vrstaDokumentaRepository.findAll(Sort.by("kategorija", "naziv"))
-                .stream()
-                .collect(Collectors.groupingBy(
-                        VrstaDokumenta::getKategorija,
-                        LinkedHashMap::new,
-                        Collectors.toList()));
-    }
 
     /** Vraca Base64 sadrzaj. Poziva se samo pri preuzimanju. */
     @Transactional(readOnly = true)

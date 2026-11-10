@@ -4,8 +4,8 @@ import ba.unze.edom.common.dto.bodovanje.KriterijPostavkaDTO;
 import ba.unze.edom.common.dto.bodovanje.KriterijiPostavkeDTO;
 import ba.unze.edom.common.dto.opste.PostavkeDTO;
 import ba.unze.edom.server.service.bodovanje.KriterijiPostavkeService;
-import ba.unze.edom.server.service.opste.PostavkeService;
 import ba.unze.edom.server.service.bodovanje.PreracunBodovaService;
+import ba.unze.edom.server.service.opste.PostavkeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

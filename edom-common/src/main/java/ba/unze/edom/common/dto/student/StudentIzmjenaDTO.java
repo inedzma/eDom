@@ -1,6 +1,9 @@
 package ba.unze.edom.common.dto.student;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 /** Izmjena podataka studenta (administrator na desktopu). */
 public record StudentIzmjenaDTO(

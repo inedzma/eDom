@@ -1,10 +1,14 @@
 package ba.unze.edom.server;
 
 import ba.unze.edom.server.dto.RegistracijaZahtjev;
-import ba.unze.edom.server.repository.*;
+import ba.unze.edom.server.repository.KorisnikRepository;
+import ba.unze.edom.server.repository.PrijavaRepository;
+import ba.unze.edom.server.repository.StudentRepository;
+import ba.unze.edom.server.repository.VrstaKriterijaRepository;
 import ba.unze.edom.server.service.bodovanje.BodovanjeService;
 import ba.unze.edom.server.service.korisnik.RegistracijaService;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;

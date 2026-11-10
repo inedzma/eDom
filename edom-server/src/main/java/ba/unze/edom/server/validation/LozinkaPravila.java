@@ -41,10 +41,6 @@ public final class LozinkaPravila {
         return g;
     }
 
-    public static boolean ispravna(String lozinka) {
-        return greske(lozinka).isEmpty();
-    }
-
     /** Jedna recenica sa svim sto nedostaje. */
     public static String poruka(String lozinka) {
         var g = greske(lozinka);

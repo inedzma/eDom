@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!-- Sobe i raspored: pregled po spratovima, prijedlog rasporeda, ručne izmjene -->
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.SVGPath?>
-<?import javafx.geometry.Insets?>
 <?import java.net.URL?>
-
-<!-- Sobe i raspored: pregled po spratovima, prijedlog rasporeda, ručne izmjene -->
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="controllers.SobeController"

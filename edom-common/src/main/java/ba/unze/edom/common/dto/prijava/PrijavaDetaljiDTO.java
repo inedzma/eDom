@@ -1,7 +1,7 @@
 package ba.unze.edom.common.dto.prijava;
 
-import ba.unze.edom.common.dto.dokumenti.DokumentDTO;
 import ba.unze.edom.common.dto.bodovanje.RezultatBodovanja;
+import ba.unze.edom.common.dto.dokumenti.DokumentDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

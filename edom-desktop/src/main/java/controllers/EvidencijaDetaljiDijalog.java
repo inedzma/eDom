@@ -3,6 +3,7 @@ package controllers;
 import api.ApiException;
 import api.EvidencijaApi;
 import api.PrijavaApi;
+import ba.unze.edom.common.dto.dokumenti.GenerisaniDokumentDTO;
 import ba.unze.edom.common.dto.student.EvidencijaOznakeDTO;
 import ba.unze.edom.common.dto.student.EvidencijaRedDTO;
 import javafx.concurrent.Task;
@@ -12,16 +13,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
-import ba.unze.edom.common.dto.dokumenti.GenerisaniDokumentDTO;
-import javafx.stage.FileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Objects;
 

@@ -1,5 +1,7 @@
 package ba.unze.edom.server.service.obavijesti;
 
+import ba.unze.edom.common.dto.bodovanje.RezultatBodovanja;
+import ba.unze.edom.common.dto.bodovanje.StavkaBodovanja;
 import ba.unze.edom.server.exception.RegistracijaException;
 import ba.unze.edom.server.service.prijava.Statusi;
 import jakarta.mail.internet.InternetAddress;
@@ -11,8 +13,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import ba.unze.edom.common.dto.bodovanje.RezultatBodovanja;
-import ba.unze.edom.common.dto.bodovanje.StavkaBodovanja;
 
 @Slf4j
 @Service
@@ -51,16 +51,6 @@ public class EmailService {
                         + "Kod važi 15 minuta.\n\n"
                         + "Ako niste tražili reset lozinke, ignorišite ovu poruku.\n\n"
                         + "E-Dom Zenica");
-    }
-
-    public void posaljiPrijavaOdobrena(String kome, String ime, String prezime,
-                                       int akademskaGodina) {
-        posalji(kome, "Odobrena prijava za studentski dom",
-                "Poštovani/a " + ime + " " + prezime + ",\n\n"
-                        + "Obavještavamo Vas da je Vaša prijava za smještaj u "
-                        + "Studentski dom Zenica za akademsku godinu "
-                        + akademskaGodina + " odobrena.\n\n"
-                        + "Srdačan pozdrav,\nStudentski centar Zenica");
     }
 
     public void posaljiObavijestORucnomUnosu(String email, String ime, int godina,
@@ -195,27 +185,5 @@ public class EmailService {
         poruka.setSubject("E-Dom: " + naslov);
         poruka.setText(t.toString());
         mailSender.send(poruka);
-    }
-
-    /** Poruka studenta domu; Reply-To = student, pa se može odgovoriti direktno iz inboxa. */
-    public void posaljiPorukuDomu(String adresaDoma, String emailStudenta, String imeStudenta,
-                                  String sifra, String naslov, String tekst) {
-        try {
-            MimeMessage poruka = mailSender.createMimeMessage();
-            MimeMessageHelper h = new MimeMessageHelper(poruka, "UTF-8");
-            h.setFrom(new InternetAddress(od, naziv, "UTF-8"));
-            h.setTo(adresaDoma);
-            if (emailStudenta != null && !emailStudenta.isBlank()) h.setReplyTo(emailStudenta);
-            h.setSubject("E-Dom poruka: " + naslov);
-            h.setText("Poruka studenta iz sistema E-Dom\n\n"
-                    + "Student: " + imeStudenta + " (" + sifra + ")\n"
-                    + "E-mail: " + emailStudenta + "\n\n"
-                    + "Naslov: " + naslov + "\n\n"
-                    + tekst + "\n\n"
-                    + "— Odgovorom na ovaj mail odgovarate direktno studentu.");
-            mailSender.send(poruka);
-        } catch (Exception e) {
-            throw new IllegalStateException("Slanje poruke domu nije uspjelo: " + e.getMessage(), e);
-        }
     }
 }

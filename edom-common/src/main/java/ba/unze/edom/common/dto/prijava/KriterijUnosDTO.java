@@ -1,6 +1,7 @@
 package ba.unze.edom.common.dto.prijava;
 
 import jakarta.validation.constraints.NotBlank;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

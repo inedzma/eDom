@@ -1,13 +1,21 @@
 package ba.unze.edom.server.service;
 
 import ba.unze.edom.server.dto.RegistracijaZahtjev;
-import ba.unze.edom.server.entity.*;
+import ba.unze.edom.server.entity.Korisnik;
+import ba.unze.edom.server.entity.Student;
+import ba.unze.edom.server.entity.Uloga;
 import ba.unze.edom.server.exception.RegistracijaException;
-import ba.unze.edom.server.repository.*;
+import ba.unze.edom.server.repository.KorisnikRepository;
+import ba.unze.edom.server.repository.StudentRepository;
+import ba.unze.edom.server.repository.UlogaRepository;
 import ba.unze.edom.server.service.korisnik.RegistracijaService;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 

@@ -1,8 +1,8 @@
 package ba.unze.edom.server.service.rang;
 
-import ba.unze.edom.common.dto.rang.DokazUslovaDTO;
 import ba.unze.edom.common.dto.prijava.PrijavaDetaljiDTO;
 import ba.unze.edom.common.dto.prijava.PromjenaStatusaDTO;
+import ba.unze.edom.common.dto.rang.DokazUslovaDTO;
 import ba.unze.edom.server.entity.Prijava;
 import ba.unze.edom.server.repository.PrijavaRepository;
 import ba.unze.edom.server.service.prijava.PrijavaAdminService;

@@ -1,6 +1,7 @@
 package ba.unze.edom.server.dto;
 
 import jakarta.validation.constraints.*;
+
 import java.math.BigDecimal;
 
 public record DomacinstvoKorakDTO(

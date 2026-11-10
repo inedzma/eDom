@@ -2,6 +2,7 @@ package ba.unze.edom.common.dto.prijava;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 
 public record PrijavaUnosDTO(

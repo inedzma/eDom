@@ -12,7 +12,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 /** Tabela bodovanja sa svim kriterijima; admin mijenja podatke, kriterije i provjeru. */
@@ -302,12 +304,6 @@ public class BodovanjePanel extends VBox {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Neispravan cijeli broj: " + t.getText());
         }
-    }
-
-    private static Label naslov(String t) {
-        Label l = new Label(t);
-        l.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        return l;
     }
 
     private static Label sitno(String t) {

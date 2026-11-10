@@ -1,20 +1,20 @@
 package ba.unze.edom.server.service.rang;
 
 import ba.unze.edom.common.dto.bodovanje.KategorijaBodovanja;
+import ba.unze.edom.common.dto.bodovanje.RezultatBodovanja;
+import ba.unze.edom.common.dto.bodovanje.StavkaBodovanja;
 import ba.unze.edom.common.dto.rang.KategorijaRanga;
 import ba.unze.edom.common.dto.rang.RangListaAdminDTO;
 import ba.unze.edom.common.dto.rang.RangRedDTO;
-import ba.unze.edom.common.dto.bodovanje.RezultatBodovanja;
-import ba.unze.edom.common.dto.bodovanje.StavkaBodovanja;
 import ba.unze.edom.server.dto.RangListaDTO;
 import ba.unze.edom.server.dto.RangStavkaDTO;
 import ba.unze.edom.server.entity.Prijava;
 import ba.unze.edom.server.entity.Student;
 import ba.unze.edom.server.exception.NevalidnaPrijavaException;
 import ba.unze.edom.server.repository.PrijavaRepository;
-import ba.unze.edom.server.service.opste.PostavkeService;
 import ba.unze.edom.server.service.bodovanje.BodovanjeService;
 import ba.unze.edom.server.service.bodovanje.GrupeKriterija;
+import ba.unze.edom.server.service.opste.PostavkeService;
 import ba.unze.edom.server.service.prijava.Statusi;
 import ba.unze.edom.server.service.student.SifraStudenta;
 import lombok.RequiredArgsConstructor;

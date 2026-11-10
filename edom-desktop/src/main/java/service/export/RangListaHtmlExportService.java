@@ -1,8 +1,8 @@
 package service.export;
 
 import api.PostavkeApi;
-import ba.unze.edom.common.dto.rang.KategorijaRanga;
 import ba.unze.edom.common.dto.opste.PostavkeDTO;
+import ba.unze.edom.common.dto.rang.KategorijaRanga;
 import ba.unze.edom.common.dto.rang.RangListaAdminDTO;
 import ba.unze.edom.common.dto.rang.RangRedDTO;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;

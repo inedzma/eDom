@@ -1,7 +1,9 @@
 package ba.unze.edom.server.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -101,11 +103,6 @@ public class Prijava {
     public void dodajDokument(Dokument d) {
         dokumenti.add(d);
         d.setPrijava(this);
-    }
-
-    public void ukloniDokument(Dokument d) {
-        dokumenti.remove(d);
-        d.setPrijava(null);
     }
 
     /** Kad je dostavljen dokaz o ispunjavanju uslova za upis naredne godine; null = nije dostavljen. */

@@ -3,7 +3,7 @@ package ba.unze.edom.server.web;
 import ba.unze.edom.server.dto.ZahtjevForma;
 import ba.unze.edom.server.dto.ZeljaForma;
 import ba.unze.edom.server.exception.PrijavaException;
-import ba.unze.edom.server.security.KorisnikPrincipal;   // uskladi s PrijavaWebController
+import ba.unze.edom.server.security.KorisnikPrincipal;
 import ba.unze.edom.server.service.sobe.StudentSmjestajService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

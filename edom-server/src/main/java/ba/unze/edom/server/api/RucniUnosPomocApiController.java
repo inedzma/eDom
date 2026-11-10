@@ -8,7 +8,10 @@ import ba.unze.edom.server.service.dokumenti.PotrebniDokumentiService;
 import ba.unze.edom.server.service.prijava.RucniUnosService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /** Pomoć desktopu tokom unosa: spisak dokumenata i bodovi prije snimanja. */
 @RestController

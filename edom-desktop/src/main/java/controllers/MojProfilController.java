@@ -5,7 +5,9 @@ import api.ProfilApi;
 import ba.unze.edom.common.dto.korisnik.KorisnikProfilDTO;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 
 import java.time.Duration;
 import java.time.Instant;

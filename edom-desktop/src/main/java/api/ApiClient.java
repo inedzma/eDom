@@ -50,11 +50,6 @@ public final class ApiClient {
                 .PUT(kaoJson(tijelo)), JSON.constructType(tip));
     }
 
-    public static void delete(String putanja) {
-        posalji(zahtjev(putanja).DELETE(), JSON.constructType(Void.class));
-    }
-
-    // ---------- interno ----------
 
     private static HttpRequest.Builder zahtjev(String putanja) {
         var b = HttpRequest.newBuilder(URI.create(BAZNI_URL + putanja))

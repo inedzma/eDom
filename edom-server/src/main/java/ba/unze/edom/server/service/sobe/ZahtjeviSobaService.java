@@ -1,7 +1,10 @@
 package ba.unze.edom.server.service.sobe;
 
 import ba.unze.edom.common.dto.sobe.ZahtjevSobeDTO;
-import ba.unze.edom.server.entity.*;
+import ba.unze.edom.server.entity.Prijava;
+import ba.unze.edom.server.entity.Smjestaj;
+import ba.unze.edom.server.entity.Student;
+import ba.unze.edom.server.entity.ZahtjevPromjeneSobe;
 import ba.unze.edom.server.exception.PrijavaException;
 import ba.unze.edom.server.repository.SmjestajRepository;
 import ba.unze.edom.server.repository.ZahtjevPromjeneSobeRepository;
