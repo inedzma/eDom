@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="bs" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
+    <title>E-Dom — Greška</title>
+    <style>
+        body.greska-str{display:flex;flex-direction:column;min-height:100vh;background:#f3f8f8}
+        .gr-main{flex:1;display:grid;place-items:center;padding:48px 16px}
+        .gr-kartica{
+            width:min(560px,100%);padding:44px 40px 36px;border-radius:28px;text-align:center;
+            background:#fff;border:1px solid var(--line);box-shadow:0 30px 70px -30px rgba(4,30,38,.3);
+        }
+        .gr-kod{
+            font-size:clamp(64px,12vw,96px);font-weight:800;line-height:1;letter-spacing:-.03em;
+            background:linear-gradient(120deg,#00a884,#2f7fe0);-webkit-background-clip:text;background-clip:text;color:transparent;
+        }
+        .gr-ikona{
+            width:64px;height:64px;margin:0 auto 18px;border-radius:20px;display:grid;place-items:center;
+            background:var(--mint-soft);color:var(--mint-dark);
+        }
+        .gr-ikona--upozorenje{background:#fff0e0;color:#d9711a}
+        .gr-kartica h1{margin:14px 0 8px;font-size:clamp(22px,3vw,28px);font-weight:800;color:var(--heading)}
+        .gr-kartica p{color:var(--label);font-size:16px;line-height:1.6;margin:0 auto;max-width:430px}
+        .gr-poruka{
+            margin:18px auto 0;padding:12px 16px;border-radius:14px;max-width:430px;
+            background:#fff7e8;border:1px solid #f6d9a8;color:#7a4a00;font-weight:700;font-size:15px;
+        }
+        .gr-dugmad{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:28px}
+        .gr-dugmad .btn{display:inline-flex;align-items:center;gap:8px}
+        @media (max-width:560px){
+            .gr-kartica{padding:32px 20px 26px}
+            .gr-dugmad .btn{flex:1;justify-content:center}
+        }
+    </style>
+</head>
+<body class="greska-str"
+      th:with="kod=${status != null ? status : 500},
+               naslov=${kod == 404 ? 'Stranica ne postoji'
+                      : kod == 403 ? 'Nemate pristup'
+                      : kod == 400 ? 'Zahtjev nije moguće izvršiti'
+                      : 'Nešto nije u redu'},
+               opis=${kod == 404 ? 'Adresa je možda pogrešno upisana ili je stranica uklonjena.'
+                    : kod == 403 ? 'Ova stranica nije dostupna za vaš nalog. Ako mislite da je ovo greška, prijavite se odgovarajućim nalogom ili se obratite administraciji doma.'
+                    : kod == 400 ? 'Sistem nije mogao izvršiti traženu radnju.'
+                    : 'Došlo je do greške na serveru. Pokušajte ponovo za nekoliko trenutaka, a ako se ponavlja, javite nam se putem kontakt forme.'}">
+
+<header th:replace="~{fragments/layout :: navbar('')}"></header>
+
+<main class="gr-main">
+    <div class="gr-kartica">
+        <div class="gr-ikona" th:classappend="${kod >= 500} ? 'gr-ikona--upozorenje'">
+            <!-- 404: lupa, 403: katanac, ostalo: upozorenje -->
+            <svg th:if="${kod == 404}" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8.5 11h5"/></svg>
+            <svg th:if="${kod == 403}" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            <svg th:if="${kod != 404 and kod != 403}" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        </div>
+
+        <div class="gr-kod" th:text="${kod}">404</div>
+        <h1 th:text="${naslov}">Stranica ne postoji</h1>
+        <p th:text="${opis}">Adresa je možda pogrešno upisana ili je stranica uklonjena.</p>
+
+        <!-- poruka poslovne greške (npr. "Nemate pristup ovoj prijavi.") -->
+        <div class="gr-poruka" th:if="${poruka != null}" th:text="${poruka}">Nemate pristup ovoj prijavi.</div>
+
+        <div class="gr-dugmad">
+            <a class="btn btn-ghost" href="javascript:history.back()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>
+                Nazad
+            </a>
+            <a class="btn btn-primary" sec:authorize="hasRole('Student')" th:href="@{/student/pocetna}">Moje prijave</a>
+            <a class="btn btn-primary" sec:authorize="!hasRole('Student')" th:href="@{/}">Početna stranica</a>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer(false)}"></footer>
+</body>
+</html>
