@@ -35,17 +35,6 @@ import java.util.Optional;
 
 /** Korak 1: student, lični podaci i studij. */
 public class NoviStudentController {
-
-    private static final List<String> FAKULTETI = List.of(
-            "Politehnički fakultet UNZE",
-            "Pravni fakultet UNZE",
-            "Ekonomski fakultet UNZE",
-            "Filozofski fakultet UNZE",
-            "Medicinski fakultet UNZE",
-            "Mašinski fakultet UNZE",
-            "Islamsko pedagoški fakultet UNZE",
-            "Fakultet inženjerstva i prirodnih nauka UNZE"
-    );
     private static final List<String> GODINE =
             List.of("1", "2", "3", "4", "5", "6", "Apsolvent", "Postdiplomac");
 
@@ -90,7 +79,9 @@ public class NoviStudentController {
     public void initialize() {
         KoraciUnosa.popuni(stepper, traka, 1);
 
-        cmbFakultet.setItems(FXCollections.observableArrayList(Fakulteti.SVI));
+        var fakulteti = FXCollections.observableArrayList(Fakulteti.SVI);
+        fakulteti.add("Drugo");   // brucoš koji još ne zna na koji će fakultet biti upisan
+        cmbFakultet.setItems(fakulteti);
         cmbGodina.setItems(FXCollections.observableArrayList(GODINE));
         cmbUpisPut.setItems(FXCollections.observableArrayList(UPIS));
         cmbUpisPut.getSelectionModel().selectFirst();
@@ -197,7 +188,7 @@ public class NoviStudentController {
             alert("Šifarnici se još učitavaju. Pokušajte za trenutak.");
             return;
         }
-        if (prazno(txtIme) || prazno(txtPrezime) || prazno(txtIndeks) || prazno(txtJMBG)
+        if (prazno(txtIme) || prazno(txtPrezime) || prazno(txtJMBG)
                 || prazno(txtAdresa) || prazno(txtRoditelj) || prazno(txtEmail) || prazno(txtProsjek)
                 || prazno(txtAkGod) || cmbFakultet.getValue() == null || cmbGodina.getValue() == null) {
             alert("Sva obavezna polja moraju biti popunjena.");
@@ -256,7 +247,7 @@ public class NoviStudentController {
                 txtIme.getText().trim(),
                 txtPrezime.getText().trim(),
                 txtJMBG.getText().trim(),
-                txtIndeks.getText().trim(),
+                prazno(txtIndeks) ? null : txtIndeks.getText().trim(),
                 txtEmail.getText().trim(),
                 txtTelefon.getText().trim(),
                 cmbFakultet.getValue(),

@@ -243,8 +243,8 @@ public class SobeService {
                 .filter(sm -> sm.getSoba().getIdSoba().equals(s.getIdSoba())).toList();
         String spolSobe = spolSobe(s, uSobi);
         if (spolSobe != null && spolStudenta != null && !spolSobe.equals(spolStudenta)) {
-            throw new PrijavaException("Soba " + s.getBroj() + " je " + ("M".equals(spolSobe) ? "muška" : "ženska")
-                    + ". Ako treba, promijenite spol sprata ili sobe.");
+            throw new PrijavaException("U sobi " + s.getBroj() + " su već "
+                    + ("M".equals(spolSobe) ? "studenti" : "studentice") + ". Odaberite drugu sobu.");
         }
 
         Smjestaj sm = postojeci.orElseGet(Smjestaj::new);

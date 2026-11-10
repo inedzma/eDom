@@ -41,13 +41,12 @@
 
             <div class="lock-note">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <span>Lični podaci se ne mogu mijenjati putem sistema. Za ispravku se obratite administraciji doma.</span>
+                <span>Ime, prezime, JMBG i ime roditelja ne mogu se mijenjati putem sistema. Za ispravku se obratite administraciji doma.</span>
             </div>
 
             <dl class="info-list">
                 <div><dt>Ime i prezime</dt><dd th:text="${profil.ime} + ' ' + ${profil.prezime}">—</dd></div>
                 <div><dt>JMBG</dt><dd th:text="${profil.jmbg}">—</dd></div>
-                <div><dt>Broj indeksa</dt><dd th:text="${profil.brojIndeksa}">—</dd></div>
                 <div><dt>Ime roditelja</dt><dd th:text="${profil.imeRoditelja}">—</dd></div>
             </dl>
         </aside>
@@ -80,10 +79,21 @@
                         <span class="field-err" th:if="${#fields.hasErrors('adresa')}" th:errors="*{adresa}"></span>
                     </div>
 
-                    <div class="f-field">
+                    <div class="f-field span-2">
                         <label for="fakultet">Fakultet</label>
-                        <input type="text" th:field="*{fakultet}" th:errorclass="is-invalid">
+                        <div class="select-wrap">
+                            <select th:field="*{fakultet}" th:errorclass="is-invalid">
+                                <option th:each="f : ${fakulteti}" th:value="${f}" th:text="${f}">Politehnički fakultet UNZE</option>
+                                <option value="Drugo">Drugo / još nije poznato</option>
+                            </select>
+                        </div>
                         <span class="field-err" th:if="${#fields.hasErrors('fakultet')}" th:errors="*{fakultet}"></span>
+                    </div>
+
+                    <div class="f-field">
+                        <label for="brojIndeksa">Broj indeksa <span class="opt">(ako ga već imate)</span></label>
+                        <input type="text" th:field="*{brojIndeksa}" th:errorclass="is-invalid" placeholder="npr. 123/23">
+                        <span class="field-err" th:if="${#fields.hasErrors('brojIndeksa')}" th:errors="*{brojIndeksa}"></span>
                     </div>
 
                     <div class="f-field">

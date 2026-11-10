@@ -28,8 +28,10 @@ public class Soba {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "kategorija_id")
     private KategorijaSobe kategorija;
-
-    /** Pregazi spol sprata za ovu sobu; null = kao sprat. */
+    /**
+     * Ručno zadan spol sobe (npr. soba rezervisana samo za studentice).
+     * Obično je null: spol tada određuju stanari, a prazna soba prima bilo koga.
+     */
     @Column(name = "spol", length = 1)
     private String spol;
 
@@ -43,10 +45,9 @@ public class Soba {
     @Column(name = "napomena")
     private String napomena;
 
-    /** Spol sobe: njen, inače sprata. null = nije određeno. */
+    /** Ručno zadan spol sobe ili null. Spratovi više ne određuju spol. */
     public String spolSobe() {
-        if (spol != null && !spol.isBlank()) return spol;
-        return sprat != null ? sprat.getSpol() : null;
+        return spol != null && !spol.isBlank() ? spol : null;
     }
 
     /** Ulazi li soba u raspored studenata. */

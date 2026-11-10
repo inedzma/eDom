@@ -149,8 +149,9 @@ public class SobeController {
             if (filterSprat != null && !SVI_SPRATOVI.equals(filterSprat) && !filterSprat.equals(sprat)) continue;
 
             List<SobaPregledDTO> vidljive = sobe.stream()
-                    .filter(s -> MUSKE.equals(filterSpol) ? "M".equals(s.spol())
-                            : ZENSKE.equals(filterSpol) ? "Z".equals(s.spol()) : true)
+                    // prazna soba (spol null) prima i studente i studentice
+                    .filter(s -> MUSKE.equals(filterSpol) ? s.spol() == null || "M".equals(s.spol())
+                            : ZENSKE.equals(filterSpol) ? s.spol() == null || "Z".equals(s.spol()) : true)
                     .filter(s -> !samoSlobodne || (s.zaStudente() && s.aktivna() && s.slobodno() > 0))
                     .filter(s -> odgovara(s, trazi))
                     .toList();
@@ -225,11 +226,13 @@ public class SobeController {
     }
 
     private void prikaziBrojeve() {
+        int uPraznim = pregled.ukupnoMjesta() - pregled.zauzeto() - pregled.slobodnoM() - pregled.slobodnoZ();
         boxBrojevi.getChildren().setAll(
                 broj("Mjesta za studente", String.valueOf(pregled.ukupnoMjesta()), null, null),
                 broj("Zauzeto", String.valueOf(pregled.zauzeto()), null, null),
                 broj("Slobodno · muške", String.valueOf(pregled.slobodnoM()), null, null),
                 broj("Slobodno · ženske", String.valueOf(pregled.slobodnoZ()), null, null),
+                broj("Slobodno · prazne sobe", String.valueOf(Math.max(0, uPraznim)), null, null),
                 broj("Odobreni bez sobe", String.valueOf(pregled.bezSobe()),
                         pregled.bezSobe() > 0 ? "broj-upozorenje" : null, this::prikaziBezSobe));
     }

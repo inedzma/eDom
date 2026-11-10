@@ -134,8 +134,8 @@
                                   styleClass="combo" maxWidth="Infinity"/>
                     </VBox>
                     <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                        <Label text="Broj indeksa" styleClass="field-label"/>
-                        <TextField fx:id="txtIndeks" promptText="npr. 421" styleClass="field"/>
+                        <Label text="Broj indeksa (ako ga ima)" styleClass="field-label"/>
+                        <TextField fx:id="txtIndeks" promptText="prazno za brucoše bez indeksa" styleClass="field"/>
                     </VBox>
 
                     <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="1">

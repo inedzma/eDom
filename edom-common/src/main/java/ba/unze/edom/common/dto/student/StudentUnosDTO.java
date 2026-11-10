@@ -8,7 +8,7 @@ public record StudentUnosDTO(
         @NotBlank(message = "Prezime je obavezno.") @Size(max = 50) String prezime,
         @NotBlank(message = "JMBG je obavezan.")
         @Pattern(regexp = "\\d{13}", message = "JMBG mora imati 13 cifara.") String jmbg,
-        @NotBlank(message = "Broj indeksa je obavezan.") @Size(max = 20) String brojIndeksa,
+        @Size(max = 20) String brojIndeksa,
         @NotBlank(message = "Email je obavezan.")
         @Email(message = "Neispravan format email adrese.") String email,
         @Size(max = 100) String telefon,

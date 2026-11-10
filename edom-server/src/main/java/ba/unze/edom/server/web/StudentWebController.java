@@ -1,9 +1,11 @@
 package ba.unze.edom.server.web;
 
+import ba.unze.edom.common.util.Fakulteti;
 import ba.unze.edom.server.dto.ProfilIzmjenaDTO;
 import ba.unze.edom.server.exception.PrijavaException;
 import ba.unze.edom.server.exception.RegistracijaException;
 import ba.unze.edom.server.security.KorisnikPrincipal;
+import ba.unze.edom.server.service.korisnik.ProfilService;
 import ba.unze.edom.server.service.prijava.PrijavaService;
 import ba.unze.edom.server.service.student.SifraStudenta;
 import jakarta.validation.Valid;
@@ -13,8 +15,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ba.unze.edom.server.service.korisnik.ProfilService;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/student")
@@ -23,6 +26,7 @@ public class StudentWebController {
 
     private final PrijavaService prijavaService;
     private final SifraStudenta sifraStudenta;
+    private final ProfilService profilService;
 
     @GetMapping("/pocetna")
     public String pocetna(@AuthenticationPrincipal KorisnikPrincipal korisnik, Model model) {
@@ -44,13 +48,17 @@ public class StudentWebController {
         return sifraStudenta.zaStudenta(korisnik.getIdStudenta());
     }
 
+    /** Spisak fakulteta za padajuću listu na profilu (isti kao na registraciji). */
+    @ModelAttribute("fakulteti")
+    public List<String> fakulteti() {
+        return Fakulteti.SVI;   // ⚠ isto što koristi RegistracijaWebController za "fakulteti"
+    }
+
     @ExceptionHandler(PrijavaException.class)
     public String prijavaGreska(PrijavaException e, RedirectAttributes ra) {
         ra.addFlashAttribute("greska", e.getMessage());
         return "redirect:/student/pocetna";
     }
-
-    private final ProfilService profilService;
 
     @GetMapping("/profil")
     public String profil(@AuthenticationPrincipal KorisnikPrincipal korisnik, Model model) {
@@ -58,7 +66,7 @@ public class StudentWebController {
         model.addAttribute("profil", profil);
         model.addAttribute("izmjena", new ProfilIzmjenaDTO(
                 profil.email(), profil.telefon(), profil.adresa(),
-                profil.fakultet(), profil.godinaStudija()));
+                profil.fakultet(), profil.godinaStudija(), profil.brojIndeksa()));
         return "student/profil";
     }
 

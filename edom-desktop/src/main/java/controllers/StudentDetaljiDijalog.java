@@ -2,6 +2,9 @@ package controllers;
 
 import api.SobeApi;
 import ba.unze.edom.common.dto.student.StudentDetaljiDTO;
+import ba.unze.edom.common.dto.student.StudentIzmjenaDTO;
+import ba.unze.edom.common.util.Fakulteti;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -9,9 +12,11 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-/** Detalji studenta: kontakt, studij, prijava, soba i napomena (šalje se mailom). */
+/** Detalji studenta: kontakt, studij, prijava, soba, napomena (šalje se mailom) i izmjena podataka. */
 final class StudentDetaljiDijalog {
 
     private StudentDetaljiDijalog() {}
@@ -34,6 +39,15 @@ final class StudentDetaljiDijalog {
         sadrzaj.setPadding(new Insets(6, 4, 4, 4));
         sadrzaj.setPrefWidth(620);
 
+        // ---------- uredi ----------
+        Button uredi = new Button("Uredi podatke studenta");
+        uredi.getStyleClass().add("sobe-btn");
+        uredi.setMinWidth(Region.USE_PREF_SIZE);
+        uredi.setOnAction(e -> uredi(s, d));
+        HBox vrh = new HBox(uredi);
+        vrh.setAlignment(Pos.CENTER_RIGHT);
+        sadrzaj.getChildren().add(vrh);
+
         // ---------- kontakt ----------
         sadrzaj.getChildren().add(naslov("Kontakt"));
         GridPane kontakt = mreza();
@@ -41,6 +55,9 @@ final class StudentDetaljiDijalog {
         red(kontakt, "Email", s.email(), true);
         red(kontakt, "Adresa", s.adresa(), false);
         red(kontakt, "Roditelj", s.imeRoditelja(), false);
+        red(kontakt, "Telefon roditelja", s.telefonRoditelja(), true);
+        red(kontakt, "Prebivalište", s.opcina() != null ? s.opcina() + ", " + s.kanton() : null, false);
+        red(kontakt, "Lična karta", s.brojLicneKarte(), true);
         sadrzaj.getChildren().add(kontakt);
 
         // ---------- studij i prijava ----------
@@ -97,6 +114,121 @@ final class StudentDetaljiDijalog {
         d.getDialogPane().setContent(sp);
         d.setResizable(true);
         d.showAndWait();
+    }
+
+    // ---------- izmjena podataka ----------
+
+    /** Forma za izmjenu podataka studenta. Ako server odbije, forma ostaje otvorena. */
+    private static void uredi(StudentDetaljiDTO s, Dialog<Void> detalji) {
+        Dialog<Void> d = new Dialog<>();
+        d.setTitle("Uredi podatke studenta");
+        d.setHeaderText(s.ime() + " " + s.prezime());
+        ButtonType sacuvajTip = new ButtonType("Sačuvaj", ButtonBar.ButtonData.OK_DONE);
+        d.getDialogPane().getButtonTypes().addAll(sacuvajTip, ButtonType.CANCEL);
+        d.getDialogPane().getStylesheets().add(
+                Objects.requireNonNull(StudentDetaljiDijalog.class.getResource("/styles/sobe.css")).toExternalForm());
+
+        TextField ime = polje(s.ime());
+        TextField prezime = polje(s.prezime());
+        TextField imeRoditelja = polje(s.imeRoditelja());
+        TextField jmbg = polje(s.jmbg());
+        TextField indeks = polje(s.brojIndeksa());
+        indeks.setPromptText("prazno ako još nema indeks");
+
+        List<String> fakulteti = new ArrayList<>(Fakulteti.SVI);   // ⚠ ista lista kao na registraciji
+        fakulteti.add("Drugo");
+        if (s.fakultet() != null && !fakulteti.contains(s.fakultet())) fakulteti.add(s.fakultet());
+        ComboBox<String> fakultet = new ComboBox<>(javafx.collections.FXCollections.observableArrayList(fakulteti));
+        fakultet.setValue(s.fakultet());
+        fakultet.setMaxWidth(Double.MAX_VALUE);
+
+        TextField email = polje(s.email());
+        TextField telefon = polje(s.telefon());
+        TextField adresa = polje(s.adresa());
+        TextField licna = polje(s.brojLicneKarte());
+        TextField telRoditelja = polje(s.telefonRoditelja());
+        TextField kanton = polje(s.kanton());
+        TextField opcina = polje(s.opcina());
+
+        VBox sadrzaj = new VBox(12);
+        sadrzaj.setPadding(new Insets(6, 4, 4, 4));
+        sadrzaj.setPrefWidth(560);
+
+        sadrzaj.getChildren().add(naslov("Lični podaci"));
+        GridPane licni = mreza();
+        unos(licni, "Ime", ime);
+        unos(licni, "Prezime", prezime);
+        unos(licni, "Ime roditelja", imeRoditelja);
+        unos(licni, "JMBG", jmbg);
+        unos(licni, "Lična karta", licna);
+        sadrzaj.getChildren().add(licni);
+
+        sadrzaj.getChildren().add(naslov("Studij"));
+        GridPane studij = mreza();
+        unos(studij, "Fakultet", fakultet);
+        unos(studij, "Broj indeksa", indeks);
+        sadrzaj.getChildren().add(studij);
+
+        sadrzaj.getChildren().add(naslov("Kontakt i prebivalište"));
+        GridPane kontakt = mreza();
+        unos(kontakt, "E-mail", email);
+        unos(kontakt, "Telefon", telefon);
+        unos(kontakt, "Telefon roditelja", telRoditelja);
+        unos(kontakt, "Adresa", adresa);
+        unos(kontakt, "Kanton", kanton);
+        unos(kontakt, "Općina", opcina);
+        sadrzaj.getChildren().add(kontakt);
+
+        Label napomena = new Label("E-mail je studentu ujedno i korisničko ime: nakon izmjene prijavljuje se novom adresom. "
+                + "Godina studija, prosjek i ostali podaci prijave mijenjaju se u bodovanju prijave.");
+        napomena.getStyleClass().add("sobe-podnaslov");
+        napomena.setWrapText(true);
+        sadrzaj.getChildren().add(napomena);
+
+        ScrollPane sp = new ScrollPane(sadrzaj);
+        sp.setFitToWidth(true);
+        sp.setPrefViewportHeight(520);
+        d.getDialogPane().setContent(sp);
+        d.setResizable(true);
+
+        // "Sačuvaj" ne zatvara prozor sam: zatvara se tek kad server prihvati izmjene
+        Button sacuvaj = (Button) d.getDialogPane().lookupButton(sacuvajTip);
+        sacuvaj.addEventFilter(ActionEvent.ACTION, e -> {
+            e.consume();
+            StudentIzmjenaDTO z = new StudentIzmjenaDTO(
+                    tekst(ime), tekst(prezime), tekst(imeRoditelja), tekst(jmbg), tekst(indeks),
+                    fakultet.getValue(), tekst(email), tekst(telefon), tekst(adresa),
+                    tekst(licna), tekst(telRoditelja), tekst(kanton), tekst(opcina));
+            sacuvaj.setDisable(true);
+            SobeController.pozovi(() -> SobeApi.izmijeniStudenta(s.idPrijava(), z), novi -> {
+                d.close();
+                detalji.close();
+                prikazi(novi);   // ponovo otvori detalje s novim podacima
+            }, () -> sacuvaj.setDisable(false));
+        });
+
+        d.showAndWait();
+    }
+
+    private static TextField polje(String v) {
+        TextField t = new TextField(v != null ? v : "");
+        t.setMaxWidth(Double.MAX_VALUE);
+        return t;
+    }
+
+    private static String tekst(TextField t) {
+        String v = t.getText();
+        return v == null || v.isBlank() ? null : v.trim();
+    }
+
+    /** Red "naziv: polje za unos". */
+    private static void unos(GridPane g, String naziv, Control polje) {
+        int r = g.getRowCount();
+        Label n = new Label(naziv);
+        n.getStyleClass().add("sobe-oznaka-polja");
+        GridPane.setHgrow(polje, Priority.ALWAYS);
+        g.add(n, 0, r);
+        g.add(polje, 1, r);
     }
 
     // ---------- pomoćne ----------

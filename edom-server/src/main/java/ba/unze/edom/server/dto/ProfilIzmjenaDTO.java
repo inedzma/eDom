@@ -22,5 +22,9 @@ public record ProfilIzmjenaDTO(
 
         @NotNull(message = "Godina studija je obavezna")
         @Min(1) @Max(8)
-        Integer godinaStudija
+        Integer godinaStudija,
+
+        // brucoš ga dopiše kad dobije indeks
+        @Size(max = 20, message = "Broj indeksa je predug")
+        String brojIndeksa
 ) {}

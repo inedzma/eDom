@@ -19,5 +19,10 @@ public record StudentDetaljiDTO(
         Integer rang,
         Integer brojSobe,
         String statusSmjestaja,
-        String napomena
+        String napomena,
+        // podaci iz prijave (lična karta, prebivalište) - za uređivanje
+        String brojLicneKarte,
+        String telefonRoditelja,
+        String kanton,
+        String opcina
 ) {}
