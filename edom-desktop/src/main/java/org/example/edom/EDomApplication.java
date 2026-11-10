@@ -9,17 +9,17 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class HelloApplication extends Application {
+public class EDomApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(
-                HelloApplication.class.getResource("/views/login-view.fxml")
+                EDomApplication.class.getResource("/views/login-view.fxml")
         );
 
         Scene scene = new Scene(fxmlLoader.load());
 
-        var cssUrl = HelloApplication.class.getResource("/styles/login-style.css");
+        var cssUrl = EDomApplication.class.getResource("/styles/login-style.css");
         if (cssUrl != null) {
             scene.getStylesheets().add(cssUrl.toExternalForm());
         }

@@ -11,16 +11,7 @@ module org.example.edom {
     requires java.prefs;
     requires java.net.http;
 
-    // UI biblioteke
-    requires org.controlsfx.controls;
-    requires com.dlsc.formsfx;
-    requires net.synedra.validatorfx;
-    requires org.kordamp.ikonli.javafx;
-    requires org.kordamp.bootstrapfx.core;
-    requires eu.hansolo.tilesfx;
-
-    // PDF
-    requires com.github.librepdf.openpdf;
+    // PDF (HTML -> PDF)
     requires openhtmltopdf.core;
     requires openhtmltopdf.pdfbox;
 

@@ -14,7 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import org.example.edom.HelloApplication;
+import org.example.edom.EDomApplication;
 import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
@@ -132,7 +132,7 @@ public class LoginController {
     private void openScene(Stage stage, Parent root, String title) {
         Scene scene = new Scene(root);
 
-        URL cssUrl = HelloApplication.class.getResource("/styles/style.css");
+        URL cssUrl = EDomApplication.class.getResource("/styles/style.css");
         if (cssUrl != null) {
             scene.getStylesheets().add(cssUrl.toExternalForm());
         } else {
@@ -191,7 +191,7 @@ public class LoginController {
 
             try {
                 FXMLLoader loader = new FXMLLoader(
-                        HelloApplication.class.getResource("/views/admin-main-view.fxml"));
+                        EDomApplication.class.getResource("/views/admin-main-view.fxml"));
                 Parent root = loader.load();
                 Stage stage = (Stage) txtUsername.getScene().getWindow();
                 openScene(stage, root, "E-Dom - Administratorski panel");
