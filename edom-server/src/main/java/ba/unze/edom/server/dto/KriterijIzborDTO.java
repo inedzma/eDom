@@ -1,10 +1,8 @@
 package ba.unze.edom.server.dto;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
+/** Jedan red u koraku "Dodatni kriteriji" na webu. */
 public class KriterijIzborDTO {
 
     private Integer idVrsteKriterija;
@@ -16,6 +14,8 @@ public class KriterijIzborDTO {
     private String grupa;
     private boolean traziParametar;
     private String nazivParametra;
+    /** Na formi se nudi unos perioda od–do; broj punih mjeseci se izračuna u parametar. */
+    private boolean traziPeriod;
 
     // Lombok ne radi dobro sa th:field na listama - getteri i setteri rucno
     public Integer getIdVrsteKriterija() { return idVrsteKriterija; }
@@ -39,20 +39,6 @@ public class KriterijIzborDTO {
     public String getNazivParametra() { return nazivParametra; }
     public void setNazivParametra(String v) { nazivParametra = v; }
 
-    private boolean traziPeriod;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate datumOd;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate datumDo;
-
     public boolean isTraziPeriod() { return traziPeriod; }
     public void setTraziPeriod(boolean v) { traziPeriod = v; }
-
-    public LocalDate getDatumOd() { return datumOd; }
-    public void setDatumOd(LocalDate v) { datumOd = v; }
-
-    public LocalDate getDatumDo() { return datumDo; }
-    public void setDatumDo(LocalDate v) { datumDo = v; }
 }

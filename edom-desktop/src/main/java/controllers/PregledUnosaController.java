@@ -20,14 +20,11 @@ import unos.NacrtPrijave;
 import util.Ekrani;
 import util.KoraciUnosa;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 /** Korak 5: pregled svega, bodovi sa servera i podnošenje. */
 public class PregledUnosaController {
-
-    private static final DateTimeFormatter DATUM = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
 
     @FXML private HBox stepper;
     @FXML private ProgressBar traka;
@@ -92,10 +89,6 @@ public class PregledUnosaController {
                 sb.append(" (").append(v != null && v.nazivParametra() != null ? v.nazivParametra() + ": " : "")
                         .append(param.toPlainString()).append(")");
             }
-            NacrtPrijave.Period p = nacrt.periodi.get(sifra);
-            if (p != null) {
-                sb.append(", od ").append(p.od().format(DATUM)).append(" do ").append(p.doDatuma().format(DATUM));
-            }
             redovi.add(sb.toString());
         });
         return String.join("\n", redovi);
@@ -133,11 +126,8 @@ public class PregledUnosaController {
 
         t.setOnSucceeded(e -> {
             RezultatBodovanja r = t.getValue();
-            lblBodovi.setText(String.format("%.2f bodova", r.potvrdjeno()));
-            lblBodoviOpis.setText(r.cekaVerifikaciju()
-                    ? String.format("Potvrđeno odmah. Nakon verifikacije preostalih dokumenata moguće je %.2f.",
-                    r.potencijalno())
-                    : "Svi bodovi su potvrđeni.");
+            lblBodovi.setText(String.format("%.2f bodova", r.bodovi()));
+            lblBodoviOpis.setText("Prema unesenim podacima. Kriterij bez dokumenta uklonite u koraku 3.");
 
             if (r.imaUpozorenja()) {
                 for (String u : r.upozorenja()) {
@@ -192,7 +182,7 @@ public class PregledUnosaController {
         t.setOnSucceeded(e -> {
             RucniUnosRezultatDTO r = t.getValue();
             alert("Prijava #" + r.idPrijava() + " je podnesena.\n\n"
-                    + String.format("Bodovi: %.2f potvrđeno / %.2f moguće", r.potvrdjeniBodovi(), r.potencijalniBodovi())
+                    + String.format("Bodovi: %.2f", r.bodovi())
                     + (r.noviNalog()
                     ? "\n\nZa studenta je kreiran nalog. Na " + zahtjev.student().email()
                     + " je poslana obavijest s uputom za postavljanje lozinke."

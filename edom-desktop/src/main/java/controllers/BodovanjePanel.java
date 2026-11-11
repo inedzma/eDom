@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-/** Tabela bodovanja sa svim kriterijima; admin mijenja podatke, kriterije i provjeru. */
+/** Tabela bodovanja sa svim kriterijima; admin ispravlja podatke i uklanja nepotkrijepljene kriterije. */
 public class BodovanjePanel extends VBox {
 
     private final String P_BRUCOS, P_USPJEH, P_UPIS, P_UDALJENOST, P_PRIMANJA;
@@ -25,10 +25,8 @@ public class BodovanjePanel extends VBox {
     private final Runnable nakonSnimanja;
 
     private final TextField tfGodina, tfUpis, tfProsjek, tfIspiti, tfKm, tfPrimanja, tfClanova;
-    private final CheckBox chkUspjeh, chkUdaljenost, chkPrimanja;
 
-    private record KRed(BodovanjeKriterijDTO k, CheckBox izabran, TextField param,
-                        DatePicker od, DatePicker doDatuma, CheckBox ver) {}
+    private record KRed(BodovanjeKriterijDTO k, CheckBox izabran, TextField param) {}
 
     private final List<KRed> redovi = new ArrayList<>();
 
@@ -50,16 +48,14 @@ public class BodovanjePanel extends VBox {
         tfKm = polje(d.udaljenostKm(), "km", 70);
         tfPrimanja = polje(d.ukupnaPrimanja(), "KM ukupno", 90);
         tfClanova = polje(d.brojClanova(), "članova", 60);
-        chkUspjeh = kvacica(d.uspjehVerifikovan());
-        chkUdaljenost = kvacica(d.udaljenostVerifikovana());
-        chkPrimanja = kvacica(d.primanjaVerifikovana());
 
         setPadding(new Insets(16));
         getStyleClass().add("pr-kartica");
 
         Label nsl = new Label("Bodovanje – svi kriteriji");
         nsl.getStyleClass().add("pr-kartica-naslov");
-        getChildren().add(nsl);
+        Label opis = sitno("Podatak koji nije potkrijepljen dokumentom ispravite, a kriterij bez dokumenta odznačite.");
+        getChildren().addAll(nsl, opis);
         if (d.greska() != null) getChildren().add(upozorenje("⚠ " + d.greska(), "#b3261e"));
         for (String u : d.upozorenja()) getChildren().add(upozorenje("⚠ " + u, "#b86e00"));
 
@@ -71,7 +67,7 @@ public class BodovanjePanel extends VBox {
         Node ostali = kriteriji(null, "Ostali kriteriji");
         if (ostali != null) getChildren().add(ostali);
 
-        Label ukupno = new Label(String.format("Potvrđeno: %.2f   ·   moguće: %.2f", d.potvrdjeno(), d.potencijalno()));
+        Label ukupno = new Label(String.format("Ukupno: %.2f bodova", d.bodovi()));
         ukupno.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
         Button sacuvaj = new Button("Sačuvaj bodovanje");
         sacuvaj.getStyleClass().add("btn-primary");
@@ -96,16 +92,16 @@ public class BodovanjePanel extends VBox {
 
         red(g, 1, new Label("Uspjeh"),
                 unos(kratko("godina"), tfGodina, kratko("prosjek"), tfProsjek, kratko("ispiti"), tfIspiti),
-                brucos ? P_BRUCOS : P_USPJEH, bodovi(uspjeh), chkUspjeh);
+                brucos ? P_BRUCOS : P_USPJEH, bodovi(uspjeh));
         red(g, 2, new Label("Ponovni upis godine"),
                 unos(kratko("upisuje"), tfUpis, kratko(". put")),
-                P_UPIS, bodovi(upis), sitno("uz uspjeh"));
+                P_UPIS, bodovi(upis));
         red(g, 3, new Label("Udaljenost"),
                 unos(tfKm, kratko("km")),
-                P_UDALJENOST, bodovi(udalj), chkUdaljenost);
+                P_UDALJENOST, bodovi(udalj));
         red(g, 4, new Label("Primanja domaćinstva"),
                 unos(tfPrimanja, kratko("KM ukupno,"), tfClanova, kratko("članova")),
-                P_PRIMANJA, bodovi(prim), chkPrimanja);
+                P_PRIMANJA, bodovi(prim));
         return g.getParent();
     }
 
@@ -130,7 +126,6 @@ public class BodovanjePanel extends VBox {
             izabran.setMaxWidth(230);
 
             TextField param = null;
-            DatePicker od = null, doDatuma = null;
             HBox unos = new HBox(6);
             unos.setAlignment(Pos.CENTER_LEFT);
             if (k.traziParametar()) {
@@ -139,15 +134,6 @@ public class BodovanjePanel extends VBox {
                 if (k.nazivParametra() != null) unos.getChildren().add(sitno(k.nazivParametra()));
                 unos.getChildren().add(param);
             }
-            if (k.traziPeriod()) {
-                od = new DatePicker(k.datumOd());
-                doDatuma = new DatePicker(k.datumDo());
-                od.setPrefWidth(120);
-                doDatuma.setPrefWidth(120);
-                od.disableProperty().bind(izabran.selectedProperty().not());
-                doDatuma.disableProperty().bind(izabran.selectedProperty().not());
-                unos.getChildren().addAll(sitno("od"), od, sitno("do"), doDatuma);
-            }
 
             Label b = new Label(k.izabran()
                     ? String.format("%.2f", k.bodovi()) + (k.boduje() ? "  ◄" : "")
@@ -155,11 +141,8 @@ public class BodovanjePanel extends VBox {
             if (k.boduje()) b.setStyle("-fx-font-weight: bold;");
             if (!k.izabran()) b.setStyle("-fx-text-fill: #9aa5b4;");
 
-            CheckBox ver = kvacica(k.verifikovan());
-            ver.disableProperty().bind(izabran.selectedProperty().not());
-
-            red(g, red++, izabran, unos, k.pravilo(), b, ver);
-            redovi.add(new KRed(k, izabran, param, od, doDatuma, ver));
+            red(g, red++, izabran, unos, k.pravilo(), b);
+            redovi.add(new KRed(k, izabran, param));
         }
         return g.getParent();
     }
@@ -172,18 +155,11 @@ public class BodovanjePanel extends VBox {
             List<BodovanjeKriterijIzmjenaDTO> kr = new ArrayList<>();
             for (KRed r : redovi) {
                 if (!r.izabran().isSelected()) continue;
-                kr.add(new BodovanjeKriterijIzmjenaDTO(
-                        r.k().idVrste(),
-                        r.param() != null ? dec(r.param()) : null,
-                        r.od() != null ? r.od().getValue() : null,
-                        r.doDatuma() != null ? r.doDatuma().getValue() : null,
-                        r.ver().isSelected()));
+                kr.add(new BodovanjeKriterijIzmjenaDTO(r.k().idVrste(), r.param() != null ? dec(r.param()) : null));
             }
             z = new BodovanjeIzmjenaDTO(
                     cijeli(tfGodina), cijeli(tfUpis), dec(tfProsjek), cijeli(tfIspiti),
-                    dec(tfKm), cijeli(tfClanova), dec(tfPrimanja),
-                    chkUspjeh.isSelected(), chkUdaljenost.isSelected(), chkPrimanja.isSelected(),
-                    kr);
+                    dec(tfKm), cijeli(tfClanova), dec(tfPrimanja), kr);
         } catch (IllegalArgumentException ex) {
             new Alert(Alert.AlertType.WARNING, ex.getMessage()).showAndWait();
             return;
@@ -196,9 +172,8 @@ public class BodovanjePanel extends VBox {
             }
         };
         task.setOnSucceeded(e -> {
-            BodovanjeDetaljnoDTO n = task.getValue();
             Alert a = new Alert(Alert.AlertType.INFORMATION,
-                    String.format("Bodovanje je sačuvano. Potvrđeno: %.2f (moguće %.2f).", n.potvrdjeno(), n.potencijalno()));
+                    String.format("Bodovanje je sačuvano. Ukupno: %.2f bodova.", task.getValue().bodovi()));
             a.setHeaderText(null);
             a.showAndWait();
             nakonSnimanja.run();
@@ -226,10 +201,9 @@ public class BodovanjePanel extends VBox {
         c1.setHgrow(Priority.ALWAYS);
         ColumnConstraints c2 = new ColumnConstraints(140, 240, 320);
         ColumnConstraints c3 = new ColumnConstraints(70, 80, 100);
-        ColumnConstraints c4 = new ColumnConstraints(40, 60, 80);
-        g.getColumnConstraints().addAll(c0, c1, c2, c3, c4);
+        g.getColumnConstraints().addAll(c0, c1, c2, c3);
 
-        String[] kol = {"Stavka", "Uneseno", "Pravilo", "Bodovi", "✓"};
+        String[] kol = {"Stavka", "Uneseno", "Pravilo", "Bodovi"};
         for (int i = 0; i < kol.length; i++) {
             Label l = new Label(kol[i]);
             l.setStyle("-fx-text-fill: #6b7a90; -fx-font-weight: bold;");
@@ -256,26 +230,19 @@ public class BodovanjePanel extends VBox {
         return h;
     }
 
-    private void red(GridPane g, int red, Node stavka, Node unos, String pravilo, Node bodovi, Node ver) {
+    private void red(GridPane g, int red, Node stavka, Node unos, String pravilo, Node bodovi) {
         Label p = sitno(pravilo);
         p.setWrapText(true);
         g.add(stavka, 0, red);
         g.add(unos, 1, red);
         g.add(p, 2, red);
         g.add(bodovi, 3, red);
-        g.add(ver, 4, red);
     }
 
     private Label bodovi(StavkaBodovanja s) {
         Label l = new Label(s == null ? "0.00" : String.format("%.2f", s.bodovi()));
         if (s != null && s.obrazlozenje() != null) l.setTooltip(new Tooltip(s.obrazlozenje()));
         return l;
-    }
-
-    private static CheckBox kvacica(boolean v) {
-        CheckBox c = new CheckBox();
-        c.setSelected(v);
-        return c;
     }
 
     private static TextField polje(Object v, String prompt, double sirina) {

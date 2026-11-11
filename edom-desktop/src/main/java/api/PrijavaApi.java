@@ -30,11 +30,6 @@ public final class PrijavaApi {
         return ApiClient.get("/api/prijave/" + idPrijave + "/dokumenti/" + idDokumenta + "/sadrzaj",
                 DokumentSadrzajDTO.class).b64();
     }
-
-    public static PrijavaDetaljiDTO verifikuj(int idPrijave, VerifikacijaDTO z) {
-        return ApiClient.put("/api/prijave/" + idPrijave + "/verifikacija", z, PrijavaDetaljiDTO.class);
-    }
-
     public static PrijavaDetaljiDTO promijeniStatus(int idPrijave, PromjenaStatusaDTO z) {
         return ApiClient.put("/api/prijave/" + idPrijave + "/status", z, PrijavaDetaljiDTO.class);
     }

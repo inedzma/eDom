@@ -4,7 +4,6 @@ import api.ApiException;
 import api.PostavkeApi;
 import api.PrijavaApi;
 import ba.unze.edom.common.dto.bodovanje.RezultatBodovanja;
-import ba.unze.edom.common.dto.bodovanje.StavkaBodovanja;
 import ba.unze.edom.common.dto.dokumenti.DokumentDTO;
 import ba.unze.edom.common.dto.prijava.PrijavaDetaljiDTO;
 import ba.unze.edom.common.dto.prijava.PromjenaStatusaDTO;
@@ -122,18 +121,11 @@ public class DetaljiPrijaveController {
         long dostavljeno = docs.stream().filter(d -> Boolean.TRUE.equals(d.dostavljen())).count();
 
         VBox bodovi;
-        VBox provjereno;
         if (r == null) {
             bodovi = stat("BODOVI", "—", "⚠ neispravni podaci", -1);
             if (p.greska() != null) Tooltip.install(bodovi, new Tooltip(p.greska()));
-            provjereno = stat("PROVJERENO", "—", "", -1);
         } else {
-            bodovi = stat("BODOVI", String.format("%.2f", r.potvrdjeno()),
-                    String.format("potvrđeno od mogućih %.2f", r.potencijalno()),
-                    r.potencijalno() > 0 ? r.potvrdjeno() / r.potencijalno() : 0);
-            long ok = r.stavke().stream().filter(StavkaBodovanja::verifikovan).count();
-            int n = r.stavke().size();
-            provjereno = stat("PROVJERENO", ok + " / " + n, "stavki bodovanja", n == 0 ? 0 : (double) ok / n);
+            bodovi = stat("BODOVI", String.format("%.2f", r.bodovi()), "prema unesenim podacima", -1);
         }
 
         VBox dokumenti = stat("DOKUMENTI", dostavljeno + " / " + docs.size(),
@@ -141,7 +133,7 @@ public class DetaljiPrijaveController {
         VBox prosjek = stat("PROSJEK", p.prosjek() != null ? broj(p.prosjek()) : "—",
                 p.polozeniIspiti() != null ? p.polozeniIspiti() + " položenih ispita" : "", -1);
 
-        boxStatistika.getChildren().setAll(bodovi, provjereno, dokumenti, prosjek);
+        boxStatistika.getChildren().setAll(bodovi, dokumenti, prosjek);
     }
 
     /** Pločica u zaglavlju: naslov, veliki broj, opis i (ako ima) traka. */
@@ -270,18 +262,12 @@ public class DetaljiPrijaveController {
         }
 
         String pitanje = "Promijeniti status prijave u '" + novi + "'?";
-        RezultatBodovanja r = prijava.bodovanje();
-        boolean prihvacena = ODOBRENO.equals(novi) || NA_CEKANJU.equals(novi);
-        if (prihvacena && r != null && r.cekaVerifikaciju()) {
-            pitanje += String.format(
-                    "%n%nPažnja: %.2f bodova nije provjereno i neće biti uračunato.%nPrijava se boduje sa %.2f bodova.",
-                    r.potencijalno() - r.potvrdjeno(), r.potvrdjeno());
-        }
         if (NA_CEKANJU.equals(novi)) {
             pitanje += "\n\nStudent ne ispunjava uslov za upis naredne godine i ide na listu čekanja."
                     + "\nKad donese uvjerenje, odobrite prijavu (ili \"Dokaz ✓\" na rang listi).";
-        } else if (ODOBRENO.equals(novi) && prijava.trebaUslov()) {
-            pitanje += "\n\nOdobravanjem potvrđujete da student ispunjava uslov za upis naredne godine.";
+        } else if (ODOBRENO.equals(novi)) {
+            pitanje += "\n\nOdobravanjem potvrđujete da su podaci provjereni"
+                    + (prijava.trebaUslov() ? " i da student ispunjava uslov za upis naredne godine." : ".");
         }
         if ("nepotpuna".equals(novi)) {
             pitanje += "\n\nStudent dobija e-mail s napomenom i može dodati dokumente na webu."

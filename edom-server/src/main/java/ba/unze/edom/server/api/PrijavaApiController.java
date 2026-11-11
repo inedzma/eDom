@@ -56,11 +56,6 @@ public class PrijavaApiController {
         return rucniUnosService.unesi(zahtjev);
     }
 
-    @PutMapping("/{id}/verifikacija")
-    public PrijavaDetaljiDTO verifikuj(@PathVariable Integer id, @RequestBody VerifikacijaDTO z) {
-        return prijavaAdminService.verifikuj(id, z);
-    }
-
     @PutMapping("/{id}/status")
     public PrijavaDetaljiDTO promijeniStatus(@PathVariable Integer id,
                                              @Valid @RequestBody PromjenaStatusaDTO z) {

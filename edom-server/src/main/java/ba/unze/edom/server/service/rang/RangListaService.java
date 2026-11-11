@@ -47,7 +47,7 @@ public class RangListaService {
 
     private record Rangirana(Prijava prijava, RezultatBodovanja rezultat, String greska) {
         double bodovi() {
-            return rezultat != null ? rezultat.potvrdjeno() : 0.0;
+            return rezultat != null ? rezultat.bodovi() : 0.0;
         }
     }
 
@@ -116,13 +116,13 @@ public class RangListaService {
         Prijava p = r.prijava();
         Student s = p.getStudent();
 
-        double uspjeh     = potvrdjeno(r, KategorijaBodovanja.USPJEH);
-        double udaljenost = potvrdjeno(r, KategorijaBodovanja.UDALJENOST);
-        double socijalni  = zaokruzi(potvrdjeno(r, KategorijaBodovanja.PRIMANJA)
-                + potvrdjeno(r, GrupeKriterija.DODATNI));
+        double uspjeh     = zbir(r, KategorijaBodovanja.USPJEH);
+        double udaljenost = zbir(r, KategorijaBodovanja.UDALJENOST);
+        double socijalni  = zaokruzi(zbir(r, KategorijaBodovanja.PRIMANJA)
+                + zbir(r, GrupeKriterija.DODATNI));
         double ukupno     = r.bodovi();
 
-        // branioci: uzima se samo najveći potvrđeni, pa se računa kao ostatak do ukupnog
+        // branioci: uzima se samo najveći, pa se računa kao ostatak do ukupnog
         double branioci = r.rezultat() == null ? 0
                 : zaokruzi(ukupno - uspjeh - udaljenost - socijalni);
 
@@ -140,10 +140,10 @@ public class RangListaService {
                 r.greska());
     }
 
-    private double potvrdjeno(Rangirana r, String kategorija) {
+    private double zbir(Rangirana r, String kategorija) {
         if (r.rezultat() == null) return 0;
         return zaokruzi(r.rezultat().stavke().stream()
-                .filter(st -> st.verifikovan() && kategorija.equals(st.kategorija()))
+                .filter(st -> kategorija.equals(st.kategorija()))
                 .mapToDouble(StavkaBodovanja::bodovi)
                 .sum());
     }
@@ -177,6 +177,4 @@ public class RangListaService {
     private double zaokruzi(double d) {
         return Math.round(d * 100.0) / 100.0;
     }
-
-
 }

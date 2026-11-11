@@ -11,8 +11,5 @@ public record BodovanjeIzmjenaDTO(
         BigDecimal udaljenostKm,
         Integer brojClanova,
         BigDecimal ukupnaPrimanja,
-        boolean uspjehVerifikovan,
-        boolean udaljenostVerifikovana,
-        boolean primanjaVerifikovana,
         List<BodovanjeKriterijIzmjenaDTO> kriteriji
 ) {}

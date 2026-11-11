@@ -123,7 +123,7 @@ public class RucniUnosService {
 
         // 4. bodovanje = ujedno i validacija; nevalidni podaci poništavaju cijeli unos
         RezultatBodovanja r = bodovanjeService.izracunaj(p);
-        p.setUkupniBodovi(r.potvrdjeno());
+        p.setUkupniBodovi(r.bodovi());
 
         prijavaRepository.save(p);
 
@@ -131,8 +131,7 @@ public class RucniUnosService {
                 z.student().email(), student.getIme(), pz.akademskaGodina(), noviNalog,
                 SifraStudenta.format(student.getSifraBroj(), pz.akademskaGodina())));
 
-        return new RucniUnosRezultatDTO(p.getIdPrijava(), student.getIdStudent(),
-                noviNalog, r.potvrdjeno(), r.potencijalno());
+        return new RucniUnosRezultatDTO(p.getIdPrijava(), student.getIdStudent(), noviNalog, r.bodovi());
     }
 
     // ---------- zajedničko za pregled i unos ----------
@@ -166,11 +165,6 @@ public class RucniUnosService {
         p.setUdaljenostKm(pz.udaljenostKm());
         p.setNapomena(pz.napomena());
 
-        // originali pred uposlenikom -> odmah verifikovano
-        p.setUspjehVerifikovan(pz.uspjehVerifikovan());
-        p.setUdaljenostVerifikovana(pz.udaljenostVerifikovana());
-        p.setPrimanjaVerifikovana(pz.primanjaVerifikovana());
-
         // kriteriji, po šifri; bodove nosi baza, ne desktop
         for (KriterijUnosDTO kz : nullSafe(z.kriteriji())) {
             VrstaKriterija v = vrstaKriterijaRepository.findBySifra(kz.sifra())
@@ -184,19 +178,6 @@ public class RucniUnosService {
             PrijavaKriterij k = new PrijavaKriterij();
             k.setVrsta(v);
             k.setParametar(v.isTraziParametar() ? kz.parametar() : null);
-            k.setVerifikovan(kz.verifikovan());
-
-            if (v.isTraziPeriod()) {
-                if (kz.datumOd() == null || kz.datumDo() == null) {
-                    throw new PrijavaException("Za kriterij '" + v.getNaziv() + "' unesite datum od i datum do.");
-                }
-                if (kz.datumOd().isAfter(kz.datumDo())) {
-                    throw new PrijavaException("Za kriterij '" + v.getNaziv() + "' datum od ne može biti poslije datuma do.");
-                }
-                k.setDatumOd(kz.datumOd());
-                k.setDatumDo(kz.datumDo());
-            }
-
             p.dodajKriterij(k);
         }
 
@@ -210,7 +191,6 @@ public class RucniUnosService {
             d.setNaziv(dz.naziv() != null && !dz.naziv().isBlank() ? dz.naziv().trim() : vrsta.getNaziv());
             d.setDatumUpload(LocalDate.now());
             d.setDostavljen(dz.dostavljen());
-            d.setBrojBodova(0);
             d.setDokumentB64(dz.b64());
             p.dodajDokument(d);
         }

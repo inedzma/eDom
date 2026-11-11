@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -65,7 +64,7 @@ public class ObrazacPrijaveService {
         pitanja.add(new Pitanje(10, "Da li vaši roditelji/staratelji imaju invalidnost? Ako imaju upišite stepen invalidnosti.",
                 odgovor(kr, "INVALID_RODITELJA")));
         pitanja.add(new Pitanje(11, "Da li vaši roditelji imaju učešće u OS RBiH? Ako imaju upišite tačan broj mjeseci.",
-                osRbih(kr)));
+                odgovor(kr, "DIJETE_OSRBIH")));
         pitanja.add(new Pitanje(12, "Da li ste dijete nosilaca ratnih priznanja? Ako jeste upišite broj ratnih priznanja.",
                 odgovor(kr, "priznanj")));
         pitanja.add(new Pitanje(13, "Logoraški status: student logoraš upisati jedan (1), roditelj ili staratelj logoraš upisati dva (2)",
@@ -117,17 +116,6 @@ public class ObrazacPrijaveService {
                     return "Da" + param;
                 }
             }
-        }
-        return "Ne";
-    }
-
-    private String osRbih(List<PrijavaKriterij> kr) {
-        for (PrijavaKriterij k : kr) {
-            if (k.getVrsta() == null || !"DIJETE_OSRBIH".equals(k.getVrsta().getSifra())) continue;
-            long mjeseci = k.getDatumOd() != null && k.getDatumDo() != null && !k.getDatumDo().isBefore(k.getDatumOd())
-                    ? Period.between(k.getDatumOd(), k.getDatumDo()).toTotalMonths()
-                    : (k.getParametar() != null ? k.getParametar().longValue() : 0);
-            return "Da – " + mjeseci + " mjeseci";
         }
         return "Ne";
     }

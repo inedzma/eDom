@@ -13,9 +13,6 @@ import ba.unze.edom.server.service.prijava.Statusi;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -29,11 +26,6 @@ import java.util.*;
 @Service
 public class BodovanjeService {
 
-    /** Podrazumijevana kazna; stvarna vrijednost je u Postavkama. */
-    static final double KAZNA_PONOVNI_UPIS = -3;
-
-    private static final DateTimeFormatter DATUM = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
-
     private final PrijavaValidator validator;
     private final PostavkeService postavke;
 
@@ -45,59 +37,26 @@ public class BodovanjeService {
     public RezultatBodovanja izracunaj(Prijava p) {
 
         if (p == null) {
-            return new RezultatBodovanja(0, 0, false, List.of());
+            return new RezultatBodovanja(0, false, List.of(), List.of());
         }
 
         validator.provjeri(p);
         PravilaBodovanja pr = postavke.pravila();
 
-        StavkaBodovanja uspjeh     = bodoviUspjeh(p, pr);
-        StavkaBodovanja udaljenost = bodoviUdaljenost(p, pr);
-        StavkaBodovanja primanja   = bodoviPrimanja(p, pr);
-        Optional<StavkaBodovanja> ponovniUpis = kaznaPonovniUpis(p, pr);
-
-        var braniociSvi        = najveciBranilac(p, false);
-        var braniociPotvrdjeni = najveciBranilac(p, true);
-
-        List<StavkaBodovanja> dodatni = dodatniKriteriji(p);
-
         List<StavkaBodovanja> stavke = new ArrayList<>();
-        stavke.add(uspjeh);
-        ponovniUpis.ifPresent(stavke::add);
-        stavke.add(udaljenost);
-        stavke.add(primanja);
-        braniociSvi.ifPresent(stavke::add);
-        stavke.addAll(dodatni);
+        stavke.add(bodoviUspjeh(p, pr));
+        kaznaPonovniUpis(p, pr).ifPresent(stavke::add);
+        stavke.add(bodoviUdaljenost(p, pr));
+        stavke.add(bodoviPrimanja(p, pr));
+        najveciBranilac(p).ifPresent(stavke::add);
+        stavke.addAll(dodatniKriteriji(p));
 
-        List<StavkaBodovanja> osnovni = new ArrayList<>(List.of(uspjeh, udaljenost, primanja));
-        ponovniUpis.ifPresent(osnovni::add);
+        double ukupno = stavke.stream().mapToDouble(StavkaBodovanja::bodovi).sum();
 
-        double potvrdjeno =
-                zbir(osnovni, true)
-                        + braniociPotvrdjeni.map(StavkaBodovanja::bodovi).orElse(0.0)
-                        + zbir(dodatni, true);
-
-        double potencijalno =
-                zbir(osnovni, false)
-                        + braniociSvi.map(StavkaBodovanja::bodovi).orElse(0.0)
-                        + zbir(dodatni, false);
-
-        String st = nazivStatusa(p);
+        String st = p.getStatus() != null ? p.getStatus().getNaziv() : null;
         boolean konacno = Statusi.ODOBRENO.equals(st) || Statusi.ZAKLJUCENO.equals(st);
 
-        return new RezultatBodovanja(
-                zaokruzi(potvrdjeno), zaokruzi(potencijalno), konacno, stavke, upozorenja(p));
-    }
-
-    private double zbir(List<StavkaBodovanja> stavke, boolean samoVerifikovane) {
-        return stavke.stream()
-                .filter(s -> !samoVerifikovane || s.verifikovan())
-                .mapToDouble(StavkaBodovanja::bodovi)
-                .sum();
-    }
-
-    private String nazivStatusa(Prijava p) {
-        return p.getStatus() != null ? p.getStatus().getNaziv() : null;
+        return new RezultatBodovanja(zaokruzi(ukupno), konacno, stavke, upozorenja(p));
     }
 
     // ---------------- UPOZORENJA ----------------
@@ -118,12 +77,10 @@ public class BodovanjeService {
 
         Integer godina = p.getGodinaStudija();
         BigDecimal prosjek = p.getProsjek();
-        boolean ver = p.isUspjehVerifikovan();
 
         if (godina == null || prosjek == null) {
             return new StavkaBodovanja("Uspjeh", 0,
-                    "Prosjek ili godina studija nisu uneseni", ver,
-                    KategorijaBodovanja.USPJEH);
+                    "Prosjek ili godina studija nisu uneseni", KategorijaBodovanja.USPJEH);
         }
 
         double prs = prosjek.doubleValue();
@@ -131,19 +88,18 @@ public class BodovanjeService {
         if (godina == GodineStudija.PRVA) {
             double b = prs * pr.brucosMnozilac() + pr.brucosDodatak();
             return new StavkaBodovanja("Uspjeh (brucoš)", zaokruzi(b),
-                    "Prosjek " + prs, ver,
-                    KategorijaBodovanja.USPJEH);
+                    "Prosjek " + prs, KategorijaBodovanja.USPJEH);
         }
 
         int ispiti = p.getPolozeniIspiti() != null ? p.getPolozeniIspiti() : 0;
         double b = prs * pr.prosjekMnozilac() + ispiti * pr.ispitMnozilac() + pr.bonus(godina);
 
         return new StavkaBodovanja("Uspjeh", zaokruzi(b),
-                "Prosjek " + prs + ", položenih ispita: " + ispiti
-                        + ", " + GodineStudija.naziv(godina), ver,
+                "Prosjek " + prs + ", položenih ispita: " + ispiti + ", " + GodineStudija.naziv(godina),
                 KategorijaBodovanja.USPJEH);
     }
 
+    /** Koristi ga test; stvarne vrijednosti su u Postavkama. */
     double bonusGodine(int godina) {
         return postavke.pravila().bonus(godina);
     }
@@ -153,59 +109,44 @@ public class BodovanjeService {
         if (put == null || put < 2 || pr.kaznaPonovniUpis() == 0) return Optional.empty();
 
         return Optional.of(new StavkaBodovanja("Ponovni upis godine", pr.kaznaPonovniUpis(),
-                "Tekuću godinu upisuje " + put + ". put", p.isUspjehVerifikovan(),
-                KategorijaBodovanja.USPJEH));
+                "Tekuću godinu upisuje " + put + ". put", KategorijaBodovanja.USPJEH));
     }
 
     // ---------------- UDALJENOST ----------------
 
     private StavkaBodovanja bodoviUdaljenost(Prijava p, PravilaBodovanja pr) {
-
-        boolean ver = p.isUdaljenostVerifikovana();
-
         if (p.getUdaljenostKm() == null) {
-            return new StavkaBodovanja("Udaljenost", 0, "Nije uneseno", ver,
-                    KategorijaBodovanja.UDALJENOST);
+            return new StavkaBodovanja("Udaljenost", 0, "Nije uneseno", KategorijaBodovanja.UDALJENOST);
         }
-
         double km = p.getUdaljenostKm().doubleValue();
         return new StavkaBodovanja("Udaljenost", pr.udaljenost().bodovi(km),
-                String.format("%.1f km", km), ver,
-                KategorijaBodovanja.UDALJENOST);
+                String.format("%.1f km", km), KategorijaBodovanja.UDALJENOST);
     }
 
     // ---------------- PRIMANJA ----------------
 
     private StavkaBodovanja bodoviPrimanja(Prijava p, PravilaBodovanja pr) {
-
-        boolean ver = p.isPrimanjaVerifikovana();
-
         Integer clanova = p.getBrojClanovaDomacinstva();
         BigDecimal ukupno = p.getUkupnaPrimanja();
 
         if (ukupno == null || clanova == null || clanova < 1) {
-            return new StavkaBodovanja("Primanja domaćinstva", 0,
-                    "Nije uneseno", ver,
-                    KategorijaBodovanja.PRIMANJA);
+            return new StavkaBodovanja("Primanja domaćinstva", 0, "Nije uneseno", KategorijaBodovanja.PRIMANJA);
         }
 
         double poClanu = ukupno.doubleValue() / clanova;
-
         return new StavkaBodovanja("Primanja domaćinstva", pr.primanja().bodovi(poClanu),
                 String.format("%.2f KM po članu (%d članova)", poClanu, clanova),
-                ver,
                 KategorijaBodovanja.PRIMANJA);
     }
 
     // ---------------- BRANIOCI ----------------
 
-    private Optional<StavkaBodovanja> najveciBranilac(Prijava p, boolean samoVerifikovani) {
+    private Optional<StavkaBodovanja> najveciBranilac(Prijava p) {
         if (p.getKriteriji() == null) return Optional.empty();
 
         return p.getKriteriji().stream()
                 .filter(k -> k.getVrsta() != null)
                 .filter(k -> GrupeKriterija.BRANIOCI.equals(k.getVrsta().getGrupa()))
-                .filter(k -> !samoVerifikovani || k.isVerifikovan())
                 .map(this::stavkaZaKriterij)
                 .max(Comparator.comparingDouble(StavkaBodovanja::bodovi));
     }
@@ -229,22 +170,20 @@ public class BodovanjeService {
 
     // ---------------- ZAJEDNICKO ----------------
 
-    /** Stavka za jedan kriterij. Koristi je i admin pregled (BodovanjeAdminService). */
+    /**
+     * Stavka za jedan kriterij. Koristi je i admin pregled (BodovanjeAdminService).
+     * Fiksni bodovi iz tabele, osim tri kriterija čije bodove Pravilnik računa iz parametra.
+     */
     public StavkaBodovanja stavkaZaKriterij(PrijavaKriterij k) {
 
         VrstaKriterija v = k.getVrsta();
 
-        if (v.getBodovi() != null) {
-            String obr = v.getNazivParametra() != null && k.getParametar() != null
-                    ? v.getNazivParametra() + ": " + k.getParametar().stripTrailingZeros().toPlainString()
-                    : null;
-            return new StavkaBodovanja(v.getNaziv(),
-                    v.getBodovi().doubleValue(), obr, k.isVerifikovan(),
-                    v.getGrupa());
-        }
+        String obr = v.getNazivParametra() != null && k.getParametar() != null
+                ? v.getNazivParametra() + ": " + k.getParametar().stripTrailingZeros().toPlainString()
+                : null;
 
-        if ("DIJETE_OSRBIH".equals(v.getSifra())) {
-            return stavkaOsRbih(k);
+        if (v.getBodovi() != null) {
+            return new StavkaBodovanja(v.getNaziv(), v.getBodovi().doubleValue(), obr, v.getGrupa());
         }
 
         double param = k.getParametar() != null ? k.getParametar().doubleValue() : 0;
@@ -252,39 +191,11 @@ public class BodovanjeService {
         double b = switch (v.getSifra()) {
             case "STUDENT_RVI"       -> param == 0 ? 0 : (param < 60 ? 15 : 20);
             case "INVALID_RODITELJA" -> param * 0.1;
+            case "DIJETE_OSRBIH"     -> Math.floor(param) * 0.3;   // parametar = broj punih mjeseci
             default -> 0;
         };
 
-        String obrazlozenje = v.getNazivParametra() != null
-                ? v.getNazivParametra() + ": " + param
-                : null;
-
-        return new StavkaBodovanja(v.getNaziv(), zaokruzi(b),
-                obrazlozenje, k.isVerifikovan(),
-                v.getGrupa());
-    }
-
-    private StavkaBodovanja stavkaOsRbih(PrijavaKriterij k) {
-        VrstaKriterija v = k.getVrsta();
-        long mjeseci;
-        String obr;
-
-        if (k.getDatumOd() != null && k.getDatumDo() != null) {
-            mjeseci = punihMjeseci(k.getDatumOd(), k.getDatumDo());
-            obr = k.getDatumOd().format(DATUM) + " – " + k.getDatumDo().format(DATUM)
-                    + " (" + mjeseci + " punih mjeseci)";
-        } else {
-            mjeseci = k.getParametar() != null ? k.getParametar().longValue() : 0;
-            obr = mjeseci + " mjeseci";
-        }
-
-        return new StavkaBodovanja(v.getNaziv(), zaokruzi(mjeseci * 0.3),
-                obr, k.isVerifikovan(), v.getGrupa());
-    }
-
-    static long punihMjeseci(LocalDate od, LocalDate doDatuma) {
-        if (od == null || doDatuma == null || doDatuma.isBefore(od)) return 0;
-        return Period.between(od, doDatuma).toTotalMonths();
+        return new StavkaBodovanja(v.getNaziv(), zaokruzi(b), obr, v.getGrupa());
     }
 
     private double zaokruzi(double d) {

@@ -134,19 +134,13 @@ public class prijaveController {
             }
         });
 
-        // bodovi: "potvrđeno / moguće" + traka; neispravne prijave na dno pri sortiranju
+        // bodovi; neispravne prijave na dno pri sortiranju
         colBodovi.setCellValueFactory(c -> new SimpleObjectProperty<>(
-                c.getValue().greska() != null ? -1.0 : nz(c.getValue().potvrdjeniBodovi())));
+                c.getValue().greska() != null ? -1.0 : nz(c.getValue().bodovi())));
         colBodovi.setCellFactory(col -> new TableCell<>() {
-            private final Label potv = new Label();
-            private final Label mog = new Label();
-            private final ProgressBar traka = new ProgressBar();
-            private final VBox box = new VBox(5, new HBox(4, potv, mog), traka);
+            private final Label broj = new Label();
             {
-                potv.getStyleClass().add("pr-bodovi");
-                mog.getStyleClass().add("pr-sitno");
-                traka.getStyleClass().add("pr-traka");
-                traka.setPrefWidth(120);
+                broj.getStyleClass().add("pr-bodovi");
             }
 
             @Override
@@ -166,17 +160,8 @@ public class prijaveController {
                     setTooltip(new Tooltip(p.greska()));
                     return;
                 }
-                double a = nz(p.potvrdjeniBodovi());
-                double b = nz(p.potencijalniBodovi());
-                potv.setText(String.format("%.2f", a));
-                mog.setText(String.format("/ %.2f", b));
-                traka.setProgress(b > 0 ? Math.min(1, a / b) : 0);
-                traka.getStyleClass().remove("pr-traka--ceka");
-                if (p.cekaVerifikaciju()) {
-                    traka.getStyleClass().add("pr-traka--ceka");
-                    setTooltip(new Tooltip("Dio bodova čeka provjeru dokumenata."));
-                }
-                setGraphic(box);
+                broj.setText(String.format("%.2f", nz(p.bodovi())));
+                setGraphic(broj);
             }
         });
 

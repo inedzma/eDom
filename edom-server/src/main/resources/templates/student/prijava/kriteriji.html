@@ -43,7 +43,7 @@
         <div class="info-note">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
             <span>Za svaki označeni kriterij potrebno je priložiti odgovarajući dokument.
-                Bodovi se dodjeljuju tek nakon što administracija provjeri dokumentaciju.</span>
+                Kriterij koji nije potkrijepljen dokumentom administracija uklanja i on ne donosi bodove.</span>
         </div>
 
         <form th:action="@{/student/prijava/{id}/kriteriji(id=${idPrijave})}"
@@ -67,19 +67,20 @@
                                 <span class="krit-doc">Potreban dokument</span>
                             </label>
 
+                            <!-- period se ne snima: služi samo da se izračuna broj punih mjeseci -->
+                            <div class="krit-param krit-period" th:if="${k.traziPeriod}">
+                                <label th:for="${'od' + stat.index}">Početak učešća</label>
+                                <input type="date" class="period-od" th:id="${'od' + stat.index}">
+                                <label th:for="${'do' + stat.index}">Kraj učešća</label>
+                                <input type="date" class="period-do" th:id="${'do' + stat.index}">
+                                <small class="hint">Broj punih mjeseci se izračuna sam (0,3 boda po mjesecu, započeti mjesec se ne računa).</small>
+                            </div>
+
                             <div class="krit-param" th:if="${k.traziParametar}">
                                 <label th:for="${'kriteriji' + stat.index + '.parametar'}"
                                        th:text="${k.nazivParametra}">Parametar</label>
-                                <input type="number" step="0.01"
+                                <input type="number" step="0.01" min="0"
                                        th:field="*{kriteriji[__${stat.index}__].parametar}">
-                            </div>
-
-                            <div class="krit-param krit-period" th:if="${k.traziPeriod}">
-                                <label th:for="${'kriteriji' + stat.index + '.datumOd'}">Početak učešća</label>
-                                <input type="date" th:field="*{kriteriji[__${stat.index}__].datumOd}">
-                                <label th:for="${'kriteriji' + stat.index + '.datumDo'}">Kraj učešća</label>
-                                <input type="date" th:field="*{kriteriji[__${stat.index}__].datumDo}">
-                                <small class="hint">Boduju se puni mjeseci učešća (0,3 boda po mjesecu). Započeti mjesec se ne računa.</small>
                             </div>
                         </div>
                     </th:block>
@@ -102,13 +103,6 @@
                                 <span class="krit-name" th:text="${k.naziv}">Kriterij</span>
                                 <span class="krit-doc">Potreban dokument</span>
                             </label>
-                            <div class="krit-param krit-period" th:if="${k.traziPeriod}">
-                                <label th:for="${'kriteriji' + stat.index + '.datumOd'}">Početak učešća</label>
-                                <input type="date" th:field="*{kriteriji[__${stat.index}__].datumOd}">
-                                <label th:for="${'kriteriji' + stat.index + '.datumDo'}">Kraj učešća</label>
-                                <input type="date" th:field="*{kriteriji[__${stat.index}__].datumDo}">
-                                <small class="hint">Boduju se puni mjeseci učešća (0,3 boda po mjesecu). Započeti mjesec se ne računa.</small>
-                            </div>
                         </div>
                     </th:block>
                 </div>
@@ -163,6 +157,25 @@
             });
         });
         osvjezi();
+
+        // period učešća -> broj punih mjeseci u polje parametra (period se ne šalje na server)
+        function punihMjeseci(od, doD) {
+            let m = (doD.getUTCFullYear() - od.getUTCFullYear()) * 12 + (doD.getUTCMonth() - od.getUTCMonth());
+            if (doD.getUTCDate() < od.getUTCDate()) m--;
+            return Math.max(0, m);
+        }
+        form.querySelectorAll('.krit-period').forEach(function (per) {
+            const od = per.querySelector('.period-od');
+            const doD = per.querySelector('.period-do');
+            const broj = per.closest('.krit').querySelector('input[type=number]');
+            function racunaj() {
+                if (broj && od.valueAsDate && doD.valueAsDate) {
+                    broj.value = punihMjeseci(od.valueAsDate, doD.valueAsDate);
+                }
+            }
+            od.addEventListener('change', racunaj);
+            doD.addEventListener('change', racunaj);
+        });
 
         // stanje učitavanja
         form.addEventListener('submit', function (e) {

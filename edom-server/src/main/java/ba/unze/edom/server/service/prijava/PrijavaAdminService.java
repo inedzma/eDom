@@ -3,7 +3,6 @@ package ba.unze.edom.server.service.prijava;
 import ba.unze.edom.common.dto.bodovanje.RezultatBodovanja;
 import ba.unze.edom.common.dto.prijava.*;
 import ba.unze.edom.server.entity.Prijava;
-import ba.unze.edom.server.entity.PrijavaKriterij;
 import ba.unze.edom.server.exception.NevalidnaPrijavaException;
 import ba.unze.edom.server.exception.PrijavaException;
 import ba.unze.edom.server.mapper.PrijaveMapper;
@@ -25,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,10 +31,6 @@ public class PrijavaAdminService {
 
     private static final ZoneId ZONA = ZoneId.of("Europe/Sarajevo");
 
-    /**
-     * Dozvoljeni prelazi statusa — jedino mjesto gdje su zapisani.
-     * "na čekanju" = viši student bez uslova za upis (lista čekanja); brucošima se ne nudi.
-     */
     /**
      * Dozvoljeni prelazi statusa — jedino mjesto gdje su zapisani.
      * "nepotpuna" = traži se dopuna; student je šalje i prijava se vraća na pregled.
@@ -93,34 +87,6 @@ public class PrijavaAdminService {
         return izgradiDetalje(ucitaj(idPrijave));
     }
 
-    // ---------- PROVJERA STAVKI ----------
-
-    @Transactional
-    public PrijavaDetaljiDTO verifikuj(Integer idPrijave, VerifikacijaDTO z) {
-        Prijava p = ucitaj(idPrijave);
-
-        if (!Statusi.NA_PREGLEDU.equals(nazivStatusa(p))) {
-            throw new PrijavaException(
-                    "Stavke se mogu provjeravati samo dok je prijava na pregledu. Vratite je prvo na pregled.");
-        }
-
-        p.setUspjehVerifikovan(z.uspjeh());
-        p.setUdaljenostVerifikovana(z.udaljenost());
-        p.setPrimanjaVerifikovana(z.primanja());
-
-        Map<Integer, Boolean> poKriteriju = z.kriteriji() == null ? Map.of()
-                : z.kriteriji().stream().collect(Collectors.toMap(
-                KriterijVerifikacijaDTO::idPrijavaKriterij, KriterijVerifikacijaDTO::verifikovan));
-
-        for (PrijavaKriterij k : p.getKriteriji()) {
-            Boolean v = poKriteriju.get(k.getIdPrijavaKriterij());
-            if (v != null) k.setVerifikovan(v);
-        }
-
-        osvjeziBodove(p);
-        return izgradiDetalje(p);
-    }
-
     // ---------- PROMJENA STATUSA ----------
 
     @Transactional
@@ -152,7 +118,7 @@ public class PrijavaAdminService {
         p.setStatus(statusRepository.findByNaziv(novi)
                 .orElseThrow(() -> new IllegalStateException("Status '" + novi + "' ne postoji u bazi.")));
         p.setNapomenaAdmina(napomena);
-        if (r != null) p.setUkupniBodovi(r.potvrdjeno());
+        if (r != null) p.setUkupniBodovi(r.bodovi());
 
         if (Set.of(Statusi.ODOBRENO, Statusi.ODBIJENO, Statusi.NEPOTPUNA, Statusi.NA_CEKANJU).contains(novi)) {
             dogadjaji.publishEvent(new StatusPromijenjenEvent(
@@ -230,11 +196,6 @@ public class PrijavaAdminService {
                 .saUslovom(!UslovUpisa.jeBrucos(p),
                         p.getDokazUslovaAt() != null,
                         UslovUpisa.opis(p, nazivStatusa(p)));
-    }
-
-    private void osvjeziBodove(Prijava p) {
-        RezultatBodovanja r = izracunajAkoMoze(p);
-        if (r != null) p.setUkupniBodovi(r.potvrdjeno());
     }
 
     private RezultatBodovanja izracunajAkoMoze(Prijava p) {

@@ -40,7 +40,6 @@ public class AdminDokumentiService {
         d.setVrstaDokumenta(v);
         d.setDatumUpload(LocalDate.now());
         d.setDostavljen(true);
-        d.setBrojBodova(0);
         d.setPrijava(p);
         dokumentRepository.save(d);
     }

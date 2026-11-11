@@ -15,15 +15,10 @@ public record BodovanjeDetaljnoDTO(
         Integer brojClanova,
         BigDecimal ukupnaPrimanja,
 
-        boolean uspjehVerifikovan,
-        boolean udaljenostVerifikovana,
-        boolean primanjaVerifikovana,
-
         List<StavkaBodovanja> osnovne,          // uspjeh, ponovni upis, udaljenost, primanja
         List<BodovanjeKriterijDTO> kriteriji,   // SVI aktivni kriteriji
 
-        double potvrdjeno,
-        double potencijalno,
+        double bodovi,
         List<String> upozorenja,
         String greska
 ) {}

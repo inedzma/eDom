@@ -103,15 +103,10 @@ public class DodajDokumenteController {
 
         if (!s.kriterijiBezDokaza().isEmpty()) {
             VBox kartica = kartica("Kriteriji bez posebnog dokumenta",
-                    "Provjerite iz ostale dokumentacije i označite šta je potvrđeno.", false);
+                    "Provjerite iz ostale dokumentacije. Ako kriterij nije potkrijepljen, "
+                            + "vratite se korak nazad i odznačite ga.", false);
             for (SpisakUnosDTO.Kriterij k : s.kriterijiBezDokaza()) {
-                CheckBox chk = kvacica("Provjereno: " + k.naziv());
-                chk.setSelected(nacrt.provjereniKriteriji.contains(k.sifra()));
-                chk.selectedProperty().addListener((obs, o, n) -> {
-                    if (n) nacrt.provjereniKriteriji.add(k.sifra());
-                    else nacrt.provjereniKriteriji.remove(k.sifra());
-                });
-                kartica.getChildren().add(chk);
+                kartica.getChildren().add(opis("• " + k.naziv()));
             }
             vboxSpisak.getChildren().add(kartica);
         }
@@ -196,7 +191,7 @@ public class DodajDokumenteController {
         if (fali > 0) {
             Alert a = new Alert(Alert.AlertType.CONFIRMATION,
                     "Nije označeno " + fali + " obaveznih dokumenata.\n\n"
-                            + "Prijavu možete podnijeti, ali ti podaci ostaju neverifikovani. Nastaviti?");
+                            + "Prijavu možete podnijeti, a dokumente evidentirati naknadno. Nastaviti?");
             a.setHeaderText(null);
             if (a.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
         }

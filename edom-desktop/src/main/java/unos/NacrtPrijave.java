@@ -9,7 +9,6 @@ import ba.unze.edom.common.dto.prijava.SpisakUnosDTO;
 import ba.unze.edom.common.dto.student.StudentUnosDTO;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.*;
 
 /** Podaci koje admin unosi kroz pet koraka; serveru se šalju tek na kraju. */
@@ -33,10 +32,8 @@ public class NacrtPrijave {
     public final List<Clan> clanovi = new ArrayList<>();
 
     // ---------- 3. kriteriji ----------
-    /** šifra kriterija -> parametar (null kad kriterij ne traži parametar) */
+    /** šifra kriterija -> parametar (null kad kriterij ne traži parametar; OS RBiH: broj punih mjeseci) */
     public final Map<String, BigDecimal> kriteriji = new LinkedHashMap<>();
-    /** šifra kriterija -> period (samo za kriterije s periodom, npr. OS RBiH) */
-    public final Map<String, Period> periodi = new HashMap<>();
 
     // ---------- 4. dokumenti ----------
     public SpisakUnosDTO spisak;
@@ -46,15 +43,11 @@ public class NacrtPrijave {
     public final Set<String> dostavljeno = new HashSet<>();
     /** Članovi: redni broj člana (0..) -> vrsta dokumenta koji je donio. */
     public final Map<Integer, Integer> dokumentClana = new HashMap<>();
-    /** Kriteriji bez posebnog dokumenta koje je uposlenik provjerio. */
-    public final Set<String> provjereniKriteriji = new HashSet<>();
 
     // ---------- 5. pregled ----------
     public String napomena;
 
     public record Clan(String ime, BigDecimal primanja) {}
-
-    public record Period(LocalDate od, LocalDate doDatuma) {}
 
     // ---------- pomoćne ----------
 
@@ -103,8 +96,6 @@ public class NacrtPrijave {
     /** Sve što je uneseno, u obliku koji server prima (za pregled bodova i za podnošenje). */
     public RucniUnosDTO zahtjev() {
         List<DokumentUnosDTO> dokumenti = new ArrayList<>();
-        Set<String> dokazaniKriteriji = new HashSet<>(provjereniKriteriji);
-        boolean uspjeh = false, cips = false, kucna = false, clanoviDokumentovani = true;
 
         if (spisak != null) {
             List<SpisakUnosDTO.Zahtjev> redovi = new ArrayList<>(spisak.obavezni());
@@ -114,10 +105,7 @@ public class NacrtPrijave {
                 if (z.poClanu()) {
                     for (int i = 0; i < z.potrebno(); i++) {
                         Integer idVrste = dokumentClana.get(i);
-                        if (idVrste == null) {
-                            clanoviDokumentovani = false;
-                            continue;
-                        }
+                        if (idVrste == null) continue;
                         String naziv = z.vrste().stream()
                                 .filter(v -> v.id().equals(idVrste))
                                 .map(SpisakUnosDTO.Vrsta::naziv)
@@ -127,38 +115,20 @@ public class NacrtPrijave {
                     continue;
                 }
 
-                boolean ima = false;
                 for (SpisakUnosDTO.Vrsta v : z.vrste()) {
                     if (dostavljeno.contains(kljucVrste(z, v.id()))) {
                         dokumenti.add(new DokumentUnosDTO(v.id(), null, true, null));
-                        ima = true;
                     }
                 }
-                if (!ima) continue;
-
-                switch (z.kljuc()) {
-                    case "uspjeh" -> uspjeh = true;
-                    case "cips" -> cips = true;
-                    case "kucna" -> kucna = true;
-                    default -> { }
-                }
-                if (z.sifreKriterija() != null) dokazaniKriteriji.addAll(z.sifreKriterija());
             }
         }
 
         List<KriterijUnosDTO> kr = new ArrayList<>();
-        kriteriji.forEach((sifra, parametar) -> {
-            Period p = periodi.get(sifra);
-            kr.add(new KriterijUnosDTO(sifra, parametar, dokazaniKriteriji.contains(sifra),
-                    p != null ? p.od() : null, p != null ? p.doDatuma() : null));
-        });
+        kriteriji.forEach((sifra, parametar) -> kr.add(new KriterijUnosDTO(sifra, parametar)));
 
         PrijavaUnosDTO prijava = new PrijavaUnosDTO(
                 akademskaGodina, prosjek, brucos() ? null : polozeniIspiti,
                 brojClanova, ukupnaPrimanja(), udaljenostKm, napomena,
-                uspjeh,                              // uspjeh verifikovan
-                cips,                                // udaljenost verifikovana
-                kucna && clanoviDokumentovani,       // primanja verifikovana
                 upisGodinePut);
 
         return new RucniUnosDTO(student, prijava, kr, dokumenti);

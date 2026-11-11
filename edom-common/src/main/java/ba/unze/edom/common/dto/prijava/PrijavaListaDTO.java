@@ -20,9 +20,8 @@ public record PrijavaListaDTO(
         Integer godinaStudija,
         BigDecimal prosjek,
 
-        Double potvrdjeniBodovi,
-        Double potencijalniBodovi,
-        boolean cekaVerifikaciju,
+        Double bodovi,
+
         int brojDokumenata,
 
         /** null ako je bodovanje uspjelo, inače poruka validatora */

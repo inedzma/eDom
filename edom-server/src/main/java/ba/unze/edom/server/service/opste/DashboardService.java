@@ -5,6 +5,7 @@ import ba.unze.edom.common.dto.prijava.PrijavaListaDTO;
 import ba.unze.edom.server.repository.PrijavaRepository;
 import ba.unze.edom.server.repository.StudentRepository;
 import ba.unze.edom.server.service.prijava.PrijavaAdminService;
+import ba.unze.edom.server.service.prijava.Statusi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,7 @@ public class DashboardService {
                         LinkedHashMap::new,
                         Collectors.counting()));
 
-        int cekaProvjeru = (int) prijave.stream().filter(PrijavaListaDTO::cekaVerifikaciju).count();
+        int cekaProvjeru = poStatusu.getOrDefault(Statusi.NA_PREGLEDU, 0L).intValue();
 
         return new DashboardDTO(godina, studentRepository.count(),
                 prijave.size(), poStatusu, cekaProvjeru);

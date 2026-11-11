@@ -23,9 +23,6 @@ public class Dokument {
     @Column(name = "datum_upload")
     private LocalDate datumUpload;
 
-    @Column(name = "broj_bodova", nullable = false)
-    private double brojBodova;
-
     @Column(name = "isdostavljen")
     private Boolean dostavljen;
 

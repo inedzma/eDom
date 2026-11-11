@@ -42,7 +42,7 @@ public class PrijavaHtmlExportService implements ExportService<PrijavaListaDTO> 
                     .append("<th>Prezime</th>")
                     .append("<th>Datum prijave</th>")
                     .append("<th>Fakultet</th>")
-                    .append("<th>Bodovi (potvrđeno / moguće)</th>")
+                    .append("<th>Bodovi</th>")
                     .append("<th>Status prijave</th>")
                     .append("</tr></thead>");
 
@@ -85,8 +85,7 @@ public class PrijavaHtmlExportService implements ExportService<PrijavaListaDTO> 
     /** Isti prikaz kao u tabeli na ekranu. */
     private String bodovi(PrijavaListaDTO p) {
         if (p.greska() != null) return "neispravni podaci";
-        if (p.potvrdjeniBodovi() == null) return "";
-        return String.format("%.2f / %.2f", p.potvrdjeniBodovi(), p.potencijalniBodovi());
+        return p.bodovi() == null ? "" : String.format("%.2f", p.bodovi());
     }
 
     private String escapeHtml(String text) {

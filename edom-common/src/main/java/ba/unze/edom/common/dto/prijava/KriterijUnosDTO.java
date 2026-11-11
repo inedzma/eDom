@@ -3,17 +3,9 @@ package ba.unze.edom.common.dto.prijava;
 import jakarta.validation.constraints.NotBlank;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
+/** Kriterij pri ručnom unosu papirne prijave (desktop). */
 public record KriterijUnosDTO(
         @NotBlank String sifra,
-        BigDecimal parametar,
-        boolean verifikovan,
-        LocalDate datumOd,
-        LocalDate datumDo
-) {
-    /** Kriterij bez perioda. */
-    public KriterijUnosDTO(String sifra, BigDecimal parametar, boolean verifikovan) {
-        this(sifra, parametar, verifikovan, null, null);
-    }
-}
+        BigDecimal parametar
+) {}

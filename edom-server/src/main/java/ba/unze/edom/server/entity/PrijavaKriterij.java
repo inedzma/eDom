@@ -25,18 +25,7 @@ public class PrijavaKriterij {
     @JoinColumn(name = "vrsta_kriterijaid")
     private VrstaKriterija vrsta;
 
+    /** Vrijednost koju kriterij traži: postotak invalidnosti, broj punih mjeseci, broj priznanja... */
     @Column(name = "parametar", precision = 10, scale = 2)
     private BigDecimal parametar;
-
-    /** Bez verifikacije administratora kriterij ne donosi bodove. */
-    @Column(name = "verifikovan", nullable = false)
-    private boolean verifikovan = false;
-
-    /** Za kriterije s periodom (OS RBiH): početak. */
-    @Column(name = "datum_od")
-    private java.time.LocalDate datumOd;
-
-    /** Za kriterije s periodom (OS RBiH): kraj. */
-    @Column(name = "datum_do")
-    private java.time.LocalDate datumDo;
 }

@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/** Tabela bodovanja u detaljima prijave: svi kriteriji, izmjena podataka, provjera. */
+/** Tabela bodovanja u detaljima prijave: svi kriteriji i izmjena podataka. */
 @Service
 @RequiredArgsConstructor
 public class BodovanjeAdminService {
@@ -29,7 +29,10 @@ public class BodovanjeAdminService {
         return dto(ucitaj(idPrijave));
     }
 
-    /** Admin smije mijenjati u svakom statusu; bodovi se odmah preračunaju. */
+    /**
+     * Admin ispravlja podatke koji nisu potkrijepljeni dokumentom ili uklanja kriterij;
+     * smije mijenjati u svakom statusu, a bodovi se odmah preračunaju.
+     */
     @Transactional
     public BodovanjeDetaljnoDTO sacuvaj(Integer idPrijave, BodovanjeIzmjenaDTO z) {
         Prijava p = ucitaj(idPrijave);
@@ -42,14 +45,10 @@ public class BodovanjeAdminService {
         p.setBrojClanovaDomacinstva(z.brojClanova());
         p.setUkupnaPrimanja(z.ukupnaPrimanja());
 
-        p.setUspjehVerifikovan(z.uspjehVerifikovan());
-        p.setUdaljenostVerifikovana(z.udaljenostVerifikovana());
-        p.setPrimanjaVerifikovana(z.primanjaVerifikovana());
-
         sinhronizujKriterije(p, z.kriteriji());
 
         try {
-            p.setUkupniBodovi(bodovanjeService.izracunaj(p).potvrdjeno());
+            p.setUkupniBodovi(bodovanjeService.izracunaj(p).bodovi());
         } catch (NevalidnaPrijavaException e) {
             throw new PrijavaException(e.getMessage());   // ništa se ne snima
         }
@@ -58,12 +57,13 @@ public class BodovanjeAdminService {
 
     // ---------- kriteriji ----------
 
+    /** Označeni kriteriji ostaju ili se dodaju, neoznačeni se brišu. */
     private void sinhronizujKriterije(Prijava p, List<BodovanjeKriterijIzmjenaDTO> lista) {
-        Map<Integer, BodovanjeKriterijIzmjenaDTO> trazeni = (lista != null ? lista : List.<BodovanjeKriterijIzmjenaDTO>of())
-                .stream()
-                .collect(Collectors.toMap(BodovanjeKriterijIzmjenaDTO::idVrste, k -> k, (a, b) -> a, LinkedHashMap::new));
+        Map<Integer, BodovanjeKriterijIzmjenaDTO> trazeni = new LinkedHashMap<>();
+        if (lista != null) {
+            for (BodovanjeKriterijIzmjenaDTO z : lista) trazeni.putIfAbsent(z.idVrste(), z);
+        }
 
-        // neoznačeni se brišu
         p.getKriteriji().removeIf(k -> k.getVrsta() == null
                 || !trazeni.containsKey(k.getVrsta().getIdVrstaKriterija()));
 
@@ -72,35 +72,20 @@ public class BodovanjeAdminService {
 
         for (BodovanjeKriterijIzmjenaDTO z : trazeni.values()) {
             PrijavaKriterij k = postojeci.get(z.idVrste());
-            VrstaKriterija v;
             if (k == null) {
-                v = vrstaKriterijaRepository.findById(z.idVrste())
+                VrstaKriterija nova = vrstaKriterijaRepository.findById(z.idVrste())
                         .orElseThrow(() -> new PrijavaException("Nepoznat kriterij."));
                 k = new PrijavaKriterij();
-                k.setVrsta(v);
+                k.setVrsta(nova);
                 p.dodajKriterij(k);
-            } else {
-                v = k.getVrsta();
             }
 
+            VrstaKriterija v = k.getVrsta();
             if (v.isTraziParametar() && z.parametar() == null) {
                 throw new PrijavaException("Za kriterij '" + v.getNaziv() + "' unesite "
                         + (v.getNazivParametra() != null ? v.getNazivParametra().toLowerCase() : "vrijednost") + ".");
             }
             k.setParametar(v.isTraziParametar() ? z.parametar() : null);
-
-            if (v.isTraziPeriod()) {
-                if (z.datumOd() == null || z.datumDo() == null) {
-                    throw new PrijavaException("Za kriterij '" + v.getNaziv() + "' unesite datum od i datum do.");
-                }
-                if (z.datumOd().isAfter(z.datumDo())) {
-                    throw new PrijavaException("Za kriterij '" + v.getNaziv() + "' datum od je poslije datuma do.");
-                }
-                k.setDatumOd(z.datumOd());
-                k.setDatumDo(z.datumDo());
-            }
-
-            k.setVerifikovan(z.verifikovan());
         }
     }
 
@@ -147,12 +132,9 @@ public class BodovanjeAdminService {
             boolean izabran = k != null;
             return new BodovanjeKriterijDTO(
                     v.getIdVrstaKriterija(), v.getSifra(), v.getNaziv(), v.getGrupa(), pravilo(v),
-                    v.isTraziParametar(), v.getNazivParametra(), v.isTraziPeriod(),
+                    v.isTraziParametar(), v.getNazivParametra(),
                     izabran,
                     izabran ? k.getParametar() : null,
-                    izabran ? k.getDatumOd() : null,
-                    izabran ? k.getDatumDo() : null,
-                    izabran && k.isVerifikovan(),
                     izabran ? bodovi.get(v.getIdVrstaKriterija()) : 0,
                     Objects.equals(najveciBranilac, v.getIdVrstaKriterija()));
         }).toList();
@@ -161,11 +143,9 @@ public class BodovanjeAdminService {
                 p.getIdPrijava(),
                 p.getGodinaStudija(), p.getUpisGodinePut(), p.getProsjek(), p.getPolozeniIspiti(),
                 p.getUdaljenostKm(), p.getBrojClanovaDomacinstva(), p.getUkupnaPrimanja(),
-                p.isUspjehVerifikovan(), p.isUdaljenostVerifikovana(), p.isPrimanjaVerifikovana(),
                 osnovne, kriteriji,
-                r != null ? r.potvrdjeno() : 0,
-                r != null ? r.potencijalno() : 0,
-                r != null && r.upozorenja() != null ? r.upozorenja() : List.of(),
+                r != null ? r.bodovi() : 0,
+                r != null ? r.upozorenja() : List.of(),
                 greska);
     }
 

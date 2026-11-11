@@ -1,7 +1,6 @@
 package ba.unze.edom.server.service.obavijesti;
 
 import ba.unze.edom.common.dto.bodovanje.RezultatBodovanja;
-import ba.unze.edom.common.dto.bodovanje.StavkaBodovanja;
 import ba.unze.edom.server.exception.RegistracijaException;
 import ba.unze.edom.server.service.prijava.Statusi;
 import jakarta.mail.internet.InternetAddress;
@@ -127,21 +126,12 @@ public class EmailService {
                 t.append(uvod).append("je ODOBRENA.\n\n");
                 if (r != null) {
                     t.append("Bodovano:\n");
-                    r.stavke().stream().filter(StavkaBodovanja::verifikovan).forEach(s ->
+                    r.stavke().forEach(s ->
                             t.append("  • ").append(s.naziv()).append(": ")
                                     .append(String.format("%.2f", s.bodovi()))
                                     .append(s.obrazlozenje() != null ? " (" + s.obrazlozenje() + ")" : "")
                                     .append("\n"));
-                    t.append(String.format("Ukupno: %.2f bodova%n%n", r.potvrdjeno()));
-
-                    var nebodovano = r.stavke().stream()
-                            .filter(s -> !s.verifikovan() && s.bodovi() > 0).toList();
-                    if (!nebodovano.isEmpty()) {
-                        t.append("Nije bodovano jer odgovarajući dokument nije dostavljen ili provjeren:\n");
-                        nebodovano.forEach(s -> t.append("  • ").append(s.naziv())
-                                .append(String.format(" (%.2f)", s.bodovi())).append("\n"));
-                        t.append("\n");
-                    }
+                    t.append(String.format("Ukupno: %.2f bodova%n%n", r.bodovi()));
                 }
                 if (imaNapomenu) t.append("Napomena: ").append(napomena).append("\n\n");
             }

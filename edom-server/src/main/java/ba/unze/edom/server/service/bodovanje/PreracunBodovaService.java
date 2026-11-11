@@ -27,7 +27,7 @@ public class PreracunBodovaService {
                 .setParameter("g", postavke.akademskaGodina())
                 .getResultList()) {
             try {
-                p.setUkupniBodovi(bodovanjeService.izracunaj(p).potvrdjeno());
+                p.setUkupniBodovi(bodovanjeService.izracunaj(p).bodovi());
                 n++;
             } catch (NevalidnaPrijavaException e) {
                 // neispravni podaci: ostaje stari broj, admin ih vidi u detaljima

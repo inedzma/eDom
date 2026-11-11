@@ -6,7 +6,6 @@ import ba.unze.edom.server.exception.NevalidnaPrijavaException;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Component
 public class PrijavaValidator {
@@ -193,35 +192,6 @@ public class PrijavaValidator {
                             "Broj mjeseci učešća (" + param + ") je nerealan.");
                 }
             }
-
-            if (k.getVrsta().isTraziPeriod()) {
-                provjeriPeriod(k);
-            }
-
-            // parametarski kriterij bez parametra nije greska -
-            // znaci da student jos nije unio vrijednost
-        }
-    }
-
-    /** Period učešća (OS RBiH): oba datuma, ispravan redoslijed, ne u budućnosti. */
-    private void provjeriPeriod(PrijavaKriterij k) {
-        LocalDate od = k.getDatumOd();
-        LocalDate doDatuma = k.getDatumDo();
-        String naziv = k.getVrsta().getNaziv();
-
-        if (od == null && doDatuma == null) return;   // stara prijava ili jos nije uneseno
-
-        if (od == null || doDatuma == null) {
-            throw new NevalidnaPrijavaException(
-                    "Za kriterij '" + naziv + "' unesite i datum početka i datum kraja.");
-        }
-        if (doDatuma.isBefore(od)) {
-            throw new NevalidnaPrijavaException(
-                    "Za kriterij '" + naziv + "' datum kraja je prije datuma početka.");
-        }
-        if (doDatuma.isAfter(LocalDate.now())) {
-            throw new NevalidnaPrijavaException(
-                    "Za kriterij '" + naziv + "' datum kraja ne može biti u budućnosti.");
         }
     }
 }

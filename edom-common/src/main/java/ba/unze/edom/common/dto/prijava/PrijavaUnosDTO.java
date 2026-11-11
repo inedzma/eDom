@@ -15,10 +15,5 @@ public record PrijavaUnosDTO(
         @NotNull(message = "Udaljenost je obavezna.") BigDecimal udaljenostKm,
         String napomena,
 
-        /** original pregledan pri ručnom unosu */
-        boolean uspjehVerifikovan,
-        boolean udaljenostVerifikovana,
-        boolean primanjaVerifikovana,
-
         Integer upisGodinePut
 ) {}

@@ -155,8 +155,6 @@ public class PrijavaService {
             if (vec != null) {
                 red.setIzabran(true);
                 red.setParametar(vec.getParametar());
-                red.setDatumOd(vec.getDatumOd());
-                red.setDatumDo(vec.getDatumDo());
             }
 
             forma.getKriteriji().add(red);
@@ -171,7 +169,7 @@ public class PrijavaService {
 
         Prijava p = dohvatiZaIzmjenu(idPrijave, idStudenta);
 
-        // izmjena kriterija ponistava raniju verifikaciju
+        // kriteriji se snimaju iznova: stari se brišu, označeni dodaju
         p.getKriteriji().clear();
 
         prijavaRepository.saveAndFlush(p);
@@ -191,19 +189,8 @@ public class PrijavaService {
 
             PrijavaKriterij k = new PrijavaKriterij();
             k.setVrsta(v);
+            // kod perioda (OS RBiH) forma je već izračunala broj punih mjeseci u parametar
             k.setParametar(v.isTraziParametar() ? red.getParametar() : null);
-            k.setVerifikovan(false);   // uvijek ceka administratora
-            if (v.isTraziPeriod()) {
-                if (red.getDatumOd() == null || red.getDatumDo() == null) {
-                    throw new PrijavaException("Za kriterij '" + v.getNaziv() + "' unesite datum od i datum do.");
-                }
-                if (red.getDatumOd().isAfter(red.getDatumDo())) {
-                    throw new PrijavaException("Za kriterij '" + v.getNaziv()
-                            + "' datum od ne može biti poslije datuma do.");
-                }
-                k.setDatumOd(red.getDatumOd());
-                k.setDatumDo(red.getDatumDo());
-            }
             p.dodajKriterij(k);
         }
     }
@@ -229,8 +216,8 @@ public class PrijavaService {
         p.setDatumPrijave(LocalDate.now());
         p.setStatus(status(Statusi.NA_PREGLEDU));
 
-        // kes potvrdjenih bodova; u ovom trenutku jos nista nije verifikovano
-        p.setUkupniBodovi(bodovanjeService.izracunaj(p).potvrdjeno());
+        // bodovi iz unesenih podataka; administrator ih ispravlja pri pregledu dokumenata
+        p.setUkupniBodovi(bodovanjeService.izracunaj(p).bodovi());
 
         // potvrda studentu sa šifrom (mail ide tek kad je prijava sigurno u bazi)
         Student s = p.getStudent();
