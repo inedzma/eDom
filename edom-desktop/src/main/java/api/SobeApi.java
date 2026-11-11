@@ -25,11 +25,6 @@ public final class SobeApi {
     public static List<StudentBezSobeDTO> bezSobe(int godina) {
         return Arrays.asList(ApiClient.get("/api/sobe/bez-sobe?godina=" + godina, StudentBezSobeDTO[].class));
     }
-
-    public static List<OznakaStanaraDTO> oznake() {
-        return Arrays.asList(ApiClient.get("/api/sobe/oznake", OznakaStanaraDTO[].class));
-    }
-
     // ---------- raspored ----------
 
     public static PrijedlogRasporedaDTO napraviPrijedlog(int godina) {
@@ -79,11 +74,6 @@ public final class SobeApi {
         Object v = m != null ? m.get(kljuc) : null;
         return v instanceof Number n ? n.intValue() : 0;
     }
-
-    public static List<ZahtjevSobeDTO> zahtjevi(int godina) {
-        return Arrays.asList(ApiClient.get("/api/sobe/zahtjevi?godina=" + godina, ZahtjevSobeDTO[].class));
-    }
-
     public static void odgovoriNaZahtjev(int id, String status, String odgovor) {
         String q = "?status=" + status + (odgovor != null && !odgovor.isBlank()
                 ? "&odgovor=" + URLEncoder.encode(odgovor, StandardCharsets.UTF_8) : "");

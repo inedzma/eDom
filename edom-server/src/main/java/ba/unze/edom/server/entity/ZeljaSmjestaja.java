@@ -4,7 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Želja studenta s weba. Samo se uzima u obzir, nije dodjela. */
+import java.time.LocalDateTime;
+
+/**
+ * Želja studenta s weba. Samo se uzima u obzir, nije dodjela.
+ * Prije dodjele služi za raspored, poslije dodjele kao zahtjev za promjenu sobe (razlog u napomeni).
+ */
 @Entity
 @Table(name = "zelja_smjestaja")
 @Getter
@@ -37,4 +42,8 @@ public class ZeljaSmjestaja {
 
     @Column(name = "napomena")
     private String napomena;
+
+    /** Kad je student zadnji put izmijenio želju (za obavijest administratoru). */
+    @Column(name = "datum_izmjene")
+    private LocalDateTime datumIzmjene;
 }

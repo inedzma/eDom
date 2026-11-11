@@ -12,7 +12,6 @@ public interface SobaRepository extends JpaRepository<Soba, Integer> {
     @Query("""
            select s from Soba s
              join fetch s.sprat sp
-             join fetch s.kategorija k
            order by sp.redoslijed, s.broj
            """)
     List<Soba> sveSaSpratom();

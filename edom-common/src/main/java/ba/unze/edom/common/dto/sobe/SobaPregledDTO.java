@@ -14,8 +14,6 @@ public record SobaPregledDTO(
         int redoslijedSprata,
         int kapacitet,
         String spol,
-        String kategorija,
-        String bojaKategorije,
         boolean zaStudente,
         boolean aktivna,
         int brojKljuceva,

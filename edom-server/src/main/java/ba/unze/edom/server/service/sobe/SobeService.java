@@ -27,7 +27,6 @@ public class SobeService {
     private final SobaRepository sobaRepository;
     private final SmjestajRepository smjestajRepository;
     private final ZeljaSmjestajaRepository zeljaRepository;
-    private final OznakaStanaraRepository oznakaRepository;
     private final PrijavaRepository prijavaRepository;
     private final StatusPrijaveRepository statusRepository;
 
@@ -59,8 +58,7 @@ public class SobeService {
 
             lista.add(new SobaPregledDTO(
                     s.getIdSoba(), s.getBroj(), s.getSprat().getNaziv(), s.getSprat().getRedoslijed(),
-                    s.getKapacitet(), spol,
-                    s.getKategorija().getNaziv(), s.getKategorija().getBoja(), s.getKategorija().isZaStudente(),
+                    s.getKapacitet(), spol, s.isZaStudente(),
                     s.isAktivna(), s.getBrojKljuceva(), s.getNapomena(), st));
 
             if (s.zaRaspored()) {
@@ -96,13 +94,6 @@ public class SobeService {
                         rang.get(p.getIdPrijava()), broj(p.getUkupniBodovi()),
                         opisZelje(zelje.get(p.getIdPrijava())),
                         p.getStudent().getBrojIndeksa(), p.getStudent().getEmail()))
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<OznakaStanaraDTO> oznake() {
-        return oznakaRepository.findAll().stream()
-                .map(o -> new OznakaStanaraDTO(o.getIdOznaka(), o.getNaziv(), o.getBoja()))
                 .toList();
     }
 
@@ -225,8 +216,8 @@ public class SobeService {
         Soba s = sobaRepository.findById(z.idSoba())
                 .orElseThrow(() -> new PrijavaException("Soba ne postoji."));
         if (!s.isAktivna()) throw new PrijavaException("Soba " + s.getBroj() + " je van upotrebe.");
-        if (!s.getKategorija().isZaStudente()) {
-            throw new PrijavaException("Soba " + s.getBroj() + " nije za studente (" + s.getKategorija().getNaziv() + ").");
+        if (!s.isZaStudente()) {
+            throw new PrijavaException("Soba " + s.getBroj() + " nije za studente (soba za goste).");
         }
 
         int godina = p.getAkademskaGodina();
@@ -271,7 +262,6 @@ public class SobeService {
         }
     }
 
-    /** Iseljenje; vraća koliko ključeva još fali (0 = sve vraćeno). */
     /** Iseljenje: student više nije u domu → prijava "iseljen". Vraća koliko ključeva još fali. */
     @Transactional
     public int iseli(Integer idSmjestaja, int vraceno) {
@@ -299,13 +289,6 @@ public class SobeService {
         smjestajRepository.delete(sm);
     }
 
-    @Transactional
-    public void postaviOznaku(Integer idSmjestaja, Integer idOznake) {
-        Smjestaj sm = smjestaj(idSmjestaja);
-        sm.setOznaka(idOznake == null ? null : oznakaRepository.findById(idOznake)
-                .orElseThrow(() -> new PrijavaException("Oznaka ne postoji.")));
-    }
-
     /** Soba u upotrebi ili ne (kvar, renoviranje). */
     @Transactional
     public void postaviAktivna(Integer idSobe, boolean aktivna, String napomena) {
@@ -329,7 +312,7 @@ public class SobeService {
         return r;
     }
 
-    /** Spol sobe: soba, pa sprat, pa trenutni stanari. */
+    /** Spol sobe: ručno zadan na sobi, inače po trenutnim stanarima. */
     private String spolSobe(Soba s, List<Smjestaj> stanari) {
         String spol = normalizuj(s.spolSobe());
         if (spol != null) return spol;
@@ -358,10 +341,8 @@ public class SobeService {
 
     private StanarDTO stanar(Smjestaj sm, Map<Integer, Integer> rang) {
         Prijava p = sm.getPrijava();
-        OznakaStanara o = sm.getOznaka();
         return new StanarDTO(sm.getIdSmjestaj(), p.getIdPrijava(), imePrezime(p), spolStudenta(p),
                 p.getGodinaStudija(), rang.get(p.getIdPrijava()), sm.getStatus(),
-                o != null ? o.getIdOznaka() : null, o != null ? o.getNaziv() : null, o != null ? o.getBoja() : null,
                 sm.getKljuceviPreuzeti(), sm.getRazlog());
     }
 

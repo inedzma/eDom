@@ -37,8 +37,6 @@
                     <Region HBox.hgrow="ALWAYS"/>
                     <Label styleClass="pr-hero-podnaslov" text="Akademska godina"/>
                     <ComboBox fx:id="cmbGodina" styleClass="pr-hero-combo"/>
-                    <Button fx:id="btnZahtjevi" text="Zahtjevi za promjenu sobe" onAction="#onZahtjevi"
-                            styleClass="pr-btn-glass"/>
                 </HBox>
 
                 <!-- brojevi (pravi kontroler) -->

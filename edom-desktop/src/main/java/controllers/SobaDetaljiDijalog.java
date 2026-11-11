@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Detalji jedne sobe: stanari (useli, iseli, premjesti, ukloni, oznaka),
+ * Detalji jedne sobe: stanari (useli, iseli, premjesti, ukloni),
  * dodavanje studenta bez sobe i soba van upotrebe.
  * Poslije svake izmjene dijalog se zatvori, pregled se osvježi i soba se ponovo otvori.
  */
@@ -25,8 +25,7 @@ final class SobaDetaljiDijalog {
 
     private SobaDetaljiDijalog() {}
 
-    static void prikazi(SobaPregledDTO s, SobePregledDTO sve, int godina,
-                        List<OznakaStanaraDTO> oznake, Runnable osvjezi) {
+    static void prikazi(SobaPregledDTO s, SobePregledDTO sve, int godina, Runnable osvjezi) {
 
         Dialog<Void> d = new Dialog<>();
         d.setTitle("Soba " + s.broj());
@@ -47,15 +46,16 @@ final class SobaDetaljiDijalog {
         sadrzaj.setPadding(new Insets(6, 4, 4, 4));
         sadrzaj.setPrefWidth(640);
 
-        Label kategorija = new Label(s.kategorija() + (s.napomena() != null ? " · " + s.napomena() : ""));
-        kategorija.getStyleClass().add("sobe-podnaslov");
-        sadrzaj.getChildren().add(kategorija);
+        Label vrsta = new Label((s.zaStudente() ? "Studentska soba" : "Soba za goste")
+                + (s.napomena() != null ? " · " + s.napomena() : ""));
+        vrsta.getStyleClass().add("sobe-podnaslov");
+        sadrzaj.getChildren().add(vrsta);
 
         // ---------- stanari ----------
         sadrzaj.getChildren().add(naslov("Stanari (" + s.zauzeto() + "/" + s.kapacitet() + ")"));
         if (s.stanari().isEmpty()) sadrzaj.getChildren().add(sitno("Soba je prazna."));
         for (StanarDTO st : s.stanari()) {
-            sadrzaj.getChildren().add(stanar(st, s, sve, oznake, akcija));
+            sadrzaj.getChildren().add(stanar(st, s, sve, akcija));
         }
 
         // ---------- dodaj studenta ----------
@@ -133,8 +133,7 @@ final class SobaDetaljiDijalog {
     }
 
     /** Jedan stanar s akcijama. */
-    private static VBox stanar(StanarDTO st, SobaPregledDTO s, SobePregledDTO sve,
-                               List<OznakaStanaraDTO> oznake, Akcija akcija) {
+    private static VBox stanar(StanarDTO st, SobaPregledDTO s, SobePregledDTO sve, Akcija akcija) {
         Hyperlink ime = new Hyperlink(st.imePrezime());
         ime.getStyleClass().add("detalji-ime");
         ime.setOnAction(e -> StudentDetaljiDijalog.otvori(st.idPrijava()));
@@ -211,29 +210,9 @@ final class SobaDetaljiDijalog {
             dugmad.add(ukloni);
         }
 
-        Region r2 = new Region();
-        HBox.setHgrow(r2, Priority.ALWAYS);
-        dugmad.add(r2);
-
-        // ---- oznaka (boja imena) ----
-        ComboBox<OznakaStanaraDTO> oznaka = new ComboBox<>();
-        List<OznakaStanaraDTO> izbor = new ArrayList<>();
-        izbor.add(new OznakaStanaraDTO(null, "bez oznake", null));
-        izbor.addAll(oznake);
-        oznaka.setItems(FXCollections.observableArrayList(izbor));
-        oznaka.setCellFactory(c -> oznakaCell());
-        oznaka.setButtonCell(oznakaCell());
-        izbor.stream().filter(o -> Objects.equals(o.id(), st.idOznaka())).findFirst().ifPresent(oznaka::setValue);
-        oznaka.valueProperty().addListener((o, a, b) -> {
-            if (b != null && !Objects.equals(b.id(), st.idOznaka())) {
-                akcija.izvrsi(() -> SobeApi.postaviOznaku(st.idSmjestaj(), b.id()));
-            }
-        });
-        dugmad.add(oznaka);
         dugmad.stream()
                 .filter(n -> n instanceof Button)
                 .forEach(n -> punaSirina((Button) n));
-        oznaka.setMinWidth(130);
         HBox red = new HBox(8);
         red.getChildren().addAll(dugmad);
         red.setAlignment(Pos.CENTER_LEFT);
@@ -307,29 +286,6 @@ final class SobaDetaljiDijalog {
         };
     }
 
-    private static ListCell<OznakaStanaraDTO> oznakaCell() {
-        return new ListCell<>() {
-            @Override
-            protected void updateItem(OznakaStanaraDTO o, boolean empty) {
-                super.updateItem(o, empty);
-                if (empty || o == null) {
-                    setText("");
-                    setGraphic(null);
-                    return;
-                }
-                setText(o.naziv());
-                if (o.boja() != null) {
-                    Region r = new Region();
-                    r.setMinSize(12, 12);
-                    r.setMaxSize(12, 12);
-                    r.setStyle("-fx-background-color: " + o.boja() + "; -fx-background-radius: 6;");
-                    setGraphic(r);
-                } else {
-                    setGraphic(null);
-                }
-            }
-        };
-    }
     /** Dugme (ili checkbox) nikad ne smije biti uže od svog teksta. */
     private static void punaSirina(Control... kontrole) {
         for (Control c : kontrole) c.setMinWidth(Region.USE_PREF_SIZE);

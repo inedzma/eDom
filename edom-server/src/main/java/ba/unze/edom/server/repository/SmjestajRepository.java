@@ -19,7 +19,6 @@ public interface SmjestajRepository extends JpaRepository<Smjestaj, Integer> {
              join fetch sm.prijava p
              join fetch p.student st
              join fetch sm.soba so
-             left join fetch sm.oznaka o
            where p.akademskaGodina = :godina
              and sm.status <> 'ISELJEN'
            """)

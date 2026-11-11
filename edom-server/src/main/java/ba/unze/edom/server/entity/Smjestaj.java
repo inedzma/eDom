@@ -40,10 +40,6 @@ public class Smjestaj {
     @Column(name = "datum_iseljenja")
     private LocalDate datumIseljenja;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "oznaka_id")
-    private OznakaStanara oznaka;
-
     @Column(name = "kljucevi_preuzeti", nullable = false)
     private int kljuceviPreuzeti;
 

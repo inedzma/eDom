@@ -40,8 +40,6 @@ public class SobeController {
     @FXML private ComboBox<String> cmbRedoslijed;
     @FXML private Label lblPogodaka;
 
-    @FXML private Button btnZahtjevi;
-
     private static final String SVI_SPRATOVI = "Svi spratovi";
     private static final String OD_VRHA = "Od IV sprata naniže";
     private static final String OD_DNA = "Od I sprata naviše";
@@ -51,7 +49,6 @@ public class SobeController {
     private static final String ZENSKE = "Ženske sobe";
 
     private SobePregledDTO pregled;
-    private List<OznakaStanaraDTO> oznake = List.of();
 
     @FXML
     public void initialize() {
@@ -78,7 +75,6 @@ public class SobeController {
         txtPretraga.textProperty().addListener((o, a, b) -> prikazi());
 
         napraviLegendu();
-        ucitajOznake();
         ucitaj();
     }
 
@@ -107,17 +103,12 @@ public class SobeController {
         pozovi(() -> SobeApi.pregled(g), p -> {
             pregled = p;
             napuniSpratove();
-            osvjeziBrojZahtjeva();
             lblStatus.setText("");
             prikazi();
             if (otvoriSobu != null) {
                 p.sobe().stream().filter(s -> s.idSoba().equals(otvoriSobu)).findFirst().ifPresent(this::otvori);
             }
         });
-    }
-
-    private void ucitajOznake() {
-        pozovi(SobeApi::oznake, o -> oznake = o);
     }
 
     // =====================================================================
@@ -255,7 +246,7 @@ public class SobeController {
         return b;
     }
 
-    /** Kartica sobe: broj, popunjenost, imena; boja po stanju, traka u boji kategorije. */
+    /** Kartica sobe: broj, popunjenost, imena; boja po stanju. */
     private VBox kartica(SobaPregledDTO s, String trazi) {
         Label broj = new Label(String.valueOf(s.broj()));
         broj.getStyleClass().add("soba-broj");
@@ -275,7 +266,7 @@ public class SobeController {
         k.setMinHeight(96);
 
         if (!s.zaStudente()) {
-            k.getChildren().add(malo(s.kategorija()));
+            k.getChildren().add(malo("Soba za goste"));
         } else if (!s.aktivna()) {
             k.getChildren().add(malo("Van upotrebe" + (s.napomena() != null ? ": " + s.napomena() : "")));
         }
@@ -289,14 +280,6 @@ public class SobeController {
             if (!trazi.isEmpty() && !trazi.chars().allMatch(Character::isDigit)
                     && bezKvacica(st.imePrezime()).contains(trazi)) {
                 ime.getStyleClass().add("soba-stanar-pogodak");
-            }
-            if (st.bojaOznake() != null) {
-                Region tacka = new Region();
-                tacka.getStyleClass().add("soba-tacka");
-                tacka.setStyle("-fx-background-color: " + st.bojaOznake() + ";");
-                HBox red = new HBox(6, tacka, ime);
-                red.setAlignment(Pos.CENTER_LEFT);
-                k.getChildren().add(red);
             } else {
                 k.getChildren().add(ime);
             }
@@ -307,15 +290,10 @@ public class SobeController {
             k.getChildren().add(slob);
         }
 
-        // traka u boji kategorije (crvena = gosti...)
-        if (s.bojaKategorije() != null) {
-            k.setStyle("-fx-border-color: " + s.bojaKategorije() + " transparent transparent transparent;"
-                    + "-fx-border-width: 5 0 0 0;");
-        }
-
         k.setCursor(Cursor.HAND);
         k.setOnMouseClicked(e -> otvori(s));
-        Tooltip.install(k, new Tooltip("Soba " + s.broj() + " · " + s.sprat() + " · " + s.kategorija()));
+        Tooltip.install(k, new Tooltip("Soba " + s.broj() + " · " + s.sprat()
+                + (s.zaStudente() ? "" : " · za goste")));
         return k;
     }
 
@@ -359,23 +337,7 @@ public class SobeController {
     // =====================================================================
 
     private void otvori(SobaPregledDTO s) {
-        SobaDetaljiDijalog.prikazi(s, pregled, godina(), oznake, () -> ucitaj(s.idSoba()));
-    }
-
-    @FXML
-    private void onZahtjevi() {
-        ZahtjeviDijalog.prikazi(godina(), this::ucitaj);
-    }
-
-    /** Broj zahtjeva na čekanju na dugmetu. */
-    private void osvjeziBrojZahtjeva() {
-        int g = godina();
-        pozovi(() -> SobeApi.zahtjevi(g), lista -> {
-            long n = lista.stream().filter(z -> "NA_CEKANJU".equals(z.status())).count();
-            btnZahtjevi.setText("Zahtjevi za promjenu sobe" + (n > 0 ? " (" + n + ")" : ""));
-            btnZahtjevi.getStyleClass().remove("sobe-btn-glavno");
-            if (n > 0) btnZahtjevi.getStyleClass().add("sobe-btn-glavno");
-        });
+        SobaDetaljiDijalog.prikazi(s, pregled, godina(), () -> ucitaj(s.idSoba()));
     }
 
     @FXML

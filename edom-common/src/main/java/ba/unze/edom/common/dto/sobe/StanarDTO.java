@@ -9,9 +9,6 @@ public record StanarDTO(
         Integer godinaStudija,
         Integer rang,
         String status,
-        Integer idOznaka,
-        String oznaka,
-        String bojaOznake,
         int kljuceviPreuzeti,
         String razlog
 ) {}

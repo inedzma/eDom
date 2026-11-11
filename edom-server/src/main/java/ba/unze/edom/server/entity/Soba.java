@@ -25,9 +25,10 @@ public class Soba {
     @Column(name = "kapacitet", nullable = false)
     private Integer kapacitet;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "kategorija_id")
-    private KategorijaSobe kategorija;
+    /** false = soba za goste: ne ulazi u raspored studenata ni u kapacitet. */
+    @Column(name = "za_studente", nullable = false)
+    private boolean zaStudente = true;
+
     /**
      * Ručno zadan spol sobe (npr. soba rezervisana samo za studentice).
      * Obično je null: spol tada određuju stanari, a prazna soba prima bilo koga.
@@ -45,13 +46,13 @@ public class Soba {
     @Column(name = "napomena")
     private String napomena;
 
-    /** Ručno zadan spol sobe ili null. Spratovi više ne određuju spol. */
+    /** Ručno zadan spol sobe ili null. */
     public String spolSobe() {
         return spol != null && !spol.isBlank() ? spol : null;
     }
 
     /** Ulazi li soba u raspored studenata. */
     public boolean zaRaspored() {
-        return aktivna && kategorija != null && kategorija.isZaStudente();
+        return aktivna && zaStudente;
     }
 }

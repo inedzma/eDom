@@ -20,8 +20,4 @@ public class Sprat {
 
     @Column(name = "redoslijed", nullable = false)
     private Integer redoslijed;
-
-    /** 'M' / 'Z'; null = određuju stanari. */
-    @Column(name = "spol", length = 1)
-    private String spol;
 }
