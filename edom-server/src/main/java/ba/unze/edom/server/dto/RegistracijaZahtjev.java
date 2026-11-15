@@ -21,7 +21,9 @@ public record RegistracijaZahtjev(
         String brojIndeksa,
 
         @NotBlank(message = "E-mail je obavezan")
-        @Email(message = "Neispravan format e-mail adrese")
+        // regexp dodatno traži domenu s tačkom (npr. .ba, .com): sam @Email propušta "ime@gmail"
+        @Email(regexp = "^[^@\\s]+@[^@\\s]+\\.[A-Za-z]{2,}$",
+                message = "Neispravan format e-mail adrese")
         String email,
 
         @Size(max = 100)
@@ -41,10 +43,10 @@ public record RegistracijaZahtjev(
         @NotBlank(message = "Ime roditelja je obavezno")
         @Size(max = 20)
         String imeRoditelja,
+
         @JakaLozinka
         String lozinka,
 
-        // ... postojeća polja (lozinka i ostalo) ...,
         @AssertTrue(message = "Morate dati saglasnost za obradu ličnih podataka.")
         boolean saglasnost
 

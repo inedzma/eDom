@@ -1,14 +1,16 @@
 package ba.unze.edom.server.service;
 
+import ba.unze.edom.common.dto.student.StudentUnosDTO;
 import ba.unze.edom.server.dto.RegistracijaZahtjev;
 import ba.unze.edom.server.entity.Korisnik;
 import ba.unze.edom.server.entity.Student;
 import ba.unze.edom.server.entity.Uloga;
 import ba.unze.edom.server.exception.RegistracijaException;
 import ba.unze.edom.server.repository.KorisnikRepository;
-import ba.unze.edom.server.repository.StudentRepository;
 import ba.unze.edom.server.repository.UlogaRepository;
 import ba.unze.edom.server.service.korisnik.RegistracijaService;
+import ba.unze.edom.server.service.student.SifraStudenta;
+import ba.unze.edom.server.service.student.StudentEvidencijaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,173 +27,142 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+/**
+ * Registracija naloga na webu.
+ * Da li je student nov ili postojeći odlučuje StudentEvidencijaService
+ * (ima svoj test), pa je ovdje zamijenjen Mockito objektom.
+ */
 @ExtendWith(MockitoExtension.class)
 class RegistracijaServiceTest {
 
-    @Mock StudentRepository studentRepository;
+    private static final String LOZINKA = "NovaLozinka1!";
+    private static final String EMAIL = "merjem@example.com";
+
+    @Mock StudentEvidencijaService studentEvidencija;
     @Mock KorisnikRepository korisnikRepository;
     @Mock UlogaRepository ulogaRepository;
     @Mock PasswordEncoder passwordEncoder;
+    @Mock SifraStudenta sifraStudenta;
 
     @InjectMocks
     RegistracijaService service;
 
     private Uloga ulogaStudent;
+    private Student student;
 
     @BeforeEach
     void pripremi() {
         ulogaStudent = new Uloga();
         ulogaStudent.setIdUloga(1);
         ulogaStudent.setNaziv("Student");
+
+        student = new Student();
+        student.setIdStudent(42);
+        student.setIme("Merjem");
+        student.setPrezime("Grizić");
     }
 
     private RegistracijaZahtjev zahtjev() {
         return new RegistracijaZahtjev(
-                "Merjem", "Grizic", "1234567890123", "320",
-                "merjem@example.com", "061111222", "Politehnicki fakultet UNZE",
-                3, "Zenica, Ulica 1", "Adem", "lozinka123");
+                "Merjem", "Grizić", "0101003175007", "320",
+                EMAIL, "061111222", "Drugo",
+                3, "Zenica, Ulica 1", "Adem", LOZINKA, true);
     }
 
-    private Student postojeciStudent(int id) {
-        Student s = new Student();
-        s.setIdStudent(id);
-        s.setIme("Merjem");
-        s.setPrezime("Grizic");
-        s.setJmbg("1234567890123");
-        s.setBrojIndeksa("320");
-        return s;
-    }
-
-    // ---------- GRANA 1: potpuno nov student ----------
-
-    @Test
-    @DisplayName("Nov student: kreira se i student i nalog")
-    void novStudent() {
-        when(studentRepository.findByJmbg(any())).thenReturn(Optional.empty());
-        when(studentRepository.findByBrojIndeksa(any())).thenReturn(Optional.empty());
-        when(korisnikRepository.findByEmail(any())).thenReturn(Optional.empty());
-        when(ulogaRepository.findByNaziv("Student")).thenReturn(Optional.of(ulogaStudent));
-        when(passwordEncoder.encode(any())).thenReturn("$2a$10$hash");
-        when(korisnikRepository.save(any(Korisnik.class)))
-                .thenAnswer(i -> i.getArgument(0));
-
-        service.registruj(zahtjev());
-
-        // kljucno: novi student JE sacuvan
-        verify(studentRepository).save(any(Student.class));
-        verify(korisnikRepository).save(any(Korisnik.class));
-    }
-
-    // ---------- GRANA 2: postojeci student bez naloga ----------
-
-    @Test
-    @DisplayName("Postojeci student bez naloga: NE kreira se novi student")
-    void postojeciStudentDobijaNalog() {
-        Student postojeci = postojeciStudent(42);
-
-        when(studentRepository.findByJmbg("1234567890123"))
-                .thenReturn(Optional.of(postojeci));
-        when(korisnikRepository.findByStudent_IdStudent(42))
-                .thenReturn(Optional.empty());
-        when(korisnikRepository.findByEmail(any())).thenReturn(Optional.empty());
-        when(ulogaRepository.findByNaziv("Student")).thenReturn(Optional.of(ulogaStudent));
-        when(passwordEncoder.encode(any())).thenReturn("$2a$10$hash");
-
-        ArgumentCaptor<Korisnik> captor = ArgumentCaptor.forClass(Korisnik.class);
-        when(korisnikRepository.save(captor.capture()))
-                .thenAnswer(i -> i.getArgument(0));
-
-        service.registruj(zahtjev());
-
-        // OVO je srz: nema duplikata
-        verify(studentRepository, never()).save(any(Student.class));
-
-        // nalog je vezan bas na postojeceg studenta
-        assertEquals(42, captor.getValue().getStudent().getIdStudent());
-    }
-
-    @Test
-    @DisplayName("Postojecem studentu se azuriraju kontakt podaci")
-    void azuriranjeKontakta() {
-        Student postojeci = postojeciStudent(42);
-        postojeci.setEmail("staro@example.com");
-
-        when(studentRepository.findByJmbg(any())).thenReturn(Optional.of(postojeci));
+    /** Uobičajen slučaj: student pronađen ili kreiran, nalog još ne postoji, e-mail slobodan. */
+    private void sveIspravno() {
+        when(studentEvidencija.nadjiIliKreiraj(any())).thenReturn(student);
         when(korisnikRepository.findByStudent_IdStudent(42)).thenReturn(Optional.empty());
-        when(korisnikRepository.findByEmail(any())).thenReturn(Optional.empty());
+        when(korisnikRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
         when(ulogaRepository.findByNaziv("Student")).thenReturn(Optional.of(ulogaStudent));
-        when(passwordEncoder.encode(any())).thenReturn("$2a$10$hash");
-        when(korisnikRepository.save(any(Korisnik.class)))
-                .thenAnswer(i -> i.getArgument(0));
+        when(passwordEncoder.encode(LOZINKA)).thenReturn("$2a$10$hash");
+        when(korisnikRepository.save(any(Korisnik.class))).thenAnswer(i -> i.getArgument(0));
+    }
+
+    @Test
+    @DisplayName("Nalog se pravi s ulogom Student i vezuje za pronađenog studenta")
+    void nalogVezanZaStudenta() {
+        sveIspravno();
+
+        Korisnik nalog = service.registruj(zahtjev());
+
+        assertSame(student, nalog.getStudent());
+        assertEquals("Student", nalog.getUloga().getNaziv());
+        assertEquals(EMAIL, nalog.getEmail());
+        assertEquals(EMAIL, nalog.getUsername());
+        assertEquals("Merjem", nalog.getIme());
+    }
+
+    @Test
+    @DisplayName("Podaci iz registracije prosljeđuju se evidenciji studenata")
+    void podaciIduUEvidenciju() {
+        sveIspravno();
 
         service.registruj(zahtjev());
 
-        assertEquals("merjem@example.com", postojeci.getEmail());
+        ArgumentCaptor<StudentUnosDTO> c = ArgumentCaptor.forClass(StudentUnosDTO.class);
+        verify(studentEvidencija).nadjiIliKreiraj(c.capture());
+        assertEquals("0101003175007", c.getValue().jmbg());
+        assertEquals(EMAIL, c.getValue().email());
+        assertEquals("Drugo", c.getValue().fakultet());
     }
 
-    // ---------- GRANA 3: student vec ima nalog ----------
+    @Test
+    @DisplayName("Studentu se dodjeljuje šifra")
+    void dodjeljujeSeSifra() {
+        sveIspravno();
+
+        service.registruj(zahtjev());
+
+        verify(sifraStudenta).dodijeli(student);
+    }
 
     @Test
-    @DisplayName("Student koji vec ima nalog dobija gresku")
+    @DisplayName("Student koji već ima nalog dobija grešku i ne pravi se drugi nalog")
     void vecImaNalog() {
-        Student postojeci = postojeciStudent(42);
-        Korisnik postojeciNalog = new Korisnik();
+        when(studentEvidencija.nadjiIliKreiraj(any())).thenReturn(student);
+        when(korisnikRepository.findByStudent_IdStudent(42)).thenReturn(Optional.of(new Korisnik()));
 
-        when(studentRepository.findByJmbg(any())).thenReturn(Optional.of(postojeci));
-        when(korisnikRepository.findByStudent_IdStudent(42))
-                .thenReturn(Optional.of(postojeciNalog));
-
-        var greska = assertThrows(RegistracijaException.class,
-                () -> service.registruj(zahtjev()));
+        var greska = assertThrows(RegistracijaException.class, () -> service.registruj(zahtjev()));
 
         assertTrue(greska.getMessage().contains("nalog"));
-        verify(korisnikRepository, never()).save(any());
-    }
-
-    // ---------- SIGURNOSNI SLUCAJ ----------
-
-    @Test
-    @DisplayName("Indeks postoji uz drugi JMBG - registracija se odbija")
-    void indeksSaDrugimJmbg() {
-        when(studentRepository.findByJmbg(any())).thenReturn(Optional.empty());
-        when(studentRepository.findByBrojIndeksa("320"))
-                .thenReturn(Optional.of(postojeciStudent(99)));
-
-        assertThrows(RegistracijaException.class,
-                () -> service.registruj(zahtjev()));
-
-        verify(studentRepository, never()).save(any(Student.class));
         verify(korisnikRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Zauzet e-mail se odbija")
     void zauzetEmail() {
-        when(studentRepository.findByJmbg(any())).thenReturn(Optional.empty());
-        when(studentRepository.findByBrojIndeksa(any())).thenReturn(Optional.empty());
-        when(korisnikRepository.findByEmail("merjem@example.com"))
-                .thenReturn(Optional.of(new Korisnik()));
+        when(studentEvidencija.nadjiIliKreiraj(any())).thenReturn(student);
+        when(korisnikRepository.findByStudent_IdStudent(42)).thenReturn(Optional.empty());
+        when(korisnikRepository.findByEmail(EMAIL)).thenReturn(Optional.of(new Korisnik()));
 
-        assertThrows(RegistracijaException.class,
-                () -> service.registruj(zahtjev()));
+        var greska = assertThrows(RegistracijaException.class, () -> service.registruj(zahtjev()));
+
+        assertTrue(greska.getMessage().contains("e-mail"));
+        verify(korisnikRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Lozinka se nikad ne cuva u citljivom obliku")
+    @DisplayName("Greška iz evidencije (npr. nepoznat fakultet) zaustavlja registraciju")
+    void greskaIzEvidencije() {
+        when(studentEvidencija.nadjiIliKreiraj(any()))
+                .thenThrow(new RegistracijaException("Odaberite fakultet iz liste."));
+
+        assertThrows(RegistracijaException.class, () -> service.registruj(zahtjev()));
+
+        verifyNoInteractions(sifraStudenta);
+        verify(korisnikRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Lozinka se nikad ne čuva u čitljivom obliku")
     void lozinkaSeHesira() {
-        when(studentRepository.findByJmbg(any())).thenReturn(Optional.empty());
-        when(studentRepository.findByBrojIndeksa(any())).thenReturn(Optional.empty());
-        when(korisnikRepository.findByEmail(any())).thenReturn(Optional.empty());
-        when(ulogaRepository.findByNaziv("Student")).thenReturn(Optional.of(ulogaStudent));
-        when(passwordEncoder.encode("lozinka123")).thenReturn("$2a$10$hash");
+        sveIspravno();
 
-        ArgumentCaptor<Korisnik> captor = ArgumentCaptor.forClass(Korisnik.class);
-        when(korisnikRepository.save(captor.capture()))
-                .thenAnswer(i -> i.getArgument(0));
+        Korisnik nalog = service.registruj(zahtjev());
 
-        service.registruj(zahtjev());
-
-        assertNotEquals("lozinka123", captor.getValue().getPasswordHash());
-        assertTrue(captor.getValue().getPasswordHash().startsWith("$2a$"));
+        assertNotEquals(LOZINKA, nalog.getPasswordHash());
+        assertEquals("$2a$10$hash", nalog.getPasswordHash());
+        verify(passwordEncoder).encode(LOZINKA);
     }
 }

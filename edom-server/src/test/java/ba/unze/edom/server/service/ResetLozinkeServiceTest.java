@@ -80,9 +80,9 @@ class ResetLozinkeServiceTest {
         postaviKod("123456", zaDeset());
 
         service.promijeniLozinku("student@example.com", "123456",
-                "novalozinka", "novalozinka");
+                "Novalozinka1.", "Novalozinka1.");
 
-        assertTrue(encoder.matches("novalozinka", k.getPasswordHash()));
+        assertTrue(encoder.matches("Novalozinka1.", k.getPasswordHash()));
         assertNull(k.getResetTokenHash());
     }
 
@@ -91,11 +91,11 @@ class ResetLozinkeServiceTest {
     void jednokratan() {
         postaviKod("123456", zaDeset());
         service.promijeniLozinku("student@example.com", "123456",
-                "novalozinka", "novalozinka");
+                "Novalozinka1.", "Novalozinka1.");
 
         assertThrows(RegistracijaException.class, () ->
                 service.promijeniLozinku("student@example.com", "123456",
-                        "drugalozinka", "drugalozinka"));
+                        "Drugalozinka1.", "Drugalozinka1."));
     }
 
     @Test
@@ -124,7 +124,7 @@ class ResetLozinkeServiceTest {
     @DisplayName("Poslije 5 pokusaja ni ispravan kod ne prolazi")
     void previsePokusaja() {
         postaviKod("123456", zaDeset());
-        k.setResetPokusaji(ResetLozinkeService.MAX_POKUSAJA);
+        k.setResetPokusaji(5);
 
         assertThrows(RegistracijaException.class, () ->
                 service.promijeniLozinku("student@example.com", "123456",
@@ -140,9 +140,9 @@ class ResetLozinkeServiceTest {
         postaviKod("123456", zaDeset());
 
         var a = assertThrows(RegistracijaException.class, () ->
-                service.promijeniLozinku("nema@example.com", "123456", "x", "x"));
+                service.promijeniLozinku("nema@example.com", "123456", "Novalozinka1.", "Novalozinka1."));
         var b = assertThrows(RegistracijaException.class, () ->
-                service.promijeniLozinku("student@example.com", "000000", "x", "x"));
+                service.promijeniLozinku("student@example.com", "000000", "Novalozinka1.", "Novalozinka1."));
 
         assertEquals(a.getMessage(), b.getMessage());
     }

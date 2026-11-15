@@ -50,7 +50,7 @@ class ProfilServiceTest {
 
     private ProfilIzmjenaDTO izmjena(String email) {
         return new ProfilIzmjenaDTO(email, "061222333",
-                "Sarajevo, Ulica 5", "Ekonomski fakultet UNZE", 4);
+                "Sarajevo, Ulica 5", "Ekonomski fakultet UNZE", 4, "23");
     }
 
     @Test

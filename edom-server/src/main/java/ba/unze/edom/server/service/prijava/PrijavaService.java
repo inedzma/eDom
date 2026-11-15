@@ -17,6 +17,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -114,11 +115,7 @@ public class PrijavaService {
                                    DomacinstvoKorakDTO dto) {
         Prijava p = dohvatiZaIzmjenu(idPrijave, idStudenta);
 
-        Integer minKm = postavke.trenutne().minUdaljenostKm();
-        if (minKm != null && dto.udaljenostKm() != null && dto.udaljenostKm().doubleValue() < minKm) {
-            throw new PrijavaException("Prema uslovima konkursa pravo na smještaj imaju studenti čije je prebivalište "
-                    + "udaljeno najmanje " + minKm + " km od Zenice.");
-        }
+        provjeriUdaljenost(dto.udaljenostKm());
 
         p.setBrojClanovaDomacinstva(dto.brojClanovaDomacinstva());
         p.setUkupnaPrimanja(dto.ukupnaPrimanja());
@@ -207,11 +204,7 @@ public class PrijavaService {
         }
         p.setNapomena(NapomenaPrijaveService.ocisti(napomena));
 
-        List<String> nedostaje = provjeriPotpunost(p);
-        if (!nedostaje.isEmpty()) {
-            throw new PrijavaException(
-                    "Prijava nije potpuna: " + String.join(", ", nedostaje) + ".");
-        }
+        provjeriPotpunost(p, p.getStudent());
 
         p.setDatumPrijave(LocalDate.now());
         p.setStatus(status(Statusi.NA_PREGLEDU));
@@ -227,7 +220,14 @@ public class PrijavaService {
                 SifraStudenta.format(s.getSifraBroj(), p.getAkademskaGodina())));
     }
 
-    private List<String> provjeriPotpunost(Prijava p) {
+    // ---------- PRAVILA ZAJEDNIČKA ZA WEB I RUČNI UNOS (desktop) ----------
+
+    /**
+     * Šta prijava mora imati da bi bila podnesena.
+     * Isto pravilo koristi i ručni unos s desktopa (RucniUnosService).
+     * student = null: lični podaci se ne provjeravaju (pregled bodova prije unosa).
+     */
+    public void provjeriPotpunost(Prijava p, Student s) {
         List<String> nedostaje = new ArrayList<>();
 
         if (p.getGodinaStudija() == null) nedostaje.add("godina studija");
@@ -236,12 +236,25 @@ public class PrijavaService {
         if (p.getUkupnaPrimanja() == null) nedostaje.add("primanja domaćinstva");
         if (p.getUdaljenostKm() == null) nedostaje.add("udaljenost do doma");
 
-        Student s = p.getStudent();
-        if (s.getBrojLicneKarte() == null) nedostaje.add("broj lične karte");
-        if (s.getTelefonRoditelja() == null) nedostaje.add("telefon roditelja");
-        if (s.getOpcina() == null) nedostaje.add("kanton i općina");
+        if (s != null) {
+            if (s.getBrojLicneKarte() == null) nedostaje.add("broj lične karte");
+            if (s.getTelefonRoditelja() == null) nedostaje.add("telefon roditelja");
+            if (s.getOpcina() == null) nedostaje.add("kanton i općina");
+        }
 
-        return nedostaje;
+        if (!nedostaje.isEmpty()) {
+            throw new PrijavaException(
+                    "Prijava nije potpuna: " + String.join(", ", nedostaje) + ".");
+        }
+    }
+
+    /** Minimalna udaljenost od Zenice iz uslova konkursa. Isto za web i ručni unos. */
+    public void provjeriUdaljenost(BigDecimal udaljenostKm) {
+        Integer minKm = postavke.trenutne().minUdaljenostKm();
+        if (minKm != null && udaljenostKm != null && udaljenostKm.doubleValue() < minKm) {
+            throw new PrijavaException("Prema uslovima konkursa pravo na smještaj imaju studenti čije je prebivalište "
+                    + "udaljeno najmanje " + minKm + " km od Zenice.");
+        }
     }
 
     // ---------- ODUSTAJANJE ----------

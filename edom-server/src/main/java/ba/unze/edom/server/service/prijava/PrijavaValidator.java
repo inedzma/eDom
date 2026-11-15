@@ -22,7 +22,7 @@ public class PrijavaValidator {
     private static final int MAX_CLANOVA = 30;
     private static final int MAX_ISPITA = 100;
     private static final int MAX_MJESECI = 600;
-    private static final int MAX_UPIS_PUT = 10;
+    private static final int MAX_UPIS_PUT = 4;
 
     public void provjeri(Prijava p) {
 

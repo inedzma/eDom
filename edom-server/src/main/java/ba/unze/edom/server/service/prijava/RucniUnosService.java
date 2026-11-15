@@ -30,13 +30,22 @@ import java.util.UUID;
 /**
  * Prijava koju uposlenik unosi s papira.
  * Sve u jednoj transakciji: ako bilo šta ne valja, u bazi ne ostaje ništa.
+ *
+ * Pravila su ista kao za web prijavu: isti student (StudentEvidencijaService),
+ * ista potpunost i minimalna udaljenost (PrijavaService), isto bodovanje i
+ * validacija (BodovanjeService). Jedina namjerna razlika: sekretar može unijeti
+ * papirnu prijavu i kad je online konkurs zatvoren.
  */
 @Service
 @RequiredArgsConstructor
 public class RucniUnosService {
 
+    private static final String LICNA_KARTA = "[A-Za-z0-9]{1,20}";
+    private static final String TELEFON = "[0-9+()\\-\\s]{6,30}";
+
     private final StudentEvidencijaService studentEvidencija;
     private final RegistracijaService registracijaService;
+    private final PrijavaService prijavaService;
     private final StudentRepository studentRepository;
     private final KorisnikRepository korisnikRepository;
     private final PrijavaRepository prijavaRepository;
@@ -70,9 +79,11 @@ public class RucniUnosService {
 
         provjeriStudenta(z.student());
         studentRepository.findByJmbg(z.student().jmbg())
-                .ifPresent(s -> provjeriDuplikat(s.getIdStudent(), z.prijava().akademskaGodina()));
+                .ifPresent(s -> zapocetaNaWebu(s.getIdStudent(), z.prijava().akademskaGodina()));
 
-        Prijava p = napravi(z);
+        Prijava p = new Prijava();
+        popuni(p, z);
+        prijavaService.provjeriPotpunost(p, null);   // lične podatke je već provjerio provjeriStudenta
 
         Integer idStatusa = z.student().idSocijalnogStatusa();
         if (idStatusa != null) {
@@ -89,8 +100,14 @@ public class RucniUnosService {
         if (s.brojLicneKarte() == null || s.brojLicneKarte().isBlank()) {
             throw new PrijavaException("Broj lične karte je obavezan.");
         }
+        if (!s.brojLicneKarte().trim().matches(LICNA_KARTA)) {
+            throw new PrijavaException("Broj lične karte smije imati samo slova i brojeve.");
+        }
         if (s.telefonRoditelja() == null || s.telefonRoditelja().isBlank()) {
             throw new PrijavaException("Telefon roditelja je obavezan.");
+        }
+        if (!s.telefonRoditelja().trim().matches(TELEFON)) {
+            throw new PrijavaException("Neispravan broj telefona.");
         }
         if (!Opcine.postoji(s.kanton(), s.opcina())) {
             throw new PrijavaException("Odaberite kanton i općinu iz liste.");
@@ -113,13 +130,21 @@ public class RucniUnosService {
             noviNalog = true;
         }
 
-        // 3. jedna prijava po akademskoj godini
+        // 3. jedna prijava po akademskoj godini; prijava započeta na webu ("u izradi")
+        //    se preuzima: podaci s papira je zamjenjuju, već priloženi dokumenti ostaju
         PrijavaUnosDTO pz = z.prijava();
-        provjeriDuplikat(student.getIdStudent(), pz.akademskaGodina());
+        Prijava p = zapocetaNaWebu(student.getIdStudent(), pz.akademskaGodina()).orElse(null);
+        if (p != null) {
+            p.getKriteriji().clear();
+            prijavaRepository.saveAndFlush(p);
+        } else {
+            p = new Prijava();
+            p.setStudent(student);
+        }
 
-        Prijava p = napravi(z);
-        p.setStudent(student);
+        popuni(p, z);
         p.setSocijalniStatus(student.getSocijalniStatus());
+        prijavaService.provjeriPotpunost(p, student);
 
         // 4. bodovanje = ujedno i validacija; nevalidni podaci poništavaju cijeli unos
         RezultatBodovanja r = bodovanjeService.izracunaj(p);
@@ -136,38 +161,47 @@ public class RucniUnosService {
 
     // ---------- zajedničko za pregled i unos ----------
 
-    private void provjeriDuplikat(Integer idStudenta, Integer akademskaGodina) {
-        if (prijavaRepository.findByStudent_IdStudentAndAkademskaGodina(idStudenta, akademskaGodina).isPresent()) {
+    /**
+     * Prijava koju je student započeo na webu, ako postoji.
+     * Podnesena prijava (bilo koji drugi status) se ne smije zamijeniti.
+     */
+    private Optional<Prijava> zapocetaNaWebu(Integer idStudenta, Integer akademskaGodina) {
+        var postojeca = prijavaRepository.findByStudent_IdStudentAndAkademskaGodina(idStudenta, akademskaGodina);
+        if (postojeca.isEmpty()) return Optional.empty();
+
+        Prijava p = postojeca.get();
+        String status = p.getStatus() != null ? p.getStatus().getNaziv() : null;
+        if (!Statusi.U_IZRADI.equals(status)) {
             throw new PrijavaException("Student već ima prijavu za akademsku " + akademskaGodina + ". godinu.");
         }
+        return postojeca;
     }
 
-    /** Prijava s kriterijima i dokumentima, bez studenta. Ne snima se ovdje. */
-    private Prijava napravi(RucniUnosDTO z) {
+    /** Upisuje podatke s papira u prijavu (novu ili započetu na webu). Ne snima se ovdje. */
+    private void popuni(Prijava p, RucniUnosDTO z) {
         PrijavaUnosDTO pz = z.prijava();
 
-        Integer upisPut = pz.upisGodinePut() != null ? pz.upisGodinePut() : 1;
-        if (upisPut < 1) {
-            throw new PrijavaException("Broj upisa godine mora biti najmanje 1.");
-        }
+        // ista provjera kao web korak 2
+        prijavaService.provjeriUdaljenost(pz.udaljenostKm());
 
-        Prijava p = new Prijava();
         p.setAkademskaGodina(pz.akademskaGodina());
         p.setDatumPrijave(LocalDate.now());
         p.setStatus(statusRepository.findByNaziv(Statusi.NA_PREGLEDU)
                 .orElseThrow(() -> new IllegalStateException("Status 'na pregledu' ne postoji.")));
         p.setGodinaStudija(z.student().godinaStudija());
-        p.setUpisGodinePut(upisPut);
+        // granice (1–4) provjerava PrijavaValidator, isto kao za web
+        p.setUpisGodinePut(pz.upisGodinePut() != null ? pz.upisGodinePut() : 1);
         p.setProsjek(pz.prosjek());
         p.setPolozeniIspiti(pz.polozeniIspiti());
         p.setBrojClanovaDomacinstva(pz.brojClanovaDomacinstva());
         p.setUkupnaPrimanja(pz.ukupnaPrimanja());
         p.setUdaljenostKm(pz.udaljenostKm());
-        p.setNapomena(pz.napomena());
+        p.setNapomena(NapomenaPrijaveService.ocisti(pz.napomena()));
 
-        // kriteriji, po šifri; bodove nosi baza, ne desktop
+        // kriteriji, po šifri; bodove nosi baza, ne desktop; samo aktivni, kao na webu
         for (KriterijUnosDTO kz : nullSafe(z.kriteriji())) {
             VrstaKriterija v = vrstaKriterijaRepository.findBySifra(kz.sifra())
+                    .filter(VrstaKriterija::isAktivan)
                     .orElseThrow(() -> new PrijavaException("Nepoznat kriterij: " + kz.sifra()));
 
             if (v.isTraziParametar() && kz.parametar() == null) {
@@ -194,8 +228,6 @@ public class RucniUnosService {
             d.setDokumentB64(dz.b64());
             p.dodajDokument(d);
         }
-
-        return p;
     }
 
     private static <T> List<T> nullSafe(List<T> l) {

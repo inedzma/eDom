@@ -29,6 +29,13 @@ public class RegistracijaWebController {
                               BindingResult greske,
                               Model model) {
 
+        // brucoš možda još nema indeks; od 2. godine indeks je obavezan
+        if (zahtjev.godinaStudija() != null && zahtjev.godinaStudija() >= 2
+                && (zahtjev.brojIndeksa() == null || zahtjev.brojIndeksa().isBlank())) {
+            greske.rejectValue("brojIndeksa", "indeks.obavezan",
+                    "Broj indeksa je obavezan od 2. godine studija.");
+        }
+
         if (greske.hasErrors()) {
             return "registracija";
         }
