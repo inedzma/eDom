@@ -6,6 +6,22 @@
     <link rel="stylesheet" th:href="@{/css/student.css}">
     <link rel="stylesheet" th:href="@{/css/prijava.css}">
     <script th:src="@{/js/validacija.js}" defer></script>
+    <style>
+        /* OS RBiH: više perioda, za jednog ili oba roditelja */
+        .period-red { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin-bottom: 10px;
+            padding: 10px 12px; border: 1px solid rgba(0, 0, 0, .12); border-radius: 10px; }
+        .period-red label { display: flex; flex-direction: column; gap: 4px; font-size: .92em; }
+        .period-ukloni[hidden], .period-dodaj[hidden] { display: none !important; }
+        .period-naslov { grid-column: 1 / -1; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .period-roditelj { font: inherit; font-weight: 400; padding: 2px 6px; border-radius: 6px; }
+        .period-ukloni { margin-left: auto; border: none; background: none; font-size: 1.3rem; line-height: 1;
+            cursor: pointer; color: #b42318; padding: 0 4px; }
+        .period-greska { color: #b42318; }
+        .period-dodaj { border: 1px dashed currentColor; background: none; border-radius: 8px; padding: 6px 12px;
+            cursor: pointer; font: inherit; color: inherit; margin-bottom: 8px; }
+        .period-zbir { display: block; font-weight: 600; }
+        @media (max-width: 520px) { .period-red { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body class="app">
 
@@ -67,13 +83,33 @@
                                 <span class="krit-doc">Potreban dokument</span>
                             </label>
 
-                            <!-- period se ne snima: služi samo da se izračuna broj punih mjeseci -->
+                            <!-- periodi se ne snimaju (polja nemaju name): služe samo da se izračuna ukupan
+                                 broj punih mjeseci za jednog ili oba roditelja; na server ide samo zbir u polju ispod -->
                             <div class="krit-param krit-period" th:if="${k.traziPeriod}">
-                                <label th:for="${'od' + stat.index}">Početak učešća</label>
-                                <input type="date" class="period-od" th:id="${'od' + stat.index}">
-                                <label th:for="${'do' + stat.index}">Kraj učešća</label>
-                                <input type="date" class="period-do" th:id="${'do' + stat.index}">
-                                <small class="hint">Broj punih mjeseci se izračuna sam (0,3 boda po mjesecu, započeti mjesec se ne računa).</small>
+                                <div class="period-lista"></div>
+
+                                <button type="button" class="period-dodaj">+ Dodaj period</button>
+                                <small class="hint period-zbir" aria-live="polite"></small>
+                                <small class="hint">Svaki period učešća upišite posebno, za jednog ili za oba roditelja.
+                                    Mjeseci svih perioda se sabiraju; započeti mjesec se ne računa (0,3 boda po mjesecu).
+                                    Periode provjerava administracija na osnovu priloženih uvjerenja.</small>
+
+                                <!-- jedan period; JavaScript ga kopira za svaki novi red -->
+                                <template class="period-sablon">
+                                    <div class="period-red">
+                                        <div class="period-naslov">
+                                            <span class="period-broj">Period</span>
+                                            <select class="period-roditelj" aria-label="Roditelj">
+                                                <option value="1">prvi roditelj</option>
+                                                <option value="2">drugi roditelj</option>
+                                            </select>
+                                            <button type="button" class="period-ukloni" title="Ukloni period"
+                                                    aria-label="Ukloni period">×</button>
+                                        </div>
+                                        <label>Početak učešća <input type="date" class="period-od"></label>
+                                        <label>Kraj učešća <input type="date" class="period-do"></label>
+                                    </div>
+                                </template>
                             </div>
 
                             <div class="krit-param" th:if="${k.traziParametar}">
@@ -164,17 +200,110 @@
             if (doD.getUTCDate() < od.getUTCDate()) m--;
             return Math.max(0, m);
         }
+        const MAX_PERIODA = 10;
+
         form.querySelectorAll('.krit-period').forEach(function (per) {
-            const od = per.querySelector('.period-od');
-            const doD = per.querySelector('.period-do');
-            const broj = per.closest('.krit').querySelector('input[type=number]');
-            function racunaj() {
-                if (broj && od.valueAsDate && doD.valueAsDate) {
-                    broj.value = punihMjeseci(od.valueAsDate, doD.valueAsDate);
-                }
+            const krit = per.closest('.krit');
+            const check = krit.querySelector('.krit-check');
+            const broj = krit.querySelector('input[type=number]');
+            const lista = per.querySelector('.period-lista');
+            const dodaj = per.querySelector('.period-dodaj');
+            const zbir = per.querySelector('.period-zbir');
+            const sablon = per.querySelector('.period-sablon');
+
+            function redovi() {
+                return Array.from(lista.querySelectorAll('.period-red'));
             }
-            od.addEventListener('change', racunaj);
-            doD.addEventListener('change', racunaj);
+
+            // "Period 1, 2, 3…"; jedini period se ne može ukloniti
+            function prenumerisi() {
+                const r = redovi();
+                r.forEach(function (red, i) {
+                    red.querySelector('.period-broj').textContent = 'Period ' + (i + 1);
+                    red.querySelector('.period-ukloni').hidden = r.length === 1;
+                });
+                dodaj.hidden = r.length >= MAX_PERIODA;
+            }
+
+            function dodajRed(roditelj) {
+                const red = sablon.content.firstElementChild.cloneNode(true);
+                red.querySelector('.period-roditelj').value = roditelj;
+                red.querySelectorAll('input, select').forEach(function (i) {
+                    i.addEventListener('change', racunaj);
+                });
+                red.querySelector('.period-ukloni').addEventListener('click', function () {
+                    red.remove();
+                    prenumerisi();
+                    racunaj();
+                });
+                lista.appendChild(red);
+                prenumerisi();
+                return red;
+            }
+
+            // greška blokira slanje forme dok je kriterij označen
+            function greska(poruka) {
+                zbir.textContent = poruka;
+                zbir.classList.toggle('period-greska', !!poruka);
+                if (broj) broj.setCustomValidity(poruka && check.checked ? poruka : '');
+            }
+
+            // zbir mjeseci svih perioda ide u polje koje se šalje na server
+            function racunaj() {
+                const periodi = [];
+                let poruka = '';
+
+                redovi().forEach(function (red, i) {
+                    const od = red.querySelector('.period-od').valueAsDate;
+                    const doD = red.querySelector('.period-do').valueAsDate;
+                    if (!od || !doD) return;                         // period još nije do kraja unesen
+                    if (doD < od) {
+                        poruka = poruka || 'Period ' + (i + 1) + ': kraj učešća ne može biti prije početka.';
+                        return;
+                    }
+                    periodi.push({
+                        broj: i + 1,
+                        roditelj: red.querySelector('.period-roditelj').value,
+                        od: od, doD: doD,
+                        mjeseci: punihMjeseci(od, doD)
+                    });
+                });
+
+                // isti roditelj ne može dvaput biti u OS RBiH u isto vrijeme
+                for (let a = 0; a < periodi.length && !poruka; a++) {
+                    for (let b = a + 1; b < periodi.length && !poruka; b++) {
+                        const p = periodi[a], q = periodi[b];
+                        if (p.roditelj === q.roditelj && p.od <= q.doD && q.od <= p.doD) {
+                            poruka = 'Periodi ' + p.broj + ' i ' + q.broj + ' se preklapaju za istog roditelja.';
+                        }
+                    }
+                }
+
+                if (poruka) { greska(poruka); return; }
+                greska('');
+
+                if (periodi.length === 0) {
+                    zbir.textContent = '';
+                    if (broj && broj.dataset.izDatuma) { broj.value = ''; delete broj.dataset.izDatuma; }
+                    return;
+                }
+
+                const m = periodi.map(function (p) { return p.mjeseci; });
+                const ukupno = m.reduce(function (a, b) { return a + b; }, 0);
+                if (broj) { broj.value = ukupno; broj.dataset.izDatuma = '1'; }
+                zbir.textContent = m.length > 1
+                    ? 'Ukupno punih mjeseci: ' + m.join(' + ') + ' = ' + ukupno
+                    : 'Ukupno punih mjeseci: ' + ukupno;
+            }
+
+            dodaj.addEventListener('click', function () {
+                const zadnji = redovi().slice(-1)[0];
+                const red = dodajRed(zadnji ? zadnji.querySelector('.period-roditelj').value : '1');
+                red.querySelector('.period-od').focus();
+            });
+            check.addEventListener('change', racunaj);
+
+            dodajRed('1');
         });
 
         // stanje učitavanja
