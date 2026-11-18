@@ -1,13 +1,94 @@
-spring.datasource.url=
-spring.datasource.username=
-spring.datasource.password=
+# =====================================================================
+#  E-Dom: primjer postavki servera
+#
+#  Kopirajte ovaj fajl u edom-server/src/main/resources/application.properties
+#  (ili pored jar fajla, pod istim imenom) i prilagodite vrijednosti.
+#
+#  Lozinke i tajni ključevi se NE upisuju ovdje, nego se zadaju kao
+#  varijable okruženja (DB_PASSWORD, MAIL_PASSWORD, JWT_SECRET ...).
+#  Zapis ${IME:podrazumijevano} znači: vrijednost varijable IME,
+#  a ako nije zadana, vrijednost iza dvotačke.
+# =====================================================================
 
+
+# ---------- Baza podataka (MySQL 8) ----------
+spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3306/edom?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Sarajevo}
+spring.datasource.username=${DB_USERNAME:edom}
+spring.datasource.password=${DB_PASSWORD}
+
+# Struktura baze se ne mijenja automatski: pri nadogradnji se pokreću SQL skripte.
 spring.jpa.hibernate.ddl-auto=validate
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.default_batch_fetch_size=50
 
-logging.level.org.springframework.security=DEBUG
-logging.level.org.springframework.web=DEBUG
+# Za razvoj se može uključiti ispis SQL upita (true); u radu ostaje false.
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=false
 
-edom.jwt.secret=
-edom.jwt.trajanje-sati=
+
+# ---------- Ispis u log ----------
+# Za razvoj: DEBUG. U radu: INFO (DEBUG ispisuje previše i otkriva detalje sistema).
+logging.level.org.springframework.security=INFO
+logging.level.org.springframework.web=INFO
+
+
+# ---------- Greške ----------
+# Poruka greške se prikazuje korisniku; tehnički detalji (stacktrace) nikad.
+spring.web.error.include-message=always
+spring.web.error.include-stacktrace=never
+
+
+# ---------- Prijava za desktop aplikaciju (JWT) ----------
+# Tajni ključ: najmanje 32 znaka, slučajno generisan, različit za svaku instalaciju.
+# Npr.:  openssl rand -base64 48
+edom.jwt.secret=${JWT_SECRET}
+edom.jwt.trajanje-sati=8
+
+
+# ---------- Adresa web aplikacije ----------
+# Koristi se u e-mailovima (linkovi za prijavu, obnovu lozinke).
+# U radu: javna adresa, npr. https://edom.unze.ba
+edom.web.url=${EDOM_WEB_URL:http://localhost:8080}
+
+
+# ---------- Dokumenti ----------
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=100MB
+edom.dokumenti.max-velicina-mb=2
+edom.dokumenti.max-sirina-px=1600
+
+
+# ---------- E-mail (SMTP) ----------
+# Primjer za Gmail: potrebna je lozinka aplikacije (Google račun → Sigurnost → Lozinke aplikacija).
+# U radu se preporučuje službeni e-mail Studentskog centra.
+spring.mail.host=${MAIL_HOST:smtp.gmail.com}
+spring.mail.port=${MAIL_PORT:587}
+spring.mail.username=${MAIL_USERNAME}
+spring.mail.password=${MAIL_PASSWORD}
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# Pošiljalac kakvog ga vidi student
+edom.mail.od=${MAIL_USERNAME}
+edom.mail.naziv=E-Dom Studentski centar
+
+# Adresa doma/administracije: prima obavijesti sistema
+edom.mail.dom=${EDOM_MAIL_ADMINISTRACIJA}
+
+# Adresa na koju stižu poruke s kontakt forme
+edom.kontakt.primalac=${EDOM_MAIL_ADMINISTRACIJA}
+
+
+# ---------- Rang lista (podrazumijevano; mijenja se i u Postavkama) ----------
+edom.rang.kapacitet=220
+edom.rang.udio-brucosa=0.35
+
+
+# ---------- Ugovor i revers ----------
+# Putanje su relativne u odnosu na folder iz kojeg se pokreće server.
+edom.obrasci.ugovor=data/obrasci/ugovor.docx
+edom.obrasci.revers=data/obrasci/revers.docx
+
+edom.ugovor.cijena=165,00
+edom.ugovor.direktor=Ime i prezime direktora
+edom.ugovor.period-od=01.10.
+edom.ugovor.period-do=15.07.
