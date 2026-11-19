@@ -103,6 +103,8 @@
     -fx-background-radius: 4;
     -fx-font-weight: bold;
     -fx-padding: 0 3;
+    -fx-text-fill: #0b3b47;   /* tekst ostaje taman */
+    -fx-fill: #0b3b47;        /* isto, ako je ime napisano kao Text */
 }
 
 /* =========================================================

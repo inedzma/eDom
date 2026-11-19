@@ -60,6 +60,12 @@
                           maxWidth="Infinity"
                           styleClass="nav-btn"/>
 
+            <ToggleButton text="Uplate"
+                          toggleGroup="$navGroup"
+                          onAction="#showUplate"
+                          maxWidth="Infinity"
+                          styleClass="nav-btn"/>
+
             <ToggleButton text="Postavke"
                           toggleGroup="$navGroup"
                           onAction="#showPostavke"

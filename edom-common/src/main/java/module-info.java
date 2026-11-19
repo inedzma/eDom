@@ -20,4 +20,5 @@ module ba.unze.edom.common {
     opens ba.unze.edom.common.dto.sobe;
     exports ba.unze.edom.common.dto.opste;
     opens ba.unze.edom.common.dto.opste;
+    exports ba.unze.edom.common.dto.uplate;
 }

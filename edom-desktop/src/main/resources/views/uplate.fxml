@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.SVGPath?>
+<BorderPane styleClass="pr-root"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.UplateController">
+
+    <stylesheets>
+        <URL value="@../styles/prijave.css"/>
+        <URL value="@../styles/uplate.css"/>
+    </stylesheets>
+
+    <!-- ================= ZAGLAVLJE ================= -->
+    <top>
+        <VBox spacing="16">
+            <padding><Insets top="24" right="28" bottom="8" left="28"/></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <VBox spacing="4">
+                    <Label text="Uplate" styleClass="pr-naslov"/>
+                    <Label fx:id="lblPodnaslov" styleClass="pr-podnaslov"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Excel" onAction="#onExcel" styleClass="pr-btn-sekundarno"/>
+                <Button text="PDF" onAction="#onPdf" styleClass="pr-btn-sekundarno"/>
+                <Button text="✉  Podsjetnik dužnicima" onAction="#onPodsjetnik" styleClass="pr-btn-primarno"/>
+                <ComboBox fx:id="cmbGodina" styleClass="pr-combo" prefWidth="130"/>
+                <Button text="⟳" onAction="#onOsvjezi" styleClass="pr-btn-ikona">
+                    <tooltip><Tooltip text="Osvježi"/></tooltip>
+                </Button>
+            </HBox>
+
+            <!-- filter po stanju -->
+            <HBox fx:id="boxFilteri" spacing="10" alignment="CENTER_LEFT"/>
+        </VBox>
+    </top>
+
+    <!-- ================= TABELA ================= -->
+    <center>
+        <VBox styleClass="pr-kartica" spacing="14">
+            <BorderPane.margin><Insets top="8" right="28" bottom="24" left="28"/></BorderPane.margin>
+
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <HBox styleClass="pr-pretraga" alignment="CENTER_LEFT" spacing="6" HBox.hgrow="ALWAYS" maxWidth="460">
+                    <SVGPath styleClass="pr-pretraga-ikona"
+                             content="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    <TextField fx:id="txtPretraga" styleClass="pr-pretraga-polje" HBox.hgrow="ALWAYS"
+                               promptText="Pretraga: ime, prezime ili broj sobe…"/>
+                </HBox>
+
+                <MenuButton fx:id="mnuSortiraj" text="Sortiraj" styleClass="pr-meni">
+                    <items>
+                        <RadioMenuItem fx:id="sortPrezime" text="Prezime (A–Ž)" selected="true"/>
+                        <RadioMenuItem fx:id="sortSoba" text="Broj sobe"/>
+                        <RadioMenuItem fx:id="sortDug" text="Najveći dug prvo"/>
+                    </items>
+                </MenuButton>
+
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Klik na mjesec: evidentiranje uplate · desni klik na studenta: podsjetnik" styleClass="pr-sitno"/>
+            </HBox>
+
+            <TableView fx:id="tabela" styleClass="pr-tabela" VBox.vgrow="ALWAYS">
+                <columnResizePolicy>
+                    <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+            </TableView>
+
+            <!-- legenda -->
+            <HBox spacing="18" alignment="CENTER_LEFT">
+                <Label text="✔ 03.10." styleClass="up-celija, up-placeno"/>
+                <Label text="plaćeno (datum uplate)" styleClass="pr-sitno"/>
+                <Label text="✖" styleClass="up-celija, up-dug"/>
+                <Label text="nije plaćeno" styleClass="pr-sitno"/>
+                <Label text="•" styleClass="up-celija, up-ceka"/>
+                <Label text="tekući ili budući mjesec" styleClass="pr-sitno"/>
+                <Label text="–" styleClass="up-celija, up-van"/>
+                <Label text="student tada nije bio u domu" styleClass="pr-sitno"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

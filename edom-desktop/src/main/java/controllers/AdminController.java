@@ -73,6 +73,11 @@ public class AdminController {
     }
 
     @FXML
+    public void showUplate(ActionEvent actionEvent) {
+        loadView("/views/uplate.fxml");
+    }
+
+    @FXML
     public void showPostavke(ActionEvent event) {
         panelOtvoren = false;
         PostavkePanel panel = new PostavkePanel();

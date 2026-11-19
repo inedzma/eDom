@@ -1,0 +1,18 @@
+/* =========================================================
+   E-Dom – ekran "Uplate" (dodatak uz prijave.css)
+   ========================================================= */
+
+/* jedan mjesec u tabeli: mala pilula */
+.up-celija {
+    -fx-padding: 3 9; -fx-background-radius: 999;
+    -fx-font-size: 12px; -fx-font-weight: 700;
+}
+.up-placeno { -fx-background-color: #e2f6ef; -fx-text-fill: #1e7a4f; }
+.up-dug     { -fx-background-color: #fdecea; -fx-text-fill: #b3261e; }
+.up-ceka    { -fx-text-fill: #93a6ae; }
+.up-van     { -fx-text-fill: #cfdde1; }
+
+/* kolone mjeseci: sadržaj u sredini, ruka kao pokazivač */
+.pr-tabela .table-cell.up-mjesec { -fx-alignment: center; -fx-cursor: hand; }
+.pr-tabela .table-cell.up-mjesec:hover { -fx-background-color: #eef7f5; }
+.pr-tabela .table-cell.up-centar { -fx-alignment: center; }
