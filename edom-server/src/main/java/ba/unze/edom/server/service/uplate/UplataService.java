@@ -115,6 +115,55 @@ public class UplataService {
         return new Red(s.getIdStudent(), s.getPrezime() + " " + s.getIme(), b.soba, celije, dug);
     }
 
+    // ---------- za studenta (web, Moj smještaj) ----------
+
+    /**
+     * Uplate prijavljenog studenta u tekućoj akademskoj godini: mjeseci od useljenja
+     * do tekućeg mjeseca. Rok za uplatu je kraj mjeseca (poslije toga mjesec je dug,
+     * isto kao u tabeli na desktopu). Prazno ako student ove godine nije useljen.
+     */
+    @Transactional(readOnly = true)
+    public Optional<MojeUplate> zaStudenta(Integer idStudenta) {
+        if (idStudenta == null) return Optional.empty();
+        UplateTabelaDTO t = tabela(null);
+        YearMonth danas = YearMonth.now(ZONA);
+
+        return t.redovi().stream()
+                .filter(r -> r.idStudent() == idStudenta)
+                .findFirst()
+                .map(r -> {
+                    List<MjesecUplate> mjeseci = r.celije().stream()
+                            .filter(c -> !UplateTabelaDTO.NIJE_U_DOMU.equals(c.stanje()))
+                            .filter(c -> !YearMonth.parse(c.mjesec()).isAfter(danas))
+                            .map(c -> {
+                                YearMonth m = YearMonth.parse(c.mjesec());
+                                return new MjesecUplate(naziv(m), c.stanje(), c.datum(), m.atEndOfMonth());
+                            })
+                            .toList();
+                    MjesecUplate sljedeci = mjeseci.stream()
+                            .filter(m -> UplateTabelaDTO.CEKA.equals(m.stanje()))
+                            .findFirst().orElse(null);
+                    return new MojeUplate(t.akademskaGodina(), mjeseci, r.dug(), sljedeci);
+                });
+    }
+
+    /** Stanje uplata jednog studenta za stranicu Moj smještaj. */
+    public record MojeUplate(int akademskaGodina, List<MjesecUplate> mjeseci, int dug, MjesecUplate sljedeci) {
+        public boolean imaDug() { return dug > 0; }
+
+        /** "oktobar 2026, novembar 2026" */
+        public String dugMjeseci() {
+            return String.join(", ", mjeseci.stream().filter(MjesecUplate::nijePlaceno).map(MjesecUplate::naziv).toList());
+        }
+    }
+
+    /** @param rok zadnji dan mjeseca do kojeg treba platiti */
+    public record MjesecUplate(String naziv, String stanje, LocalDate datumUplate, LocalDate rok) {
+        public boolean placeno()    { return UplateTabelaDTO.PLACENO.equals(stanje); }
+        public boolean nijePlaceno() { return UplateTabelaDTO.DUG.equals(stanje); }
+        public boolean ceka()       { return UplateTabelaDTO.CEKA.equals(stanje); }
+    }
+
     // ---------- evidencija ----------
 
     /** Označi mjesec kao plaćen; ako je već označen, samo se ispravi datum. */

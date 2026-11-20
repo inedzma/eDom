@@ -257,3 +257,9 @@ body.app{display:flex;flex-direction:column;min-height:100vh}
 .konkurs-status{display:inline-block;margin-top:10px;padding:6px 14px;border-radius:999px;font-weight:700;font-size:14px}
 .konkurs-status.ks--da{background:var(--mint-soft);color:var(--mint-dark)}
 .konkurs-status.ks--ne{background:#fdecea;color:#b3261e}
+
+/* ===== Uputa za uplatu (Moj smještaj) ===== */
+.upl-naslov { margin: 22px 0 4px; font-size: 1.05rem; }
+.upl-uvod { margin: 0 0 12px; color: #5c7380; font-size: 14px; }
+.upl-slika { display: block; width: 100%; max-width: 760px; height: auto;
+    border: 1px solid #d5e2e5; border-radius: 8px; background: #fff; }

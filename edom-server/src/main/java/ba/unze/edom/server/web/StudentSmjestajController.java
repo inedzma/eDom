@@ -4,6 +4,7 @@ import ba.unze.edom.server.dto.ZeljaForma;
 import ba.unze.edom.server.exception.PrijavaException;
 import ba.unze.edom.server.security.KorisnikPrincipal;
 import ba.unze.edom.server.service.sobe.StudentSmjestajService;
+import ba.unze.edom.server.service.uplate.UplataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -11,17 +12,21 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/** Stranica "Moj smještaj": soba i cimeri, te želja (prije dodjele ili kao zahtjev za promjenu). */
+/** Stranica "Moj smještaj": soba i cimeri, uplate, te želja (prije dodjele ili kao zahtjev za promjenu). */
 @Controller
 @RequestMapping("/student/smjestaj")
 @RequiredArgsConstructor
 public class StudentSmjestajController {
 
     private final StudentSmjestajService service;
+    private final UplataService uplataService;
 
     @GetMapping
     public String stranica(@AuthenticationPrincipal KorisnikPrincipal k, Model model) {
         model.addAttribute("stanje", service.stanje(k.getIdStudenta()).orElse(null));
+        // null = student ove godine nije useljen, pa nema šta plaćati
+        var uplate = uplataService.zaStudenta(k.getIdStudenta()).orElse(null);
+        model.addAttribute("uplate", uplate);
         if (!model.containsAttribute("zelja")) model.addAttribute("zelja", service.zelja(k.getIdStudenta()));
         return "student/smjestaj";
     }
